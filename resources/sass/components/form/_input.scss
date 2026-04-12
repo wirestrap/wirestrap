@@ -1,0 +1,137 @@
+.ws-form-input {
+    --ws-form-input-padding-x: var(--ws-spacing-6);
+    --ws-form-input-padding-y: var(--ws-spacing-3);
+    --ws-form-input-font-size: var(--ws-font-size-base);
+    --ws-form-input-line-height: var(--ws-line-height-base);
+    --ws-form-input-color: var(--ws-body-color);
+    --ws-form-input-bg: var(--ws-input-bg);
+    --ws-form-input-border-color: var(--ws-border-color);
+    --ws-form-input-border-radius: var(--ws-border-radius);
+    --ws-form-input-disabled-opacity: .5;
+    --ws-form-input-disabled-cursor: not-allowed;
+    --ws-form-input-placeholder-color: var(--ws-muted);
+    --ws-form-input-focus-border-color: var(--ws-focus-color);
+    --ws-form-input-icon-padding: var(--ws-spacing-20);
+}
+
+// Input
+.ws-form-input {
+    display: block;
+    width: 100%;
+    padding: var(--ws-form-input-padding-y) var(--ws-form-input-padding-x);
+    font-size: var(--ws-form-input-font-size);
+    line-height: var(--ws-form-input-line-height);
+    color: var(--ws-form-input-color);
+    background-color: var(--ws-form-input-bg);
+    background-clip: padding-box;
+    border: 1px solid var(--ws-form-input-border-color);
+    border-radius: var(--ws-form-input-border-radius);
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    appearance: none;
+
+    &::placeholder {
+        color: var(--ws-form-input-placeholder-color);
+        opacity: 1;
+    }
+
+    &:focus {
+        outline: 0;
+        border-color: var(--ws-form-input-focus-border-color);
+    }
+
+    &:disabled {
+        opacity: var(--ws-form-input-disabled-opacity);
+        cursor: var(--ws-form-input-disabled-cursor);
+    }
+
+    &.ws-form-invalid {
+        border-color: var(--ws-danger);
+    }
+}
+
+// Icon wrapper (non-floating)
+.ws-form-input-wrapper {
+    position: relative;
+
+    > input.ws-form-has-icon-start {
+        padding-left: var(--ws-form-input-icon-padding);
+    }
+
+    > input.ws-form-has-icon-end {
+        padding-right: var(--ws-form-input-icon-padding);
+    }
+}
+
+// Icon
+.ws-form-input-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    display: inline-flex;
+    align-items: center;
+
+    &.ws-form-input-icon-start {
+        left: var(--ws-spacing-6);
+    }
+
+    &.ws-form-input-icon-end {
+        right: var(--ws-spacing-6);
+    }
+}
+
+// Password toggle
+.ws-form-input-password-toggle {
+    pointer-events: auto;
+    appearance: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+    line-height: 1;
+}
+
+// Floating overrides
+.ws-form-floating {
+    --ws-form-input-icon-padding: var(--ws-spacing-20);
+
+    > .ws-form-input {
+        height: var(--ws-form-floating-height);
+        min-height: var(--ws-form-floating-height);
+        padding: var(--ws-form-floating-padding-y) var(--ws-form-floating-padding-x) .25rem;
+    }
+
+    > .ws-form-input:focus ~ .ws-form-label,
+    > .ws-form-input:not(:placeholder-shown) ~ .ws-form-label,
+    > .ws-form-input:-webkit-autofill ~ .ws-form-label {
+        opacity: var(--ws-form-floating-label-opacity);
+        transform: scale(.75) translateY(-.65rem) translateX(.15rem);
+    }
+
+    > .ws-form-input.ws-form-has-icon-start {
+        padding-left: var(--ws-form-input-icon-padding);
+    }
+
+    > .ws-form-input.ws-form-has-icon-end {
+        padding-right: var(--ws-form-input-icon-padding);
+    }
+
+    &.ws-form-has-icon-start > .ws-form-label {
+        padding-left: var(--ws-form-input-icon-padding);
+    }
+
+    &.ws-form-has-icon-start > .ws-form-input:focus ~ .ws-form-label,
+    &.ws-form-has-icon-start > .ws-form-input:not(:placeholder-shown) ~ .ws-form-label,
+    &.ws-form-has-icon-start > .ws-form-input:-webkit-autofill ~ .ws-form-label {
+        transform: scale(.75) translateY(-.65rem) translate(.7rem);
+    }
+
+    &.ws-form-has-icon-end > .ws-form-label {
+        padding-right: var(--ws-form-input-icon-padding);
+    }
+
+    > .ws-form-input-icon {
+        z-index: 4;
+    }
+}

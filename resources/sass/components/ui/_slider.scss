@@ -1,0 +1,83 @@
+.ws-slider {
+    --ws-slider-columns: 3;
+    --ws-slider-gap: var(--ws-spacing-4);
+    --ws-slider-arrow-size: 2rem;
+    --ws-slider-arrow-color: var(--ws-body-color);
+    --ws-slider-arrow-bg: var(--ws-body-bg);
+    --ws-slider-arrow-hover-bg: var(--ws-tertiary-bg);
+    --ws-slider-arrow-border-color: var(--ws-border-color);
+    --ws-slider-arrow-border-radius: var(--ws-border-radius);
+    --ws-slider-slide-transition: transform 300ms ease;
+}
+
+.ws-slider {
+    display: flex;
+    align-items: center;
+    gap: var(--ws-slider-gap);
+
+    .ws-slider-track {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        padding: 2px;
+        container-type: inline-size;
+
+        .ws-slider-inner {
+            display: flex;
+            gap: var(--ws-slider-gap);
+            transition: var(--ws-slider-slide-transition);
+            will-change: transform;
+
+            .ws-slider-slide {
+                flex: 0 0 calc(
+                    (100cqi - (var(--ws-slider-columns) - 1) * var(--ws-slider-gap))
+                    / var(--ws-slider-columns)
+                );
+            }
+        }
+    }
+
+    .ws-slider-arrow {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: var(--ws-slider-arrow-size);
+        height: var(--ws-slider-arrow-size);
+        background: var(--ws-slider-arrow-bg);
+        border: 1px solid var(--ws-slider-arrow-border-color);
+        border-radius: var(--ws-slider-arrow-border-radius);
+        color: var(--ws-slider-arrow-color);
+        cursor: pointer;
+        transition: opacity .1s ease, background-color .1s ease-in-out;
+
+        &:hover {
+            background-color: var(--ws-slider-arrow-hover-bg);
+        }
+
+        &:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        &.ws-slider-arrow-prev::before {
+            content: '';
+            display: inline-block;
+            width: .4rem;
+            height: .4rem;
+            border-left: 1.5px solid currentColor;
+            border-bottom: 1.5px solid currentColor;
+            transform: rotate(45deg) translateX(1px);
+        }
+
+        &.ws-slider-arrow-next::before {
+            content: '';
+            display: inline-block;
+            width: .4rem;
+            height: .4rem;
+            border-right: 1.5px solid currentColor;
+            border-top: 1.5px solid currentColor;
+            transform: rotate(45deg) translateX(-1px);
+        }
+    }
+}

@@ -1,0 +1,18 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - vendor/nesbot/carbon/extension.neon
+    - phpstan-baseline.neon
+
+parameters:
+    parallel:
+        maximumNumberOfProcesses: 3
+        jobSize: 20
+
+    paths:
+        - src
+
+    level: 8
+
+    phpVersion: 80100
+
+    ignoreErrors:

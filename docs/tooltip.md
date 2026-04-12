@@ -1,0 +1,44 @@
+# Tooltip
+
+Floating tooltip built on `@floating-ui/dom`. Wraps any trigger element. Focusing an element inside the slot keeps the tooltip open.
+
+## Usage
+
+```blade
+<x-wirestrap::tooltip content="Save your changes">
+    <button type="button">Save</button>
+</x-wirestrap::tooltip>
+```
+
+```blade
+{{-- Rich content via slot; click trigger --}}
+<x-wirestrap::tooltip id="info-tip" placement="right" trigger="click">
+    <span>?</span>
+
+    <x-slot:content>
+        <strong>Required.</strong> Must be unique across the workspace.
+    </x-slot:content>
+</x-wirestrap::tooltip>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `id` | `string\|null` | `null` | Element id. Required when using append-body or `$wirestrap.tooltip`. |
+| `content` | `slot\|string` | `''` | Tooltip text. Use the content slot for HTML. |
+| `placement` | `string` | `config` | Preferred placement: top, bottom, left, right, and -start/-end variants. Flips if out of bounds. |
+| `trigger` | `string` | `config` | Show trigger: hover or click. |
+| `arrow` | `bool` | `true` | Show directional arrow. |
+| `append-body` | `bool` | `config` | Teleport to `<body>` to avoid overflow/z-index issues. Requires id. |
+| `offset-distance` | `int` | `config` | Distance between trigger and tooltip in px. |
+| `offset-skidding` | `int` | `config` | Lateral offset in px. |
+| `position` | `string` | `config` | CSS positioning strategy: absolute or fixed. |
+
+## $wirestrap.tooltip
+
+| Method | Description |
+|--------|-------------|
+| `$wirestrap.tooltip.show(id)` | Show tooltip. |
+| `$wirestrap.tooltip.hide(id)` | Hide tooltip. |
+| `$wirestrap.tooltip.toggle(id)` | Toggle tooltip. |

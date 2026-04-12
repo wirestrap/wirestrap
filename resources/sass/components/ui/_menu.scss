@@ -1,0 +1,129 @@
+.ws-menu {
+    --ws-menu-transition-duration: 200ms;
+    --ws-menu-item-padding-x: var(--ws-spacing-4);
+    --ws-menu-link-padding-x: var(--ws-spacing-6);
+    --ws-menu-link-padding-y: var(--ws-spacing-3);
+    --ws-menu-link-gap: var(--ws-spacing-5);
+    --ws-menu-link-font-size: var(--ws-font-size-sm);
+    --ws-menu-link-border-radius: var(--ws-border-radius);
+    --ws-menu-link-hover-bg: var(--ws-tertiary-bg);
+    --ws-menu-link-hover-color: var(--ws-emphasis-color);
+    --ws-menu-sub-padding-start: var(--ws-spacing-17);
+    --ws-menu-sub-bullet-color: var(--ws-muted-bg);
+    --ws-menu-sub-bullet-size: 4px;
+}
+
+.ws-menu {
+    .ws-menu-item {
+        padding: 0;
+
+        & > * {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        & > *:not(.ws-menu-accordion) {
+            display: flex;
+            align-items: center;
+            gap: var(--ws-menu-link-gap);
+            padding: var(--ws-menu-link-padding-y) var(--ws-menu-link-padding-x);
+            color: currentColor;
+            text-decoration: none;
+            border-radius: var(--ws-menu-link-border-radius);
+            font-size: var(--ws-menu-link-font-size);
+
+            &:hover,
+            &:active {
+                background-color: var(--ws-menu-link-hover-bg);
+                color: var(--ws-menu-link-hover-color);
+            }
+        }
+    }
+
+    .ws-menu-accordion-panel > .ws-menu-item {
+        padding-left: 0;
+        padding-right: 0;
+
+        & > *:not(.ws-menu-accordion),
+        & > .ws-menu-accordion .ws-menu-accordion-trigger {
+            padding-left: var(--ws-menu-sub-padding-start);
+            position: relative;
+
+            &:before {
+                content: '';
+                position: absolute;
+                display: block;
+                width: var(--ws-menu-sub-bullet-size);
+                height: var(--ws-menu-sub-bullet-size);
+                border-radius: 50%;
+                background-color: var(--ws-menu-sub-bullet-color);
+                top: 50%;
+                transform: translateY(-50%);
+                left: var(--ws-spacing-8);
+                transition: background-color .1s ease-in-out;
+            }
+
+            &:hover:before {
+                background-color: var(--ws-primary);
+            }
+        }
+    }
+
+    .ws-menu-accordion-panel .ws-menu-accordion-panel > .ws-menu-item {
+        & > *:not(.ws-menu-accordion),
+        & > .ws-menu-accordion .ws-menu-accordion-trigger {
+            padding-left: calc(var(--ws-menu-sub-padding-start) + var(--ws-spacing-8));
+
+            &:before {
+                left: calc(var(--ws-spacing-8) * 2);
+            }
+        }
+    }
+
+    .ws-menu-accordion {
+        flex-direction: column;
+        align-items: start;
+        justify-content: center;
+
+        .ws-menu-accordion-trigger {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            position: relative;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            gap: var(--ws-menu-link-gap);
+            padding: var(--ws-menu-link-padding-y) calc(var(--ws-menu-link-padding-x) + 1rem) var(--ws-menu-link-padding-y) var(--ws-menu-link-padding-x);
+            color: currentColor;
+            font-size: var(--ws-menu-link-font-size);
+            border-radius: var(--ws-menu-link-border-radius);
+            transition: background-color .15s, color .15s;
+
+            &:hover {
+                background-color: var(--ws-menu-link-hover-bg);
+                color: var(--ws-menu-link-hover-color);
+            }
+
+            &:after {
+                content: '';
+                display: block;
+                width: .35rem;
+                height: .35rem;
+                position: absolute;
+                right: var(--ws-menu-link-padding-x);
+                top: 50%;
+                border-right: 1.5px solid currentColor;
+                border-bottom: 1.5px solid currentColor;
+                transform: translateY(-50%) rotate(45deg);
+                transition: transform .2s ease;
+            }
+
+            &.open::after {
+                transform: translateY(-50%) rotate(-135deg);
+            }
+        }
+    }
+}

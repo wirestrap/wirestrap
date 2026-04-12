@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (x.x.x)'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ inputs.version }}
+
+    steps:
+      - name: Normalize version
+        run: echo "VERSION=${VERSION#v}" >> $GITHUB_ENV
+
+      - name: Validate version format
+        run: |
+          if [[ ! "${{ env.VERSION }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version format. Expected x.x.x"
+            exit 1
+          fi
+
+      - name: Validate branch
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          if [[ ! "$BRANCH" =~ ^[0-9]+\.x$ ]]; then
+            echo "Error: Release must be triggered from a versioned branch (e.g. 0.x, 1.x). Current branch: $BRANCH"
+            exit 1
+          fi
+          MAJOR="${VERSION%%.*}"
+          BRANCH_MAJOR="${BRANCH%%.*}"
+          if [[ "$MAJOR" != "$BRANCH_MAJOR" ]]; then
+            echo "Error: Version major ($MAJOR) does not match branch major ($BRANCH_MAJOR)"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - name: Verify tag does not exist
+        run: |
+          git fetch --tags
+          if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
+            echo "Error: Tag v${{ env.VERSION }} already exists"
+            exit 1
+          fi
+
+      - name: Install Sass
+        run: npm install -g sass
+
+      - name: Compile SCSS
+        run: sass resources/sass/wirestrap.scss dist/wirestrap.css --style=compressed --no-source-map
+
+      - name: Commit and tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dist/wirestrap.css
+          git commit -m "release: v${{ env.VERSION }}"
+          git tag v${{ env.VERSION }}
+          git push origin HEAD v${{ env.VERSION }}
+
+      - name: Create release
+        run: gh release create "v${{ env.VERSION }}" --generate-notes --title "v${{ env.VERSION }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

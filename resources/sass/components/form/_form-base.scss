@@ -1,0 +1,64 @@
+// Label
+.ws-form-label {
+    display: inline-block;
+    margin-bottom: .5rem;
+    color: var(--ws-body-color);
+}
+
+// Floating wrapper
+.ws-form-floating {
+    --ws-form-floating-height: 3.5rem;
+    --ws-form-floating-padding-x: var(--ws-spacing-6);
+    --ws-form-floating-padding-y: var(--ws-spacing-8);
+    --ws-form-floating-label-opacity: .65;
+}
+
+.ws-form-floating {
+    position: relative;
+
+    > .ws-form-label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2;
+        height: 100%;
+        padding: var(--ws-form-floating-padding-y) var(--ws-form-floating-padding-x);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        pointer-events: none;
+        border: 1px solid transparent;
+        transform-origin: 0 0;
+        transition: opacity .1s ease-in-out, transform .1s ease-in-out;
+        line-height: 1.2;
+    }
+}
+
+// Label and icon opacity when field is disabled
+.ws-form-floating {
+    > .ws-form-input:disabled ~ .ws-form-label,
+    > .ws-form-textarea:disabled ~ .ws-form-label,
+    > .ws-form-input:disabled ~ .ws-form-input-icon,
+    > .ws-form-textarea:disabled ~ .ws-form-input-icon {
+        opacity: .5;
+    }
+}
+
+div:has(> .ws-form-input:disabled) > .ws-form-label,
+div:has(> .ws-form-textarea:disabled) > .ws-form-label,
+div:has(.ws-form-input-wrapper .ws-form-input:disabled) > .ws-form-label,
+div:has(.ws-form-textarea-wrapper .ws-form-textarea:disabled) > .ws-form-label {
+    opacity: .5;
+}
+
+.ws-form-input-wrapper:has(.ws-form-input:disabled) .ws-form-input-icon,
+.ws-form-textarea-wrapper:has(.ws-form-textarea:disabled) .ws-form-input-icon {
+    opacity: .5;
+}
+
+// Invalid feedback message
+.ws-form-feedback-invalid {
+    font-size: var(--ws-font-size-sm);
+    color: var(--ws-danger);
+    margin-top: .25rem;
+}

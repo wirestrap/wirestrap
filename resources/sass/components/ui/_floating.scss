@@ -1,0 +1,9 @@
+[data-ws-floatable],
+.ws-tooltip {
+    opacity: 0;
+    transition: opacity .15s ease-in-out;
+
+    &.show {
+        opacity: 1;
+    }
+}

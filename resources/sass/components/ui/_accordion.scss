@@ -1,0 +1,72 @@
+.ws-accordion {
+    --ws-accordion-border-color: var(--ws-border-color);
+    --ws-accordion-border-radius: var(--ws-border-radius);
+    --ws-accordion-padding-x: var(--ws-spacing-10);
+    --ws-accordion-padding-y: var(--ws-spacing-8);
+    --ws-accordion-active-color: var(--ws-primary);
+    --ws-accordion-invalid-color: var(--ws-danger);
+    --ws-accordion-transition-duration: 300ms;
+}
+
+// Container
+.ws-accordion {
+    overflow: hidden;
+    border-bottom: 1px solid var(--ws-accordion-border-color);
+
+    .ws-accordion-item {
+        &:not(:last-child) {
+            border-bottom: 1px solid var(--ws-accordion-border-color);
+        }
+
+        .ws-accordion-header {
+            margin: 0;
+
+            .ws-accordion-button {
+                display: flex;
+                align-items: center;
+                width: 100%;
+                position: relative;
+                padding: var(--ws-accordion-padding-y) calc(var(--ws-accordion-padding-x) + 1rem) var(--ws-accordion-padding-y) var(--ws-accordion-padding-x);
+                background: none;
+                border: none;
+                text-align: left;
+                cursor: pointer;
+                gap: .5rem;
+                font-weight: 600;
+                color: var(--ws-muted);
+                transition: color linear var(--ws-accordion-transition-duration);
+
+                &.show {
+                    color: var(--ws-primary);
+                    transition: background-color linear var(--ws-accordion-transition-duration);
+                }
+
+                &::after {
+                    content: '';
+                    display: block;
+                    width: .5rem;
+                    height: .5rem;
+                    position: absolute;
+                    right: var(--ws-accordion-padding-x);
+                    top: 50%;
+                    border-right: 1px solid currentColor;
+                    border-bottom: 1px solid currentColor;
+                    transform: translateY(-50%) rotate(45deg);
+                    transition: transform var(--ws-accordion-transition-duration) ease;
+                }
+
+                &.show::after {
+                    transform: translateY(-50%) rotate(-135deg);
+                }
+
+                &.ws-accordion-button-invalid {
+                    color: var(--ws-accordion-invalid-color);
+                }
+            }
+        }
+
+        .ws-accordion-body {
+            padding: var(--ws-accordion-padding-y) var(--ws-accordion-padding-x);
+        }
+    }
+}

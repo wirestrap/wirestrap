@@ -1,0 +1,65 @@
+.ws-tooltip {
+    --ws-tooltip-bg: var(--ws-body-bg);
+    --ws-tooltip-color: var(--ws-body-color);
+    --ws-tooltip-border-color: var(--ws-border-color);
+    --ws-tooltip-border-radius: var(--ws-border-radius);
+    --ws-tooltip-box-shadow: var(--ws-box-shadow);
+    --ws-tooltip-padding-x: var(--ws-spacing-6);
+    --ws-tooltip-padding-y: var(--ws-spacing-4);
+    --ws-tooltip-font-size: var(--ws-font-size-sm);
+    --ws-tooltip-max-width: 200px;
+    --ws-tooltip-arrow-size: .5rem;
+    --ws-tooltip-zindex: var(--ws-zindex-tooltip);
+}
+
+.ws-tooltip {
+    z-index: var(--ws-tooltip-zindex);
+    width: max-content;
+    max-width: min(var(--ws-tooltip-max-width), 100dvw);
+    background-color: var(--ws-tooltip-bg);
+    color: var(--ws-tooltip-color);
+    border: 1px solid var(--ws-tooltip-border-color);
+    border-radius: var(--ws-tooltip-border-radius);
+    box-shadow: var(--ws-tooltip-box-shadow);
+    font-size: var(--ws-tooltip-font-size);
+}
+
+.ws-tooltip > [data-ws-arrow] {
+    width: var(--ws-tooltip-arrow-size);
+    height: var(--ws-tooltip-arrow-size);
+    background-color: var(--ws-tooltip-bg);
+    border: 1px solid transparent;
+    transform: rotate(45deg);
+}
+
+.ws-tooltip[data-floating-placement^="top"] > [data-ws-arrow] {
+    bottom: calc(var(--ws-tooltip-arrow-size) / -2);
+    border-right-color: var(--ws-tooltip-border-color);
+    border-bottom-color: var(--ws-tooltip-border-color);
+    mask: linear-gradient(to bottom right, transparent 50%, black 50%);
+}
+
+.ws-tooltip[data-floating-placement^="bottom"] > [data-ws-arrow] {
+    top: calc(var(--ws-tooltip-arrow-size) / -2);
+    border-top-color: var(--ws-tooltip-border-color);
+    border-left-color: var(--ws-tooltip-border-color);
+    mask: linear-gradient(to top left, transparent 50%, black 50%);
+}
+
+.ws-tooltip[data-floating-placement^="left"] > [data-ws-arrow] {
+    right: calc(var(--ws-tooltip-arrow-size) / -2);
+    border-top-color: var(--ws-tooltip-border-color);
+    border-right-color: var(--ws-tooltip-border-color);
+    mask: linear-gradient(to top right, transparent 50%, black 50%);
+}
+
+.ws-tooltip[data-floating-placement^="right"] > [data-ws-arrow] {
+    left: calc(var(--ws-tooltip-arrow-size) / -2);
+    border-left-color: var(--ws-tooltip-border-color);
+    border-bottom-color: var(--ws-tooltip-border-color);
+    mask: linear-gradient(to bottom left, transparent 50%, black 50%);
+}
+
+.ws-tooltip-content {
+    padding: var(--ws-tooltip-padding-y) var(--ws-tooltip-padding-x);
+}

@@ -1,0 +1,47 @@
+# Popover
+
+Floating panel with header and body, built on `@floating-ui/dom`. Flips and shifts to stay within the viewport.
+
+## Usage
+
+```blade
+<x-wirestrap::popover>
+    <button type="button">More info</button>
+
+    <x-slot:header>Details</x-slot:header>
+    <x-slot:content>Here is some additional context.</x-slot:content>
+</x-wirestrap::popover>
+```
+
+```blade
+{{-- Click trigger, append to body --}}
+<x-wirestrap::popover id="user-card" trigger="click" placement="bottom" append-body>
+    <span>Target</span>
+
+    <x-slot:header>Status</x-slot:header>
+    <x-slot:content>Last updated: <strong>today at 14:32</strong></x-slot:content>
+</x-wirestrap::popover>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `id` | `string\|null` | `null` | Element id. Required when using append-body or `$wirestrap.popover`. |
+| `header` | `slot\|string` | `''` | Header text. Use the header slot for HTML. |
+| `content` | `slot\|string` | `''` | Body text. Use the content slot for HTML. |
+| `placement` | `string` | `config` | Preferred placement: top, bottom, left, right, and -start/-end variants. Flips if out of bounds. |
+| `trigger` | `string` | `config` | Show trigger: hover or click. |
+| `arrow` | `bool` | `true` | Show directional arrow. |
+| `append-body` | `bool` | `config` | Teleport to `<body>` to avoid overflow/z-index issues. Requires id. |
+| `offset-distance` | `int` | `config` | Distance between trigger and popover in px. |
+| `offset-skidding` | `int` | `config` | Lateral offset in px. |
+| `position` | `string` | `config` | CSS positioning strategy: absolute or fixed. |
+
+## $wirestrap.popover
+
+| Method | Description |
+|--------|-------------|
+| `$wirestrap.popover.show(id)` | Show popover. |
+| `$wirestrap.popover.hide(id)` | Hide popover. |
+| `$wirestrap.popover.toggle(id)` | Toggle popover. |
