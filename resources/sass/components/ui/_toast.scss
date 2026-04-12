@@ -1,0 +1,142 @@
+.ws-toast-container {
+    --ws-toast-box-shadow: var(--ws-box-shadow);
+    --ws-toast-border-color: var(--ws-border-color);
+    --ws-toast-border-radius: var(--ws-border-radius);
+    --ws-toast-background-color: var(--ws-body-bg);
+    --ws-toast-primary: var(--ws-primary);
+    --ws-toast-success: var(--ws-success);
+    --ws-toast-info: var(--ws-info);
+    --ws-toast-warning: var(--ws-warning);
+    --ws-toast-danger: var(--ws-danger);
+    --ws-toast-max-width: 22rem;
+    --ws-toast-gap: var(--ws-spacing-4);
+    --ws-toast-padding-x: var(--ws-spacing-6);
+    --ws-toast-padding-y: var(--ws-spacing-4);
+    --ws-toast-body-padding-y: var(--ws-spacing-5);
+    --ws-toast-font-size: var(--ws-font-size-sm);
+    --ws-toast-progress-height: 2px;
+    --ws-toast-offset: 1rem;
+}
+
+.ws-toast-container {
+    position: fixed;
+    z-index: var(--ws-zindex-toast);
+    display: flex;
+    gap: var(--ws-toast-gap);
+    pointer-events: none;
+    max-width: var(--ws-toast-max-width);
+    width: 100%;
+
+    // Layouts
+    &.ws-toast-top-start, &.ws-toast-bottom-start { // Left
+        left: var(--ws-toast-offset);
+        align-items: flex-start;
+
+        .ws-toast {
+            border-right: 1px solid var(--ws-toast-border-color);
+            transform: translateX(-1rem);
+
+            &.ws-toast-leaving { transform: translateX(-1rem); }
+        }
+    }
+    &.ws-toast-top-end, &.ws-toast-bottom-end { // Right
+        right: var(--ws-toast-offset);
+        align-items: flex-end;
+
+        .ws-toast {
+            border-left: 1px solid var(--ws-toast-border-color);
+            transform: translateX(1rem);
+
+            &.ws-toast-leaving { transform: translateX(1rem); }
+            .ws-toast-progress { flex-direction: row-reverse; }
+        }
+    }
+    &.ws-toast-top-start, &.ws-toast-top-end { // Top
+        top: var(--ws-toast-offset);
+        flex-direction: column-reverse;
+    }
+    &.ws-toast-bottom-start, &.ws-toast-bottom-end { // Bottom
+        bottom: var(--ws-toast-offset);
+        flex-direction: column;
+    }
+
+    .ws-toast {
+        background-color: var(--ws-toast-background-color);
+        border: 1px solid var(--ws-toast-border-color);
+        border-radius: var(--ws-toast-border-radius);
+        box-shadow: var(--ws-toast-box-shadow);
+        pointer-events: auto;
+        cursor: pointer;
+        width: 100%;
+        max-width: calc(100% - var(--ws-toast-offset));
+        overflow: hidden;
+        opacity: 0;
+        transform: translateX(1rem);
+
+        &.ws-toast-visible {
+            opacity: 1;
+            transform: translateX(0);
+            transition: opacity 200ms ease, transform 200ms ease;
+        }
+
+        &.ws-toast-leaving {
+            opacity: 0;
+            transition: opacity 200ms ease, transform 200ms ease;
+        }
+
+        .ws-toast-header {
+            display: flex;
+            align-items: center;
+            gap: var(--ws-toast-gap);
+            padding: var(--ws-toast-padding-y) var(--ws-toast-padding-x);
+            padding-bottom: 0;
+
+            .ws-toast-icon {
+                display: inline-block;
+                width: .5rem;
+                height: .5rem;
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+
+            .ws-toast-title {
+                font-size: var(--ws-toast-font-size);
+            }
+        }
+
+        .ws-toast-body {
+            padding: var(--ws-toast-body-padding-y) var(--ws-toast-padding-x);
+            font-size: var(--ws-toast-font-size);
+        }
+
+        .ws-toast-progress {
+            height: var(--ws-toast-progress-height);
+            display: flex;
+
+            .ws-toast-progress-bar {
+                height: 100%;
+                width: 100%;
+                transition: width 100ms linear;
+            }
+        }
+    }
+}
+
+// Variants
+$variants: ('primary', 'success', 'info', 'warning', 'danger');
+@each $variant in $variants {
+    .ws-toast-top-start .ws-toast-#{$variant},
+    .ws-toast-bottom-start .ws-toast-#{$variant} {
+        border-left: 3px solid var(--ws-toast-#{$variant});
+    }
+
+    .ws-toast-top-end .ws-toast-#{$variant},
+    .ws-toast-bottom-end .ws-toast-#{$variant} {
+        border-right: 3px solid var(--ws-toast-#{$variant});
+    }
+
+    .ws-toast-#{$variant} {
+        .ws-toast-header .ws-toast-icon { background-color: var(--ws-toast-#{$variant}); }
+        .ws-toast-progress .ws-toast-progress-bar { background-color: var(--ws-toast-#{$variant}); }
+    }
+}

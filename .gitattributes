@@ -1,0 +1,9 @@
+/.github export-ignore
+/phpstan.neon export-ignore
+/phpstan-baseline.neon export-ignore
+/rector.php export-ignore
+/pint.json export-ignore
+/eslint.config.mjs export-ignore
+/.prettierrc export-ignore
+/package.json export-ignore
+/package-lock.json export-ignore

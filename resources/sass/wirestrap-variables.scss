@@ -1,0 +1,73 @@
+:root {
+    // Z-index
+    --ws-zindex-alert: 1095;
+    --ws-zindex-toast: 1090;
+    --ws-zindex-tooltip: 1080;
+    --ws-zindex-select: 1071;
+    --ws-zindex-popover: 1070;
+    --ws-zindex-modal: 1055;
+    --ws-zindex-modal-backdrop: 1050;
+    --ws-zindex-modal-minimized: 1049;
+    --ws-zindex-flyout: 1000;
+
+    // Text
+    --ws-font-size-sm: .875rem;
+    --ws-font-size-base: var(--bs-body-font-size, .9rem);
+    --ws-line-height-base: var(--bs-body-line-height, 1.5);
+
+    // Spacing (0.125rem steps)
+    --ws-spacing-1: .125rem;
+    --ws-spacing-2: .25rem;
+    --ws-spacing-3: .375rem;
+    --ws-spacing-4: .5rem;
+    --ws-spacing-5: .625rem;
+    --ws-spacing-6: .75rem;
+    --ws-spacing-7: .875rem;
+    --ws-spacing-8: 1rem;
+    --ws-spacing-9: 1.125rem;
+    --ws-spacing-10: 1.25rem;
+    --ws-spacing-11: 1.375rem;
+    --ws-spacing-12: 1.5rem;
+    --ws-spacing-13: 1.625rem;
+    --ws-spacing-14: 1.75rem;
+    --ws-spacing-15: 1.875rem;
+    --ws-spacing-16: 2rem;
+    --ws-spacing-17: 2.125rem;
+    --ws-spacing-18: 2.25rem;
+    --ws-spacing-19: 2.375rem;
+    --ws-spacing-20: 2.5rem;
+
+    // Border
+    --ws-border-radius: var(--bs-border-radius, .375rem);
+    --ws-border-radius-lg: var(--bs-border-radius-lg, .5rem);
+
+    // Box shadow
+    --ws-box-shadow-sm: var(--bs-box-shadow-sm,0 .125rem .25rem rgba(0, 0, 0, .075));
+    --ws-box-shadow: var(--bs-box-shadow, 0 .125rem .25rem rgba(0, 0, 0, .075));
+    --ws-box-shadow-lg: var(--bs-box-shadow-lg, 0 .5rem 1rem rgba(0, 0, 0, .15));
+
+    // Base colors
+    --ws-body-bg: var(--bs-body-bg, #fff);
+    --ws-body-color: var(--bs-body-color, #212529);
+    --ws-emphasis-color: var(--bs-emphasis-color, #000);
+    --ws-white: var(--bs-white, #fff);
+    --ws-gray: var(--bs-gray, gray);
+    --ws-primary: var(--bs-primary, #0d6efd);
+    --ws-secondary: var(--bs-secondary, #6c757d);
+    --ws-success: var(--bs-success, #198754);
+    --ws-info: var(--bs-info, #0dcaf0);
+    --ws-warning: var(--bs-warning, #ffc107);
+    --ws-danger: var(--bs-danger, #dc3545);
+    --ws-dark: var(--bs-dark, #212529);
+
+    // Derived colors
+    // -- Grays
+    --ws-muted: color-mix(in srgb, var(--ws-emphasis-color) 25%, var(--ws-gray));
+    --ws-muted-bg: color-mix(in srgb, var(--ws-body-bg) 75%, var(--ws-gray));
+    --ws-tertiary-bg: color-mix(in srgb, var(--ws-body-bg) 85%, var(--ws-gray));
+    --ws-border-color: color-mix(in srgb, var(--ws-body-bg) 70%, var(--ws-gray));
+    --ws-input-bg: color-mix(in srgb, var(--ws-body-bg) 98%, var(--ws-gray));
+
+    // -- Colors
+    --ws-focus-color: color-mix(in srgb, var(--ws-body-bg) 25%, var(--ws-primary));
+}

@@ -1,0 +1,114 @@
+.ws-form-textarea {
+    --ws-form-textarea-padding-x: var(--ws-spacing-6);
+    --ws-form-textarea-padding-y: var(--ws-spacing-3);
+    --ws-form-textarea-font-size: var(--ws-font-size-base);
+    --ws-form-textarea-line-height: var(--ws-line-height-base);
+    --ws-form-textarea-color: var(--ws-body-color);
+    --ws-form-textarea-bg: var(--ws-input-bg);
+    --ws-form-textarea-border-color: var(--ws-border-color);
+    --ws-form-textarea-border-radius: var(--ws-border-radius);
+    --ws-form-textarea-disabled-opacity: .5;
+    --ws-form-textarea-disabled-cursor: not-allowed;
+    --ws-form-textarea-placeholder-color: var(--ws-muted);
+    --ws-form-textarea-focus-border-color: var(--ws-focus-color);
+    --ws-form-textarea-floating-padding-top: var(--ws-spacing-12);
+    --ws-form-textarea-icon-padding: var(--ws-spacing-20);
+}
+
+// Textarea
+.ws-form-textarea {
+    display: block;
+    width: 100%;
+    padding: var(--ws-form-textarea-padding-y) var(--ws-form-textarea-padding-x);
+    font-size: var(--ws-form-textarea-font-size);
+    line-height: var(--ws-form-textarea-line-height);
+    color: var(--ws-form-textarea-color);
+    background-color: var(--ws-form-textarea-bg);
+    background-clip: padding-box;
+    border: 1px solid var(--ws-form-textarea-border-color);
+    border-radius: var(--ws-form-textarea-border-radius);
+    transition: border-color .15s ease-in-out;
+    appearance: none;
+    resize: vertical;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ws-muted-bg) transparent;
+
+    &::placeholder {
+        color: var(--ws-form-textarea-placeholder-color);
+        opacity: 1;
+    }
+
+    &:focus {
+        outline: 0;
+        border-color: var(--ws-form-textarea-focus-border-color);
+    }
+
+    &:disabled {
+        opacity: var(--ws-form-textarea-disabled-opacity);
+        cursor: var(--ws-form-textarea-disabled-cursor);
+    }
+
+    &.ws-form-invalid {
+        border-color: var(--ws-danger);
+    }
+}
+
+// Icon wrapper (non-floating)
+.ws-form-textarea-wrapper {
+    position: relative;
+
+    > textarea.ws-form-has-icon-start {
+        padding-left: var(--ws-form-textarea-icon-padding);
+    }
+
+    > textarea.ws-form-has-icon-end {
+        padding-right: var(--ws-form-textarea-icon-padding);
+    }
+
+    // Icon: top-aligned for textarea
+    > .ws-form-input-icon {
+        top: .25rem;
+        transform: none;
+    }
+}
+
+// Floating overrides
+.ws-form-floating {
+    > .ws-form-textarea {
+        height: auto;
+        min-height: var(--ws-form-floating-height);
+        padding: var(--ws-form-textarea-floating-padding-top) var(--ws-form-floating-padding-x) .25rem;
+    }
+
+    > .ws-form-textarea:focus ~ .ws-form-label,
+    > .ws-form-textarea:not(:placeholder-shown) ~ .ws-form-label,
+    > .ws-form-textarea:-webkit-autofill ~ .ws-form-label {
+        opacity: var(--ws-form-floating-label-opacity);
+        transform: scale(.75) translateY(-.65rem) translateX(.15rem);
+    }
+
+    > .ws-form-textarea.ws-form-has-icon-start {
+        padding-left: var(--ws-form-textarea-icon-padding);
+    }
+
+    > .ws-form-textarea.ws-form-has-icon-end {
+        padding-right: var(--ws-form-textarea-icon-padding);
+    }
+
+    &.ws-form-has-icon-start > .ws-form-textarea:focus ~ .ws-form-label,
+    &.ws-form-has-icon-start > .ws-form-textarea:not(:placeholder-shown) ~ .ws-form-label,
+    &.ws-form-has-icon-start > .ws-form-textarea:-webkit-autofill ~ .ws-form-label {
+        transform: scale(.75) translateY(-.65rem) translate(.7rem);
+    }
+
+    // Icon: top-aligned in floating textarea
+    &:has(> .ws-form-textarea) > .ws-form-input-icon {
+        top: 1rem;
+        transform: none;
+    }
+}
+
+.ws-form-textarea[x-data="wsTextarea"] {
+    height: var(--ws-textarea-height, auto);
+    max-height: 400px;
+}

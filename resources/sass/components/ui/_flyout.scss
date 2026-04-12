@@ -1,0 +1,22 @@
+.ws-flyout {
+    --ws-flyout-background-color: var(--ws-body-bg);
+    --ws-flyout-border-color: var(--ws-border-color);
+    --ws-flyout-border-radius: var(--ws-border-radius);
+    --ws-flyout-box-shadow: var(--ws-box-shadow);
+    --ws-flyout-min-width: 10rem;
+    --ws-flyout-padding-y: var(--ws-spacing-4);
+    --ws-flyout-zindex: var(--ws-zindex-flyout);
+}
+
+.ws-flyout {
+    position: absolute;
+    z-index: var(--ws-flyout-zindex);
+    width: max-content;
+    min-width: var(--ws-flyout-min-width);
+    max-width: 100dvw;
+    padding: var(--ws-flyout-padding-y) 0;
+    background-color: var(--ws-flyout-background-color);
+    border: 1px solid var(--ws-flyout-border-color);
+    border-radius: var(--ws-flyout-border-radius);
+    box-shadow: var(--ws-flyout-box-shadow);
+}

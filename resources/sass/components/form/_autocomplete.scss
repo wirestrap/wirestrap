@@ -1,0 +1,350 @@
+// Variables
+.ws-autocomplete {
+    --ws-autocomplete-padding-x: var(--ws-spacing-6);
+    --ws-autocomplete-padding-y: var(--ws-spacing-3);
+    --ws-autocomplete-font-size: var(--ws-font-size-base);
+    --ws-autocomplete-line-height: var(--ws-line-height-base);
+    --ws-autocomplete-color: var(--ws-body-color);
+    --ws-autocomplete-bg: var(--ws-input-bg);
+    --ws-autocomplete-border-color: var(--ws-border-color);
+    --ws-autocomplete-border-radius: var(--ws-border-radius);
+    --ws-autocomplete-focus-border-color: var(--ws-focus-color);
+    --ws-autocomplete-placeholder-color: var(--ws-muted);
+    --ws-autocomplete-ghost-color: var(--ws-muted);
+    --ws-autocomplete-dropdown-bg: var(--ws-body-bg);
+    --ws-autocomplete-dropdown-border-color: var(--ws-border-color);
+    --ws-autocomplete-dropdown-border-radius: var(--ws-border-radius-lg);
+    --ws-autocomplete-dropdown-box-shadow: var(--ws-box-shadow);
+    --ws-autocomplete-dropdown-max-height: 400px;
+    --ws-autocomplete-option-padding: var(--ws-spacing-3) var(--ws-spacing-6);
+    --ws-autocomplete-option-highlighted-bg: var(--ws-tertiary-bg);
+    --ws-autocomplete-option-highlighted-color: var(--ws-primary);
+    --ws-autocomplete-z-index: var(--ws-zindex-select);
+    --ws-autocomplete-disabled-cursor: not-allowed;
+    --ws-autocomplete-disabled-opacity: .5;
+    --ws-autocomplete-tag-bg: var(--ws-muted-bg);
+    --ws-autocomplete-tag-border-radius: var(--ws-border-radius-lg);
+    --ws-autocomplete-tag-invalid-bg: color-mix(in srgb, var(--ws-body-bg) 85%, var(--ws-danger));
+    --ws-autocomplete-tag-invalid-color: var(--ws-danger);
+    --ws-autocomplete-icon-padding: var(--ws-spacing-20);
+}
+
+// Root
+.ws-autocomplete {
+    position: relative;
+    width: 100%;
+
+    &[disabled] {
+        cursor: var(--ws-autocomplete-disabled-cursor);
+
+        .ws-autocomplete-input-wrapper {
+            pointer-events: none;
+            opacity: var(--ws-autocomplete-disabled-opacity);
+        }
+    }
+
+    [data-ws-floatable] {
+        z-index: var(--ws-autocomplete-z-index);
+        background-color: var(--ws-autocomplete-dropdown-bg);
+        border: 1px solid var(--ws-autocomplete-dropdown-border-color);
+        border-radius: var(--ws-autocomplete-dropdown-border-radius);
+        box-shadow: var(--ws-autocomplete-dropdown-box-shadow);
+        max-height: var(--ws-autocomplete-dropdown-max-height);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--ws-muted-bg) transparent;
+        transition: opacity ease-in-out .1s, transform ease-in-out .1s;
+
+        &[data-floating-placement^='top'] {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            transform: translateY(1.25rem);
+        }
+
+        &[data-floating-placement^='bottom'] {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            transform: translateY(-1.25rem);
+        }
+
+        &.show {
+            transform: unset;
+        }
+    }
+}
+
+// Field - relative positioning context for the ghost overlay
+// In single mode it fills the wrapper; in multiple mode it grows as a flex item
+.ws-autocomplete-field {
+    position: relative;
+    background-color: var(--ws-autocomplete-bg);
+    border-radius: var(--ws-autocomplete-border-radius);
+}
+
+// Override ws-form-input variables so input and ghost share the same values
+.ws-autocomplete .ws-autocomplete-input {
+    --ws-form-input-padding-x: var(--ws-autocomplete-padding-x);
+    --ws-form-input-padding-y: var(--ws-autocomplete-padding-y);
+    --ws-form-input-font-size: var(--ws-autocomplete-font-size);
+    --ws-form-input-line-height: var(--ws-autocomplete-line-height);
+    --ws-form-input-color: var(--ws-autocomplete-color);
+    --ws-form-input-bg: transparent;
+    --ws-form-input-border-color: var(--ws-autocomplete-border-color);
+    --ws-form-input-border-radius: var(--ws-autocomplete-border-radius);
+    --ws-form-input-focus-border-color: var(--ws-autocomplete-focus-border-color);
+    --ws-form-input-placeholder-color: var(--ws-autocomplete-placeholder-color);
+    position: relative;
+    z-index: 1;
+}
+
+// Ghost overlay - positioned identically to the input's content area
+.ws-autocomplete-ghost {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    padding-left: var(--ws-autocomplete-padding-x);
+    padding-right: var(--ws-autocomplete-padding-x);
+    font-size: var(--ws-autocomplete-font-size);
+    line-height: var(--ws-autocomplete-line-height);
+    pointer-events: none;
+    overflow: hidden;
+    white-space: pre;
+    // Transparent border matches the 1px input border to align text precisely
+    border: 1px solid transparent;
+}
+
+.ws-autocomplete-ghost-match {
+    color: transparent;
+    flex-shrink: 0;
+    white-space: pre;
+}
+
+.ws-autocomplete-ghost-suffix {
+    color: var(--ws-autocomplete-ghost-color);
+    flex-shrink: 1;
+    overflow: hidden;
+    white-space: pre;
+}
+
+// Dropdown option
+.ws-autocomplete-option {
+    padding: var(--ws-autocomplete-option-padding);
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &.highlighted {
+        background-color: var(--ws-autocomplete-option-highlighted-bg);
+        color: var(--ws-autocomplete-option-highlighted-color);
+        outline: 0;
+    }
+}
+
+// ─── Icon ─────────────────────────────────────────────────────────────────────
+
+// Single mode: icon lives inside ws-autocomplete-field, so padding offsets go on the input and ghost
+.ws-autocomplete-has-icon-start:not(.ws-autocomplete-is-multiple) .ws-autocomplete-field > .ws-autocomplete-input {
+    padding-left: var(--ws-autocomplete-icon-padding);
+}
+
+.ws-autocomplete-has-icon-start:not(.ws-autocomplete-is-multiple) .ws-autocomplete-ghost {
+    padding-left: var(--ws-autocomplete-icon-padding);
+}
+
+.ws-autocomplete-has-icon-end:not(.ws-autocomplete-is-multiple) .ws-autocomplete-field > .ws-autocomplete-input {
+    padding-right: var(--ws-autocomplete-icon-padding);
+}
+
+.ws-autocomplete-has-icon-end:not(.ws-autocomplete-is-multiple) .ws-autocomplete-ghost {
+    padding-right: var(--ws-autocomplete-icon-padding);
+}
+
+// Multiple mode: icon lives in the wrapper, so wrapper absorbs the icon offset
+.ws-autocomplete-is-multiple.ws-autocomplete-has-icon-start .ws-autocomplete-input-wrapper {
+    padding-left: var(--ws-autocomplete-icon-padding);
+}
+
+.ws-autocomplete-is-multiple.ws-autocomplete-has-icon-end .ws-autocomplete-input-wrapper {
+    padding-right: var(--ws-autocomplete-icon-padding);
+}
+
+// ─── Floating label ───────────────────────────────────────────────────────────
+
+.ws-form-floating {
+    --ws-autocomplete-icon-padding: var(--ws-spacing-20);
+
+    // Single mode: input gets fixed height + padding, ghost mirrors it
+    > .ws-autocomplete:not(.ws-autocomplete-is-multiple) {
+        .ws-autocomplete-input {
+            height: var(--ws-form-floating-height);
+            min-height: var(--ws-form-floating-height);
+            padding-top: var(--ws-form-floating-padding-y);
+            padding-bottom: .25rem;
+        }
+
+        .ws-autocomplete-ghost {
+            padding-top: var(--ws-form-floating-padding-y);
+            padding-bottom: .25rem;
+        }
+    }
+
+    // Multiple mode: wrapper carries the top offset, input and tags stay natural
+    > .ws-autocomplete.ws-autocomplete-is-multiple .ws-autocomplete-input-wrapper {
+        align-items: flex-start;
+        padding-top: var(--ws-spacing-11);
+    }
+
+    // Icon must sit above the floating label (z-index: 2)
+    > .ws-autocomplete .ws-form-input-icon {
+        z-index: 4;
+    }
+
+    // Label floats when the input has a value or the component is focused
+    > .ws-autocomplete:focus-within ~ .ws-form-label,
+    > .ws-autocomplete.ws-autocomplete-has-value ~ .ws-form-label,
+    > .ws-autocomplete:has(.ws-autocomplete-input:not(:placeholder-shown)) ~ .ws-form-label {
+        opacity: var(--ws-form-floating-label-opacity);
+        transform: scale(.75) translateY(-.65rem) translateX(.15rem);
+    }
+
+    // With start icon: label resting position shifted right, floated position adjusted
+    &.ws-form-has-icon-start > .ws-autocomplete ~ .ws-form-label {
+        padding-left: var(--ws-autocomplete-icon-padding);
+    }
+
+    &.ws-form-has-icon-start > .ws-autocomplete:focus-within ~ .ws-form-label,
+    &.ws-form-has-icon-start > .ws-autocomplete.ws-autocomplete-has-value ~ .ws-form-label,
+    &.ws-form-has-icon-start > .ws-autocomplete:has(.ws-autocomplete-input:not(:placeholder-shown)) ~ .ws-form-label {
+        transform: scale(.75) translateY(-.65rem) translate(.7rem);
+    }
+}
+
+// ─── Multiple mode ────────────────────────────────────────────────────────────
+
+.ws-autocomplete-is-multiple .ws-autocomplete-input-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .25rem .4rem;
+    padding: var(--ws-autocomplete-padding-y) var(--ws-autocomplete-padding-x);
+    background-color: var(--ws-autocomplete-bg);
+    border: 1px solid var(--ws-autocomplete-border-color);
+    border-radius: var(--ws-autocomplete-border-radius);
+    cursor: text;
+    transition: border-color .15s ease-in-out;
+
+    &:focus-within {
+        border-color: var(--ws-autocomplete-focus-border-color);
+    }
+
+    &.ws-form-invalid {
+        border-color: var(--ws-danger);
+    }
+}
+
+// Field grows to fill remaining row space, no background (wrapper provides it)
+.ws-autocomplete-is-multiple .ws-autocomplete-field {
+    flex: 1 1 6rem;
+    min-width: 6rem;
+    background: none;
+}
+
+// In multiple mode, the input is borderless and unpadded (wrapper handles that)
+.ws-autocomplete-is-multiple .ws-autocomplete-input {
+    --ws-form-input-border-color: transparent;
+    --ws-form-input-focus-border-color: transparent;
+    --ws-form-input-padding-x: 0;
+    --ws-form-input-padding-y: 0;
+    --ws-form-input-border-radius: 0;
+}
+
+// Ghost in multiple mode has no padding or border offset (input is borderless)
+.ws-autocomplete-is-multiple .ws-autocomplete-ghost {
+    border: none;
+    padding: 0;
+}
+
+// Tag badge
+.ws-autocomplete-tag {
+    zoom: .8;
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    padding: .2rem .25rem .2rem .6rem;
+    background-color: var(--ws-autocomplete-tag-bg);
+    border-radius: var(--ws-autocomplete-tag-border-radius);
+    max-width: 100%;
+    height: fit-content;
+    position: relative;
+
+    &:hover {
+        background-color: var(--ws-tertiary-bg);
+    }
+
+    &.ws-autocomplete-tag-invalid {
+        background-color: var(--ws-autocomplete-tag-invalid-bg);
+        color: var(--ws-autocomplete-tag-invalid-color);
+    }
+}
+
+.ws-autocomplete-tag-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    font-size: var(--ws-autocomplete-font-size);
+    line-height: var(--ws-autocomplete-line-height);
+}
+
+.ws-autocomplete-tag-remove {
+    flex-shrink: 0;
+    appearance: none;
+    background: none;
+    border: none;
+    padding: .1rem;
+    cursor: pointer;
+    color: inherit;
+    opacity: .5;
+    line-height: 1;
+
+    @media (hover: hover) and (pointer: fine) {
+        &::after {
+            position: absolute;
+            content: '';
+            inset: 0;
+        }
+    }
+
+    &:hover {
+        opacity: 1;
+    }
+
+    span {
+        display: block;
+        position: relative;
+        width: .8rem;
+        height: .8rem;
+
+        &::before,
+        &::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 1px;
+            background: currentColor;
+            border-radius: 1px;
+        }
+
+        &::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        &::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+    }
+}

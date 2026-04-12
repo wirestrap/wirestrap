@@ -1,0 +1,165 @@
+// Variables
+.ws-alert-backdrop {
+    --ws-alert-box-shadow: var(--ws-box-shadow-lg);
+    --ws-alert-border-color: var(--ws-border-color);
+    --ws-alert-border-radius: var(--ws-border-radius-lg);
+    --ws-alert-background-color: var(--ws-body-bg);
+    --ws-alert-primary: var(--ws-primary);
+    --ws-alert-success: var(--ws-success);
+    --ws-alert-info: var(--ws-info);
+    --ws-alert-warning: var(--ws-warning);
+    --ws-alert-danger: var(--ws-danger);
+    --ws-alert-max-width: 28rem;
+    --ws-alert-padding-x: var(--ws-spacing-8);
+    --ws-alert-padding-y: var(--ws-spacing-8);
+    --ws-alert-body-font-size: var(--ws-font-size-base);
+    --ws-alert-btn-padding-x: var(--ws-spacing-7);
+    --ws-alert-btn-padding-y: var(--ws-spacing-3);
+    --ws-alert-btn-font-size: var(--ws-font-size-sm);
+}
+
+// Backdrop
+.ws-alert-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: var(--ws-zindex-alert);
+    background-color: rgba(0, 0, 0, .5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+
+    &.ws-alert-visible {
+        opacity: 1;
+        transition: opacity 200ms ease;
+    }
+
+    &.ws-alert-leaving {
+        opacity: 0;
+        transition: opacity 200ms ease;
+    }
+}
+
+// Alert
+.ws-alert {
+    background-color: var(--ws-alert-background-color);
+    border: 1px solid var(--ws-alert-border-color);
+    border-radius: var(--ws-alert-border-radius);
+    box-shadow: var(--ws-alert-box-shadow);
+    width: 100%;
+    max-width: var(--ws-alert-max-width);
+    overflow: hidden;
+    opacity: 0;
+    transform: scale(.7);
+    outline: none;
+    transition: opacity 250ms ease, transform .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    &.ws-alert-visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    &.ws-alert-leaving {
+        opacity: 0;
+        transform: scale(.7);
+    }
+
+    .ws-alert-header {
+        display: flex;
+        align-items: center;
+        gap: var(--ws-spacing-4);
+        padding: var(--ws-alert-padding-y) var(--ws-alert-padding-x) var(--ws-spacing-4);
+
+        .ws-alert-icon {
+            display: inline-block;
+            width: .625rem;
+            height: .625rem;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .ws-alert-title {
+            font-size: var(--ws-alert-body-font-size);
+        }
+    }
+
+    .ws-alert-body {
+        padding: var(--ws-alert-padding-y) var(--ws-alert-padding-x);
+        font-size: var(--ws-alert-body-font-size);
+        line-height: 1.5;
+    }
+
+    .ws-alert-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--ws-spacing-4);
+        padding: var(--ws-spacing-2) var(--ws-alert-padding-x) var(--ws-alert-padding-y);
+
+        .ws-alert-dismiss {
+            padding: var(--ws-alert-btn-padding-y) var(--ws-alert-btn-padding-x);
+            font-size: var(--ws-alert-btn-font-size);
+            background-color: var(--ws-alert-primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--ws-border-radius);
+            cursor: pointer;
+
+            &:hover {
+                opacity: .85;
+            }
+        }
+
+        .ws-alert-cancel {
+            padding: var(--ws-alert-btn-padding-y) var(--ws-alert-btn-padding-x);
+            font-size: var(--ws-alert-btn-font-size);
+            background-color: transparent;
+            color: var(--ws-body-color);
+            border: 1px solid var(--ws-alert-border-color);
+            border-radius: var(--ws-border-radius);
+            cursor: pointer;
+
+            &:hover {
+                background-color: var(--ws-tertiary-bg);
+            }
+        }
+    }
+
+    .ws-alert-progress {
+        height: 3px;
+        background-color: var(--ws-alert-border-color);
+
+        .ws-alert-progress-bar {
+            height: 100%;
+            width: 100%;
+            transition: width 100ms linear;
+        }
+    }
+}
+
+// Variants
+$variants: ('primary', 'success', 'info', 'warning', 'danger');
+@each $variant in $variants {
+    .ws-alert-#{$variant} {
+        border-top: 3px solid var(--ws-alert-#{$variant});
+
+        .ws-alert-header .ws-alert-icon { background-color: var(--ws-alert-#{$variant}); }
+        .ws-alert-footer .ws-alert-dismiss { background-color: var(--ws-alert-#{$variant}); }
+        .ws-alert-progress .ws-alert-progress-bar { background-color: var(--ws-alert-#{$variant}); }
+    }
+}
+
+.ws-alert-warning .ws-alert-footer .ws-alert-dismiss,
+.ws-alert-info .ws-alert-footer .ws-alert-dismiss {
+    color: var(--ws-dark);
+}
+
+// Static shake
+@keyframes ws-alert-shake {
+    0%, 100% { transform: scale(1); }
+    25%, 75% { transform: scale(1) translateX(-8px); }
+    50% { transform: scale(1) translateX(8px); }
+}
+
+.ws-alert.ws-alert-shaking {
+    animation: ws-alert-shake 300ms ease-out;
+}
