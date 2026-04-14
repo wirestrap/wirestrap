@@ -84,10 +84,11 @@ const _toasts = {
         _getContainer().appendChild(item.el);
         this._items.push(item);
 
-        // Defer adding the visible class to the next frame so the browser paints the initial
-        // non-visible state first, allowing the CSS transition to play on entry
+        // Double rAF: ensures the initial state is painted before adding the visible classes
         requestAnimationFrame(() => {
-            item.el.classList.add('ws-toast-visible');
+            requestAnimationFrame(() => {
+                item.el.classList.add('ws-toast-visible');
+            });
         });
 
         if (duration > 0) {
