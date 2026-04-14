@@ -18,17 +18,22 @@ import { afterTransition } from './transition';
  */
 export function animateHeight(el, targetPx, cssTransition, onDone) {
     let cancelTransition = null;
+    let innerRafId = null;
 
-    const rafId = requestAnimationFrame(() => {
-        el.style.transition = cssTransition;
-        el.style.height = `${targetPx}px`;
-        el.style.opacity = targetPx > 0 ? '1' : '0';
+    // Double rAF: ensures the initial state is painted before adding the visible classes
+    const outerRafId = requestAnimationFrame(() => {
+        innerRafId = requestAnimationFrame(() => {
+            el.style.transition = cssTransition;
+            el.style.height = `${targetPx}px`;
+            el.style.opacity = targetPx > 0 ? '1' : '0';
 
-        cancelTransition = afterTransition(el, onDone, { property: 'height' });
+            cancelTransition = afterTransition(el, onDone, { property: 'height' });
+        });
     });
 
     return () => {
-        cancelAnimationFrame(rafId);
+        cancelAnimationFrame(outerRafId);
+        cancelAnimationFrame(innerRafId);
         cancelTransition?.();
     };
 }

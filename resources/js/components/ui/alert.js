@@ -208,12 +208,13 @@ const _alert = {
         };
         document.addEventListener('keydown', item.keyHandler);
 
-        // Defer adding visible classes to the next frame so the browser paints the initial
-        // non-visible state first, allowing the CSS entry transition to play.
+        // Double rAF: ensures the initial state is painted before adding the visible classes
         requestAnimationFrame(() => {
-            item.backdropEl.classList.add('ws-alert-visible');
-            item.alertEl.classList.add('ws-alert-visible');
-            item.alertEl.focus();
+            requestAnimationFrame(() => {
+                item.backdropEl.classList.add('ws-alert-visible');
+                item.alertEl.classList.add('ws-alert-visible');
+                item.alertEl.focus();
+            });
         });
 
         if (duration > 0) {
