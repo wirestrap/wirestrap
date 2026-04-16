@@ -58,7 +58,7 @@ return [
     */
     'tooltip' => [
         'placement' => 'top',
-        'append' => null,
+        'teleport' => null,
         'trigger' => 'hover',
         'offset_skidding' => 0,
         'offset_distance' => 8,
@@ -69,7 +69,7 @@ return [
 
     'popover' => [
         'placement' => 'top',
-        'append' => null,
+        'teleport' => null,
         'trigger' => 'hover',
         'offset_skidding' => 0,
         'offset_distance' => 8,
@@ -81,7 +81,7 @@ return [
     'flyout' => [
         'events' => false,
         'placement' => 'bottom-start',
-        'append' => null,
+        'teleport' => null,
         'trigger' => 'hover',
         'offset_skidding' => 0,
         'offset_distance' => 0,
