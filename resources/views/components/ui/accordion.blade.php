@@ -38,7 +38,7 @@
             $labelSlotVar = 'label_' . $key;
             $itemIcon = $item->attributes->get('icon');
             $itemIconPlacement = $item->attributes->get('icon-placement', 'start');
-            $isOpen = $item->attributes->has('open');
+            $isOpen = $item->attributes->get('open', false);
         @endphp
 
         <div wire:key="ws-accordion-{{ $id }}-{{ $key }}" class="ws-accordion-item">
