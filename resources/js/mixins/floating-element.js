@@ -3,16 +3,16 @@ import { afterTransition } from '../utils/transition';
 
 /**
  * Default @floating-ui/dom config for dropdown-style floating elements (select, autocomplete).
- * Places the floatable below the reference at fixed position, flips to top if needed,
+ * Places the floatable below the reference, flips to top if needed,
  * and matches the reference width.
  *
  * @param {number} offsetY - Main-axis (Y) offset in pixels between the reference and the dropdown.
  * @returns {object}
  */
-export function defaultDropdownConfig(offsetY = 0) {
+export function defaultDropdownConfig(offsetY = 0, strategy = 'absolute') {
     return {
         placement: 'bottom',
-        strategy: 'fixed',
+        strategy,
         middleware: [
             offset({ mainAxis: offsetY }),
             flip({ fallbackPlacements: ['top', 'bottom'] }),

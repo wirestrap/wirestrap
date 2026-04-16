@@ -123,6 +123,7 @@ public function getStatuses(): array
 | `search` | `bool` | `config` | Search input inside dropdown. Filtering is client-side. |
 | `live` | `bool` | `config` | Trigger server round-trip on each selection change. |
 | `dropdown-offset` | `int` | `config` | Y-axis offset in pixels between the trigger and the dropdown. |
+| `position` | `string` | `config` | Floating positioning strategy: `absolute` or `fixed`. |
 | `empty-value` | `mixed` | `config` | Value treated as "no selection" (shows placeholder). |
 | `has-validation` | `bool` | `config` | Adds invalid class when wire:model has an error. |
 | `has-validation-message` | `bool` | `config` | Renders error message below. |

@@ -194,6 +194,7 @@ Alpine.data('wsSelect', () => ({
     selectEmptyValue: null,
     selectLive: false,
     selectDropdownOffset: 0,
+    selectPosition: 'absolute',
     wireOptionsMethod: null,
     wireOptionsMethodWatch: null,
     _placeholderText: '',
@@ -258,6 +259,7 @@ Alpine.data('wsSelect', () => ({
         this.selectEmptyValue = this.$el.getAttribute('data-ws-empty-value');
         this.selectLive = this.$el.getAttribute('data-ws-live') === 'true';
         this.selectDropdownOffset = parseInt(this.$el.getAttribute('data-ws-dropdown-offset') || 0, 10);
+        this.selectPosition = this.$el.getAttribute('data-ws-position') || 'absolute';
         this.wireOptionsMethod = this.$el.getAttribute('data-ws-wire-options');
         this.wireOptionsMethodWatch = this.$el.getAttribute('data-ws-wire-options-watch');
 
@@ -361,7 +363,7 @@ Alpine.data('wsSelect', () => ({
      * Floating select
      */
     getFloatingConfig() {
-        return defaultDropdownConfig(this.selectDropdownOffset);
+        return defaultDropdownConfig(this.selectDropdownOffset, this.selectPosition);
     },
 
     selectShow() {
