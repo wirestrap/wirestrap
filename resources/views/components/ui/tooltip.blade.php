@@ -2,7 +2,7 @@
     'id' => null,
     'content' => '',    /** @var \Illuminate\View\ComponentSlot|string */
     'placement' => config('wirestrap.tooltip.placement', 'top'),
-    'appendBody' => config('wirestrap.tooltip.append_body', false),
+    'append' => config('wirestrap.tooltip.append', null),
     'trigger' => config('wirestrap.tooltip.trigger', 'hover'),
     'offsetSkidding' => config('wirestrap.tooltip.offset_skidding', 0),
     'offsetDistance' => config('wirestrap.tooltip.offset_distance', 8),
@@ -11,7 +11,7 @@
 ])
 
 @php
-    if ($appendBody && !$id) {
+    if ($append && !$id) {
         throw new \Wirestrap\Exceptions\MissingComponentIdException('tooltip');
     }
 
@@ -47,9 +47,9 @@
         {{ $slot }}
     </div>
 
-    @if ($appendBody) @teleport('body') @endif
+    @if ($append) @teleport($append) @endif
         <div
-            @if($appendBody) data-ws-float-for="{{ $id }}" @endif
+            @if($append) data-ws-float-for="{{ $id }}" @endif
             @if($id) id="{{ $id }}-tip" @endif
             data-ws-floatable
             role="tooltip"
@@ -61,5 +61,5 @@
             @if ($arrow) <div data-ws-arrow class="ws-tooltip-arrow"></div> @endif
             <div class="ws-tooltip-content">{{ $content }}</div>
         </div>
-    @if ($appendBody) @endteleport @endif
+    @if ($append) @endteleport @endif
 </div>

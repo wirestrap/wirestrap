@@ -25,12 +25,12 @@ Floating tooltip built on `@floating-ui/dom`. Wraps any trigger element. Focusin
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | `string\|null` | `null` | Element id. Required when using append-body or `$wirestrap.tooltip`. |
+| `id` | `string\|null` | `null` | Element id. Required when using append or `$wirestrap.tooltip`. |
 | `content` | `slot\|string` | `''` | Tooltip text. Use the content slot for HTML. |
 | `placement` | `string` | `config` | Preferred placement: top, bottom, left, right, and -start/-end variants. Flips if out of bounds. |
 | `trigger` | `string` | `config` | Show trigger: hover or click. |
 | `arrow` | `bool` | `true` | Show directional arrow. |
-| `append-body` | `bool` | `config` | Teleport to `<body>` to avoid overflow/z-index issues. Requires id. |
+| `append` | `string\|null` | `config` | CSS selector of the element to teleport the tooltip into (e.g. `"body"`, `"#app"`). Avoids overflow/z-index issues. Requires id. |
 | `offset-distance` | `int` | `config` | Distance between trigger and tooltip in px. |
 | `offset-skidding` | `int` | `config` | Lateral offset in px. |
 | `position` | `string` | `config` | CSS positioning strategy: absolute or fixed. |

@@ -3,7 +3,7 @@
     'header' => '',     /** @var \Illuminate\View\ComponentSlot|string */
     'content' => '',    /** @var \Illuminate\View\ComponentSlot|string */
     'placement' => config('wirestrap.popover.placement', 'top'),
-    'appendBody' => config('wirestrap.popover.append_body', false),
+    'append' => config('wirestrap.popover.append', null),
     'trigger' => config('wirestrap.popover.trigger', 'hover'),
     'offsetSkidding' => config('wirestrap.popover.offset_skidding', 0),
     'offsetDistance' => config('wirestrap.popover.offset_distance', 8),
@@ -12,7 +12,7 @@
 ])
 
 @php
-    if ($appendBody && !$id) {
+    if ($append && !$id) {
         throw new \Wirestrap\Exceptions\MissingComponentIdException('popover');
     }
     $isHeaderSlot = $header instanceof \Illuminate\View\ComponentSlot;
@@ -45,9 +45,9 @@
         {{ $slot }}
     </div>
 
-    @if ($appendBody) @teleport('body') @endif
+    @if ($append) @teleport($append) @endif
         <div
-            @if($appendBody) data-ws-float-for="{{ $id }}" @endif
+            @if($append) data-ws-float-for="{{ $id }}" @endif
             data-ws-floatable
             class="ws-popover {{ config('wirestrap.popover.class', '') }}"
             style="display: none"
@@ -67,5 +67,5 @@
                 {{ $isContentSlot ? $content->attributes->except(['class']) : '' }}
             >{{ $content }}</div>
         </div>
-    @if ($appendBody) @endteleport @endif
+    @if ($append) @endteleport @endif
 </div>

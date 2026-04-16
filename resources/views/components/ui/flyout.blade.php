@@ -2,7 +2,7 @@
     'id' => null,
     'content' => '',    /** @var \Illuminate\View\ComponentSlot|string */
     'placement' => config('wirestrap.flyout.placement', 'bottom-start'),
-    'appendBody' => config('wirestrap.flyout.append_body', false),
+    'append' => config('wirestrap.flyout.append', null),
     'trigger' => config('wirestrap.flyout.trigger', 'hover'),
     'offsetSkidding' => config('wirestrap.flyout.offset_skidding', 0),
     'offsetDistance' => config('wirestrap.flyout.offset_distance', 0),
@@ -10,7 +10,7 @@
 ])
 
 @php
-    if ($appendBody && !$id) {
+    if ($append && !$id) {
         throw new \Wirestrap\Exceptions\MissingComponentIdException('flyout');
     }
 
@@ -43,14 +43,14 @@
         {{ $slot }}
     </div>
 
-    @if ($appendBody) @teleport('body') @endif
+    @if ($append) @teleport($append) @endif
         <div
-            @if($appendBody) data-ws-float-for="{{ $id }}" @endif
+            @if($append) data-ws-float-for="{{ $id }}" @endif
             data-ws-floatable
             class="ws-flyout {{ config('wirestrap.flyout.class', '') }}{{ $isContentSlot ? ' ' . $content->attributes->get('class') : '' }}"
             {{ $isContentSlot ? $content->attributes->except(['x-bind', 'class', 'data-ws-floatable', 'style']) : '' }}
             style="display: none;{{ $isContentSlot ? $content->attributes->get('style') : '' }}"
             wire:ignore.self
         >{{ $content }}</div>
-    @if ($appendBody) @endteleport @endif
+    @if ($append) @endteleport @endif
 </div>
