@@ -14,6 +14,7 @@
     'hasValidationMessage' => config('wirestrap.input.has_validation_message', true),
     'defaultAttributes' => config('wirestrap.input.default_attributes', []),
     'dropdownOffset' => config('wirestrap.autocomplete.dropdown_offset', 0),
+    'position' => config('wirestrap.autocomplete.position', 'absolute'),
 ])
 
 @php
@@ -88,6 +89,7 @@
         data-ws-multiple="{{ $multiple ? 'true' : 'false' }}"
         data-ws-live="{{ $live ? 'true' : 'false' }}"
         data-ws-dropdown-offset="{{ $dropdownOffset }}"
+        data-ws-position="{{ $position }}"
         data-ws-label-remove="{{ __('Remove') }}"
         @if ($disabled) disabled @endif
     >

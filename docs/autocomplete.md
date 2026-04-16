@@ -54,6 +54,7 @@ Text input with suggestion dropdown and inline ghost text. Supports single-value
 | `multiple` | `bool` | `false` | Tag mode. wire:model must bind to an array property. |
 | `live` | `bool` | `false` | In multiple mode, sync to Livewire on each tag change. |
 | `dropdown-offset` | `int` | `config` | Y-axis offset in pixels between the trigger and the dropdown. |
+| `position` | `string` | `config` | Floating positioning strategy: `absolute` or `fixed`. |
 | `disabled` | `bool` | `false` | Disable the component. |
 | `has-validation` | `bool` | `config` | Adds invalid class when wire:model has an error. |
 | `has-validation-message` | `bool` | `config` | Renders error message below. |

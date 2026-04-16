@@ -84,6 +84,7 @@ Alpine.data('wsAutocomplete', () => ({
      */
     autocompleteWiremodel: null,
     autocompleteDropdownOffset: 0,
+    autocompletePosition: 'absolute',
     wireOptionsMethod: null,
     wireOptionsMethodWatch: null,
 
@@ -139,6 +140,7 @@ Alpine.data('wsAutocomplete', () => ({
         this.wireOptionsMethod = this.$el.getAttribute('data-ws-wire-options');
         this.wireOptionsMethodWatch = this.$el.getAttribute('data-ws-wire-options-watch');
         this.autocompleteDropdownOffset = parseInt(this.$el.getAttribute('data-ws-dropdown-offset') || 0, 10);
+        this.autocompletePosition = this.$el.getAttribute('data-ws-position') || 'absolute';
 
         this._refreshHandler = () => {
             this.lazyReset();
@@ -214,7 +216,7 @@ Alpine.data('wsAutocomplete', () => ({
      * Floating autocomplete
      */
     getFloatingConfig() {
-        return defaultDropdownConfig(this.autocompleteDropdownOffset);
+        return defaultDropdownConfig(this.autocompleteDropdownOffset, this.autocompletePosition);
     },
 
     autocompleteOpen() {

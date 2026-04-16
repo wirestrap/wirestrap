@@ -208,6 +208,7 @@ return [
         'search_placeholder' => 'Search ...',
         'empty_value' => null,
         'dropdown_offset' => 0,
+        'position' => 'absolute',
         'has_validation' => true,
         'has_validation_message' => true,
         'default_attributes' => [
@@ -218,5 +219,6 @@ return [
 
     'autocomplete' => [
         'dropdown_offset' => 0,
+        'position' => 'absolute',
     ],
 ];
