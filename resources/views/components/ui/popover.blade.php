@@ -60,16 +60,12 @@
             <div
                 class="ws-popover-header{{ $isHeaderSlot ? ' ' . $header->attributes->get('class') : '' }}"
                 {{ $isHeaderSlot ? $header->attributes->except(['class']) : '' }}
-            >
-                {{ $header }}
-            </div>
+            >{{ $header }}</div>
 
             <div
                 class="ws-popover-body{{ $isContentSlot ? ' ' . $content->attributes->get('class') : '' }}"
                 {{ $isContentSlot ? $content->attributes->except(['class']) : '' }}
-            >
-                {{ $content }}
-            </div>
+            >{{ $content }}</div>
         </div>
     @if ($appendBody) @endteleport @endif
 </div>

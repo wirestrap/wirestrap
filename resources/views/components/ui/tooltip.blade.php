@@ -59,9 +59,7 @@
             wire:ignore.self
         >
             @if ($arrow) <div data-ws-arrow class="ws-tooltip-arrow"></div> @endif
-            <div class="ws-tooltip-content">
-                {{ $content }}
-            </div>
+            <div class="ws-tooltip-content">{{ $content }}</div>
         </div>
     @if ($appendBody) @endteleport @endif
 </div>
