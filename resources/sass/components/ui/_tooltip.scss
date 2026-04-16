@@ -7,6 +7,8 @@
     --ws-tooltip-padding-x: var(--ws-spacing-6);
     --ws-tooltip-padding-y: var(--ws-spacing-4);
     --ws-tooltip-font-size: var(--ws-font-size-sm);
+    --ws-tooltip-font-weight: 400;
+    --ws-tooltip-text-align: center;
     --ws-tooltip-max-width: 200px;
     --ws-tooltip-arrow-size: .5rem;
     --ws-tooltip-zindex: var(--ws-zindex-tooltip);
@@ -62,4 +64,6 @@
 
 .ws-tooltip-content {
     padding: var(--ws-tooltip-padding-y) var(--ws-tooltip-padding-x);
+    text-align: var(--ws-tooltip-text-align);
+    font-weight: var(--ws-tooltip-font-weight);
 }
