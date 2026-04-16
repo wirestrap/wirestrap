@@ -51,8 +51,6 @@
             {{ $isContentSlot ? $content->attributes->except(['x-bind', 'class', 'data-ws-floatable', 'style']) : '' }}
             style="display: none;{{ $isContentSlot ? $content->attributes->get('style') : '' }}"
             wire:ignore.self
-        >
-            {{ $content }}
-        </div>
+        >{{ $content }}</div>
     @if ($appendBody) @endteleport @endif
 </div>
