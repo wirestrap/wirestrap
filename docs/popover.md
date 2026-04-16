@@ -14,8 +14,8 @@ Floating panel with header and body, built on `@floating-ui/dom`. Flips and shif
 ```
 
 ```blade
-{{-- Click trigger, append to body --}}
-<x-wirestrap::popover id="user-card" trigger="click" placement="bottom" append="body">
+{{-- Click trigger, teleport to body --}}
+<x-wirestrap::popover id="user-card" trigger="click" placement="bottom" teleport="body">
     <span>Target</span>
 
     <x-slot:header>Status</x-slot:header>
@@ -27,13 +27,13 @@ Floating panel with header and body, built on `@floating-ui/dom`. Flips and shif
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | `string\|null` | `null` | Element id. Required when using append or `$wirestrap.popover`. |
+| `id` | `string\|null` | `null` | Element id. Required when using teleport or `$wirestrap.popover`. |
 | `header` | `slot\|string` | `''` | Header text. Use the header slot for HTML. |
 | `content` | `slot\|string` | `''` | Body text. Use the content slot for HTML. |
 | `placement` | `string` | `config` | Preferred placement: top, bottom, left, right, and -start/-end variants. Flips if out of bounds. |
 | `trigger` | `string` | `config` | Show trigger: hover or click. |
 | `arrow` | `bool` | `true` | Show directional arrow. |
-| `append` | `string\|null` | `config` | CSS selector of the element to teleport the popover into (e.g. `"body"`, `"#app"`). Avoids overflow/z-index issues. Requires id. |
+| `teleport` | `string\|null` | `config` | CSS selector of the element to teleport the popover into (e.g. `"body"`, `"#app"`). Avoids overflow/z-index issues. Requires id. |
 | `offset-distance` | `int` | `config` | Distance between trigger and popover in px. |
 | `offset-skidding` | `int` | `config` | Lateral offset in px. |
 | `position` | `string` | `config` | CSS positioning strategy: absolute or fixed. |
