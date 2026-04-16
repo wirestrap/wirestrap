@@ -14,7 +14,7 @@
  *   trigger    - the element carrying data-ws-float-trigger, where click/hover starts.
  *
  * Teleport support:
- *   When appendBody is used (Blade component option), the floatable lives outside the
+ *   When `append` is used (Blade component option), the floatable lives outside the
  *   container in the DOM. It carries data-ws-float-for="{containerId}" to link back.
  *   _containerFor() resolves the owning container for any element, handling both cases.
  *
@@ -169,7 +169,7 @@ function _findEntry(container) {
 }
 
 /**
- * When appendBody is used, the floatable is teleported outside the container.
+ * When `append` is used, the floatable is teleported outside the container.
  * Look inside the container first, then fall back to a document query via data-ws-float-for.
  * Exclude floatables that are inside [data-ws-float-trigger]: those belong to nested Alpine
  * components (select, autocomplete) and are not managed by this floating-manager instance.

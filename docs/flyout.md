@@ -19,7 +19,7 @@ Generic floating panel built on `@floating-ui/dom`. No semantic meaning — use 
 
 ```blade
 {{-- Append to body to avoid overflow/z-index issues; external control --}}
-<x-wirestrap::flyout id="action-menu" append-body trigger="click">
+<x-wirestrap::flyout id="action-menu" append="body" trigger="click">
     <button type="button">Actions</button>
     <x-slot:content>...</x-slot:content>
 </x-wirestrap::flyout>
@@ -31,11 +31,11 @@ Generic floating panel built on `@floating-ui/dom`. No semantic meaning — use 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | `string\|null` | `null` | Element id. Required when using append-body or `$wirestrap.flyout`. |
+| `id` | `string\|null` | `null` | Element id. Required when using append or `$wirestrap.flyout`. |
 | `content` | `slot\|string` | `''` | Panel content. Slot attributes are forwarded to the panel element. |
 | `placement` | `string` | `config` | Preferred placement: top, bottom, left, right, and -start/-end variants. Flips if out of bounds. |
 | `trigger` | `string` | `config` | Show trigger: hover or click. |
-| `append-body` | `bool` | `config` | Teleport panel to `<body>` to avoid overflow/z-index issues. Requires id. |
+| `append` | `string\|null` | `config` | CSS selector of the element to teleport the panel into (e.g. `"body"`, `"#app"`). Avoids overflow/z-index issues. Requires id. |
 | `offset-distance` | `int` | `config` | Distance between trigger and panel in px. |
 | `offset-skidding` | `int` | `config` | Lateral offset in px. |
 | `position` | `string` | `config` | CSS positioning strategy: absolute or fixed. |
