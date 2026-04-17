@@ -4,31 +4,44 @@
     'head' => null,         /** @var \Illuminate\View\ComponentSlot|null Fallback when columns is not used */
     'foot' => null,         /** @var \Illuminate\View\ComponentSlot|null */
     'bulkActions' => null,  /** @var \Illuminate\View\ComponentSlot|list<array{label: string, icon?: string, icon-placement?: string}>|null */
-    'bulk' => null,         /** @var string|null Livewire property name to bind bulk selection to */
+    'wireModelBulk' => null, /** @var string|null Livewire property name to bind bulk selection to */
     'responsive' => config('wirestrap.table.responsive', true),
     'animate' => config('wirestrap.table.animate', false),
-    'empty' => config('wirestrap.table.empty', 'No results found'), /** @var string|null Set to null or empty string to disable */
+    'emptyLabel' => config('wirestrap.table.empty_label', 'No results'), /** @var string|null Set to null or empty string to disable */
 ])
 
 @php
     $bulkActionsSlot = $bulkActions instanceof \Illuminate\View\ComponentSlot ? $bulkActions : null;
     $bulkActionItems = is_array($bulkActions) ? $bulkActions : null;
-    $emptyColspan = ($count = count($columns) + ($bulk ? 1 : 0)) > 0 ? $count : 100;
+    $emptyColspan = ($count = count($columns) + ($wireModelBulk ? 1 : 0)) > 0 ? $count : 100;
+    $wrapperClass = $attributes->get('class', config('wirestrap.table.class', ''));
 @endphp
 
 <div
     x-data="wsTable"
-    @if ($responsive) class="ws-table-responsive" @endif
-    @if ($bulk) data-ws-model="{{ $bulk }}" @endif
+    @if ($responsive)
+        class="ws-table-responsive{{ $wrapperClass ? ' ' . $wrapperClass : '' }}"
+    @elseif ($wrapperClass)
+        class="{{ $wrapperClass }}"
+    @endif
+    @if ($wireModelBulk) data-ws-model="{{ $wireModelBulk }}" @endif
     @if (!$animate) data-ws-animate="false" @endif
     data-ws-tip="ws-tooltip"
     data-ws-tip-arrow="ws-tooltip-arrow"
     data-ws-tip-inner="ws-tooltip-content"
+    {{
+        $attributes->except([
+            'x-data',
+            'class',
+            'data-ws-model',
+            'data-ws-animate',
+            'data-ws-tip',
+            'data-ws-tip-arrow',
+            'data-ws-tip-inner',
+        ])
+    }}
 >
-    <table
-        class="ws-table {{ $attributes->get('class', config('wirestrap.table.class', '')) }}"
-        {{ $attributes->except(['class']) }}
-    >
+    <table class="ws-table">
         @if ($caption)
             <caption>{{ $caption }}</caption>
         @endif
@@ -36,7 +49,7 @@
         @if ($columns)
             <thead>
                 <tr>
-                    @if ($bulk)
+                    @if ($wireModelBulk)
                         <th scope="col">
                             <input type="checkbox" class="ws-form-check-input" x-bind="wsBulkSelectAll" aria-label="{{ __('Select all') }}" />
                         </th>
@@ -94,7 +107,7 @@
 
             <tr data-ws-empty>
                 <td colspan="{{ $emptyColspan }}" class="ws-table-empty">
-                    <div>{{ $empty }}</div>
+                    <div>{{ __($emptyLabel) }}</div>
                 </td>
             </tr>
         </tbody>
@@ -104,7 +117,7 @@
         @endif
     </table>
 
-    @if ($bulk && $bulkActions)
+    @if ($wireModelBulk && $bulkActions)
         <div data-ws-bulk-container style="display: none" wire:ignore.self>
             @if ($bulkActionsSlot)
                 {{ $bulkActionsSlot }}

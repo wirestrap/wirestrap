@@ -80,7 +80,7 @@
         class="{{ $wsSelectClass }}"
         data-ws-wiremodel="{{ $wiremodel }}"
         data-ws-multiple="{{ $multiple === true ? 'true' : 'false' }}"
-        data-ws-placeholder="{{ $placeholder }}"
+        data-ws-placeholder="{{ __($placeholder) }}"
         data-ws-live="{{ $live === true ? 'true' : 'false' }}"
         @if ($wireOptions) data-ws-wire-options="{{ $wireOptions }}" @endif
         @if ($wireOptionsWatch) data-ws-wire-options-watch="{{ $wireOptionsWatch }}" @endif
@@ -103,7 +103,7 @@
             @if ($id && $hasLabel) aria-labelledby="{{ $id }}-label" @endif
             class="{{ $selectionClass }}"
         >
-            <span class="ws-selection-placeholder">{{ $placeholder }}</span>
+            <span class="ws-selection-placeholder">{{ __($placeholder) }}</span>
         </div>
 
         <div
@@ -118,8 +118,8 @@
                     <input
                         x-bind="searchInput"
                         type="text"
-                        placeholder="{{ $searchPlaceholder }}"
-                        aria-label="{{ $searchPlaceholder }}"
+                        placeholder="{{ __($searchPlaceholder) }}"
+                        aria-label="{{ __($searchPlaceholder) }}"
                     />
                 </div>
             @endif

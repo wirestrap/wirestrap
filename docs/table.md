@@ -25,7 +25,7 @@ Table with auto-truncating column headers (tooltip reveals full text on hover) a
 ```blade
 {{-- Bulk selection with actions bar --}}
 <x-wirestrap::table
-    bulk="selectedIds"
+    wire-model-bulk="selectedIds"
     :bulk-actions="[
         ['label' => 'Delete', 'class' => 'btn btn-danger', 'wire:click' => 'deleteSelected'],
         ['label' => 'Export', 'class' => 'btn btn-secondary', 'wire:click' => 'export'],
@@ -49,14 +49,14 @@ Table with auto-truncating column headers (tooltip reveals full text on hover) a
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `columns` | `array` | `[]` | Column definitions. Each item is a string (label only) or an array — see Column definition below. |
-| `bulk` | `string\|null` | `null` | Livewire property name for bulk selection. Enables select-all checkbox and table.check. |
-| `bulk-actions` | `slot\|array\|null` | `null` | Bulk actions bar. Array of button definitions or slot for custom content. Requires bulk. |
+| `wire-model-bulk` | `string\|null` | `null` | Livewire property name for bulk selection. Enables select-all checkbox and table.check. |
+| `bulk-actions` | `slot\|array\|null` | `null` | Bulk actions bar. Array of button definitions or slot for custom content. Requires wire-model-bulk. |
 | `caption` | `slot\|string\|null` | `null` | Table caption. |
 | `head` | `slot\|null` | `null` | Custom thead. Used when columns is not set. |
 | `foot` | `slot\|null` | `null` | tfoot content. |
 | `responsive` | `bool` | `config` | Wrap table in a responsive container. |
 | `animate` | `bool` | `config` | Enables FLIP animations on row add/reorder and fade+collapse on row removal. Requires `wire:key` on rows. |
-| `empty` | `string\|null` | `config` | Message shown when no rows. Null or empty string to disable. |
+| `empty-label` | `string\|null` | `config` | Message shown when no rows. Null or empty string to disable. |
 
 ### Column definition
 
