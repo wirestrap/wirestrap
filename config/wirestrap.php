@@ -130,7 +130,7 @@ return [
     'table' => [
         'responsive' => true,
         'animate' => false,
-        'empty' => 'No results found',
+        'empty_label' => 'No results',
         'class' => '',
     ],
 
