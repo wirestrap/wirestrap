@@ -105,13 +105,11 @@
         <tbody>
             {{ $slot }}
 
-            @if ($emptyLabel)
-                <tr data-ws-empty>
-                    <td colspan="{{ $emptyColspan }}" class="ws-table-empty">
-                        <div>{{ __($emptyLabel) }}</div>
-                    </td>
-                </tr>
-            @endif
+            <tr data-ws-empty>
+                <td colspan="{{ $emptyColspan }}" class="ws-table-empty">
+                    <div>{{ __($emptyLabel) }}</div>
+                </td>
+            </tr>
         </tbody>
 
         @if ($foot)
