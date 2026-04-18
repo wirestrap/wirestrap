@@ -65,21 +65,19 @@
         ></button>
     @endif
 
-    @pushOnce('styles', 'ws-slider-' . $id)
-        <style>
-            #{{ $id }} { --ws-slider-columns: {{ $columns }}; }
-            @if ($columnsSm)
-            @media (min-width: 576px) { #{{ $id }} { --ws-slider-columns: {{ $columnsSm }}; } }
-            @endif
-            @if ($columnsMd)
-            @media (min-width: 768px) { #{{ $id }} { --ws-slider-columns: {{ $columnsMd }}; } }
-            @endif
-            @if ($columnsLg)
-            @media (min-width: 992px) { #{{ $id }} { --ws-slider-columns: {{ $columnsLg }}; } }
-            @endif
-            @if ($columnsXl)
-            @media (min-width: 1200px) { #{{ $id }} { --ws-slider-columns: {{ $columnsXl }}; } }
-            @endif
-        </style>
-    @endPushOnce
+    <style>
+        #{{ $id }} { --ws-slider-columns: {{ $columns }}; }
+        @if ($columnsSm)
+        @media (min-width: 576px) { #{{ $id }} { --ws-slider-columns: {{ $columnsSm }}; } }
+        @endif
+        @if ($columnsMd)
+        @media (min-width: 768px) { #{{ $id }} { --ws-slider-columns: {{ $columnsMd }}; } }
+        @endif
+        @if ($columnsLg)
+        @media (min-width: 992px) { #{{ $id }} { --ws-slider-columns: {{ $columnsLg }}; } }
+        @endif
+        @if ($columnsXl)
+        @media (min-width: 1200px) { #{{ $id }} { --ws-slider-columns: {{ $columnsXl }}; } }
+        @endif
+    </style>
 </div>
