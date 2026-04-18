@@ -7,8 +7,6 @@
     --ws-table-hover-bg: rgba(0, 0, 0, .075);
     --ws-table-th-font-weight: 600;
     --ws-table-margin-bottom: var(--ws-spacing-8);
-    --ws-table-bulk-gap: var(--ws-spacing-4);
-    --ws-table-bulk-margin-bottom: var(--ws-spacing-8);
     --ws-table-animate-duration: 300ms;
 }
 
@@ -114,6 +112,4 @@ th:has([x-bind="wsBulkSelectAll"]) {
 .ws-table-bulk-actions {
     display: flex;
     align-items: center;
-    gap: var(--ws-table-bulk-gap);
-    margin-bottom: var(--ws-table-bulk-margin-bottom);
 }
