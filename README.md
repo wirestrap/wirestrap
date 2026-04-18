@@ -62,7 +62,13 @@ Every prop has a corresponding config entry. Set a default once and all instance
 
 ## Coding assistants
 
-Wirestrap ships with a concise Markdown reference covering every component, their props, and their JavaScript API. Publish it so your coding assistant can read it and make accurate use of Wirestrap without guessing:
+Wirestrap ships with a concise Markdown reference covering every component, their props, and their JavaScript API. Point your coding assistant at the docs directly in the vendor folder:
+
+```
+vendor/wirestrap/wirestrap/docs/
+```
+
+If you prefer to have the docs in your own project, you can publish them:
 
 ```bash
 php artisan vendor:publish --tag=wirestrap:docs

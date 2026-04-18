@@ -5,6 +5,7 @@
     'columnsMd' => config('wirestrap.slider.columns_md', null),
     'columnsLg' => config('wirestrap.slider.columns_lg', null),
     'columnsXl' => config('wirestrap.slider.columns_xl', null),
+    'columnsXxl' => config('wirestrap.slider.columns_xxl', null),
     'scrollBy' => config('wirestrap.slider.scroll_by', 1),
     'scrollPage' => config('wirestrap.slider.scroll_page', false),
     'arrows' => config('wirestrap.slider.arrows', true),
@@ -65,21 +66,22 @@
         ></button>
     @endif
 
-    @pushOnce('styles', 'ws-slider-' . $id)
-        <style>
-            #{{ $id }} { --ws-slider-columns: {{ $columns }}; }
-            @if ($columnsSm)
-            @media (min-width: 576px) { #{{ $id }} { --ws-slider-columns: {{ $columnsSm }}; } }
-            @endif
-            @if ($columnsMd)
-            @media (min-width: 768px) { #{{ $id }} { --ws-slider-columns: {{ $columnsMd }}; } }
-            @endif
-            @if ($columnsLg)
-            @media (min-width: 992px) { #{{ $id }} { --ws-slider-columns: {{ $columnsLg }}; } }
-            @endif
-            @if ($columnsXl)
-            @media (min-width: 1200px) { #{{ $id }} { --ws-slider-columns: {{ $columnsXl }}; } }
-            @endif
-        </style>
-    @endPushOnce
+    <style>
+        #{{ $id }} { --ws-slider-columns: {{ $columns }}; }
+        @if ($columnsSm)
+        @media (min-width: 576px) { #{{ $id }} { --ws-slider-columns: {{ $columnsSm }}; } }
+        @endif
+        @if ($columnsMd)
+        @media (min-width: 768px) { #{{ $id }} { --ws-slider-columns: {{ $columnsMd }}; } }
+        @endif
+        @if ($columnsLg)
+        @media (min-width: 992px) { #{{ $id }} { --ws-slider-columns: {{ $columnsLg }}; } }
+        @endif
+        @if ($columnsXl)
+        @media (min-width: 1200px) { #{{ $id }} { --ws-slider-columns: {{ $columnsXl }}; } }
+        @endif
+        @if ($columnsXxl)
+        @media (min-width: 1400px) { #{{ $id }} { --ws-slider-columns: {{ $columnsXxl }}; } }
+        @endif
+    </style>
 </div>

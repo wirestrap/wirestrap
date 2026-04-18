@@ -107,6 +107,7 @@ return [
         'columns_md' => null,
         'columns_lg' => null,
         'columns_xl' => null,
+        'columns_xxl' => null,
         'scroll_by' => 1,
         'scroll_page' => false,
         'arrows' => true,

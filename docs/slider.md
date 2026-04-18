@@ -2,8 +2,6 @@
 
 Horizontal carousel with arrow navigation and a fixed column layout. Slides are named slots.
 
-**Important:** Uses `@push('styles')` for per-instance column styles — add `@stack('styles')` inside `<head>` in your layout.
-
 ## Usage
 
 ```blade
@@ -39,6 +37,7 @@ Horizontal carousel with arrow navigation and a fixed column layout. Slides are 
 | `columns-md` | `int\|null` | `config` | Column override at ≥768px. |
 | `columns-lg` | `int\|null` | `config` | Column override at ≥992px. |
 | `columns-xl` | `int\|null` | `config` | Column override at ≥1200px. |
+| `columns-xxl` | `int\|null` | `config` | Column override at ≥1400px. |
 | `scroll-by` | `int` | `config` | Slides advanced per arrow click. Ignored when scroll-page is enabled. |
 | `scroll-page` | `bool` | `config` | Advance by full visible columns per arrow click. |
 | `arrows` | `bool` | `config` | Show built-in prev/next arrows. |
