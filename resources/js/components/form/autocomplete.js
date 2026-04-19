@@ -360,8 +360,7 @@ Alpine.data('wsAutocomplete', () => ({
             const tag = this.selectedTags[i];
 
             const tagEl = document.createElement('span');
-            tagEl.className = 'ws-autocomplete-tag'
-                + (this.invalidIndices.includes(i) ? ' ws-autocomplete-tag-invalid' : '');
+            tagEl.className = 'ws-autocomplete-tag' + (this.invalidIndices.includes(i) ? ' ws-autocomplete-tag-invalid' : '');
 
             const labelEl = document.createElement('span');
             labelEl.className = 'ws-autocomplete-tag-label';
