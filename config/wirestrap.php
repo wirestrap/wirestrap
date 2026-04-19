@@ -222,5 +222,6 @@ return [
     'autocomplete' => [
         'dropdown_offset' => 0,
         'position' => 'absolute',
+        'teleport' => null,
     ],
 ];

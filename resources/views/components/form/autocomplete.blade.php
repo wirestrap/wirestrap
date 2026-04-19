@@ -15,6 +15,7 @@
     'defaultAttributes' => config('wirestrap.input.default_attributes', []),
     'dropdownOffset' => config('wirestrap.autocomplete.dropdown_offset', 0),
     'position' => config('wirestrap.autocomplete.position', 'absolute'),
+    'teleport' => config('wirestrap.autocomplete.teleport', null),
 ])
 
 @php
@@ -135,6 +136,8 @@
                     x-ref="input"
                     x-bind="autocompleteInput"
                     @if ($resolvedId) id="{{ $resolvedId }}" @endif
+                    @if ($resolvedId) aria-controls="{{ $resolvedId }}-listbox" @endif
+                    @if ($resolvedId && $teleport) aria-owns="{{ $resolvedId }}-listbox" @endif
                     type="text"
                     class="ws-form-input ws-autocomplete-input{{ $inputInvalidClass }}"
                     @if ($resolvedPlaceholder !== null) placeholder="{{ $resolvedPlaceholder }}" @endif
@@ -151,21 +154,26 @@
             </div>
         </div>
 
-        <div
-            x-bind="floatable"
-            data-ws-floatable
-            data-floating-placement="bottom"
-            style="display: none"
-            wire:ignore
-        >
-            <template x-for="suggestion in filteredSuggestions" :key="suggestion">
-                <div
-                    class="ws-autocomplete-option"
-                    role="option"
-                    data-ws-option
-                    x-text="suggestion"
-                ></div>
-            </template>
+        <div wire:ignore>
+            @if ($teleport) @teleport($teleport) @endif
+            <div
+                x-bind="floatable"
+                class="ws-autocomplete-dropdown"
+                data-ws-floatable
+                data-floating-placement="bottom"
+                style="display: none"
+                @if ($resolvedId) id="{{ $resolvedId }}-listbox" @endif
+            >
+                <template x-for="suggestion in filteredSuggestions" :key="suggestion">
+                    <div
+                        class="ws-autocomplete-option"
+                        role="option"
+                        data-ws-option
+                        x-text="suggestion"
+                    ></div>
+                </template>
+            </div>
+            @if ($teleport) @endteleport @endif
         </div>
     </div>
 
