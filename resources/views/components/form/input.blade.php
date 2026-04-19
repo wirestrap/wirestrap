@@ -72,8 +72,8 @@
     <input
         @if ($resolvedId) id="{{ $resolvedId }}" @endif
         @if ($hasPasswordToggle)
+            x-bind="input"
             type="password"
-            :type="showPassword ? 'text' : 'password'"
         @else
             type="{{ $type }}"
         @endif
@@ -96,16 +96,15 @@
         <button
             type="button"
             class="ws-form-input-icon ws-form-input-icon-end ws-form-input-password-toggle"
-            x-on:click="toggle()"
-            :aria-label="showPassword ? $root.getAttribute('data-ws-label-hide') : $root.getAttribute('data-ws-label-show')"
+            x-bind="passwordToggle"
         >
-            <span x-show="!showPassword">
+            <span class="ws-password-show-icon">
                 <x-dynamic-component
                     :component="\Wirestrap\Wirestrap::iconComponent()"
                     :icon="$passwordShowIcon"
                 />
             </span>
-            <span x-show="showPassword">
+            <span class="ws-password-hide-icon">
                 <x-dynamic-component
                     :component="\Wirestrap\Wirestrap::iconComponent()"
                     :icon="$passwordHideIcon"

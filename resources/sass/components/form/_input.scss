@@ -90,6 +90,20 @@
     color: inherit;
     cursor: pointer;
     line-height: 1;
+
+    .ws-password-hide-icon {
+        display: none;
+    }
+
+    &.ws-password-shown {
+        .ws-password-show-icon {
+            display: none;
+        }
+
+        .ws-password-hide-icon {
+            display: inline;
+        }
+    }
 }
 
 // Floating overrides
