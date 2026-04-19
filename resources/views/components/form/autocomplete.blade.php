@@ -82,7 +82,7 @@
     <div
         class="{{ $autocompleteClass }}"
         x-data="wsAutocomplete"
-        :class="{ 'ws-autocomplete-has-value': hasValue }"
+        x-bind="autocompleteRoot"
         @if ($wireOptions) data-ws-wire-options="{{ $wireOptions }}" @endif
         @if ($wireOptionsWatch) data-ws-wire-options-watch="{{ $wireOptionsWatch }}" @endif
         @if ($wiremodel) data-ws-wiremodel="{{ $wiremodel }}" @endif
@@ -96,8 +96,7 @@
     >
         <div
             class="ws-autocomplete-input-wrapper{{ $wrapperInvalidClass }}"
-            x-ref="inputWrapper"
-            x-on:click.self="$refs.input.focus()"
+            x-bind="inputWrapper"
         >
             @if ($hasIcon && $multiple)
                 <span class="ws-form-input-icon ws-form-input-icon-{{ $iconPlacement }}">
@@ -105,26 +104,7 @@
                 </span>
             @endif
 
-            <div wire:ignore class="ws-d-contents">
-                <template x-if="multiple">
-                    <template x-for="(tag, index) in selectedTags" :key="tag">
-                        <span class="ws-autocomplete-tag" :class="{ 'ws-autocomplete-tag-invalid': invalidIndices.includes(index) }">
-                            <span class="ws-autocomplete-tag-label" x-text="tag"></span>
-
-                            <button
-                                type="button"
-                                class="ws-autocomplete-tag-remove"
-                                x-on:pointerdown.prevent
-                                x-on:click.stop="removeTag(tag)"
-                                tabindex="-1"
-                                :aria-label="$root.getAttribute('data-ws-label-remove') + ' ' + tag"
-                            >
-                                <span></span>
-                            </button>
-                        </span>
-                    </template>
-                </template>
-            </div>
+            <div wire:ignore class="ws-d-contents" x-ref="tagList"></div>
 
             <div class="ws-autocomplete-field">
                 <div class="ws-autocomplete-ghost" aria-hidden="true">
