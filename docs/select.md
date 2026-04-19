@@ -95,6 +95,17 @@ public function getStatuses(): array
 ```
 
 ```blade
+{{-- teleport: moves the dropdown to body, escaping overflow and stacking contexts --}}
+<x-wirestrap::select
+    id="country-select"
+    wire:model="country"
+    label="Country"
+    wire-options="getCountries"
+    teleport="body"
+/>
+```
+
+```blade
 {{-- Multiple selection: wire:model must bind to an array property --}}
 <x-wirestrap::select
     id="tags-select"
@@ -124,6 +135,7 @@ public function getStatuses(): array
 | `live` | `bool` | `config` | Trigger server round-trip on each selection change. |
 | `dropdown-offset` | `int` | `config` | Y-axis offset in pixels between the trigger and the dropdown. |
 | `position` | `string` | `config` | Floating positioning strategy: `absolute` or `fixed`. |
+| `teleport` | `string\|null` | `config` | CSS selector of the teleport target (e.g. `body`). Moves the dropdown outside the component's DOM tree, escaping all stacking contexts. Requires `id`. Prefer over `position="fixed"` when the dropdown is clipped by a parent. |
 | `empty-value` | `mixed` | `config` | Value treated as "no selection" (shows placeholder). |
 | `has-validation` | `bool` | `config` | Adds invalid class when wire:model has an error. |
 | `has-validation-message` | `bool` | `config` | Renders error message below. |

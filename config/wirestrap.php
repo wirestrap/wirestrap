@@ -210,6 +210,7 @@ return [
         'empty_value' => null,
         'dropdown_offset' => 0,
         'position' => 'absolute',
+        'teleport' => null,
         'has_validation' => true,
         'has_validation_message' => true,
         'default_attributes' => [

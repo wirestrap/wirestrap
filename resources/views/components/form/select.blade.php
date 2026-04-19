@@ -17,6 +17,7 @@
     'live' => config('wirestrap.select.live', false),
     'dropdownOffset' => config('wirestrap.select.dropdown_offset', 0),
     'position' => config('wirestrap.select.position', 'absolute'),
+    'teleport' => config('wirestrap.select.teleport', null),
 ])
 
 @php
@@ -101,32 +102,40 @@
             x-bind="selection"
             @if ($id) id="{{ $id }}" @endif
             @if ($id && $hasLabel) aria-labelledby="{{ $id }}-label" @endif
+            @if ($id) aria-controls="{{ $id }}-listbox" @endif
+            @if ($id && $teleport) aria-owns="{{ $id }}-listbox" @endif
             class="{{ $selectionClass }}"
         >
             <span class="ws-selection-placeholder">{{ __($placeholder) }}</span>
         </div>
 
-        <div
-            x-bind="floatable"
-            data-ws-floatable
-            data-floating-placement="bottom"
-            style="display: none"
-            wire:ignore
-        >
-            @if ($search)
-                <div class="ws-search-container">
-                    <input
-                        x-bind="searchInput"
-                        type="text"
-                        placeholder="{{ __($searchPlaceholder) }}"
-                        aria-label="{{ __($searchPlaceholder) }}"
-                    />
-                </div>
-            @endif
+        <div wire:ignore>
+            @if ($teleport) @teleport($teleport) @endif
+            <div
+                x-bind="floatable"
+                class="ws-select-dropdown"
+                data-ws-floatable
+                data-floating-placement="bottom"
+                style="display: none"
+                @if ($id) id="{{ $id }}-listbox" @endif
+            >
+                @if ($search)
+                    <div class="ws-search-container">
+                        <input
+                            x-bind="searchInput"
+                            type="text"
+                            @if ($id) id="{{ $id }}-search" @endif
+                            placeholder="{{ __($searchPlaceholder) }}"
+                            aria-label="{{ __($searchPlaceholder) }}"
+                        />
+                    </div>
+                @endif
 
-            <div x-bind="loader"></div>
+                <div x-bind="loader"></div>
 
-            <div wire:ignore class="ws-d-contents" x-bind="optionList"></div>
+                <div wire:ignore class="ws-d-contents" x-bind="optionList"></div>
+            </div>
+            @if ($teleport) @endteleport @endif
         </div>
     </div>
 
