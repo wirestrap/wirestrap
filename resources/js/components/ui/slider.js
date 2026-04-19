@@ -20,6 +20,27 @@
  */
 Alpine.data('wsSlider', () => ({
     /**
+     * Binding
+     */
+    prevArrow: {
+        ['x-on:click']() {
+            this.scrollPrev();
+        },
+        ['x-bind:disabled']() {
+            return !this.canScrollPrev;
+        },
+    },
+
+    nextArrow: {
+        ['x-on:click']() {
+            this.scrollNext();
+        },
+        ['x-bind:disabled']() {
+            return !this.canScrollNext;
+        },
+    },
+
+    /**
      * State
      */
     canScrollPrev: false,

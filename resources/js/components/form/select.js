@@ -36,12 +36,14 @@ Alpine.data('wsSelect', () => ({
     select: {
         ['x-ref']: 'select',
         ['x-bind:class']() {
+            const classes = { 'ws-select-open': this.floatingShown };
             if (this.selectEmptyValue === null) {
-                return {};
+                return classes;
             }
+
             const isEmptyValue =
                 !this.selectMultiple && this.checkedValues.length === 1 && this.checkedValues[0] === this.selectEmptyValue;
-            return { 'ws-selected': !isEmptyValue && this.checkedValues.length > 0 };
+            return { ...classes, 'ws-selected': !isEmptyValue && this.checkedValues.length > 0 };
         },
         ['x-on:keydown.enter'](event) {
             this.onEnter(event);
@@ -143,6 +145,11 @@ Alpine.data('wsSelect', () => ({
             if (event.key === 'Escape') {
                 this.selectHide(true);
                 event.stopPropagation();
+            } else if (event.key === 'Enter') {
+                // When teleported, keydown events from searchInput do not bubble to the
+                // .ws-select root where x-on:keydown.enter listens: handle Enter here
+                event.preventDefault();
+                this.navigateSelect();
             } else if (event.key === 'ArrowDown') {
                 event.preventDefault();
                 event.stopPropagation();
@@ -285,7 +292,10 @@ Alpine.data('wsSelect', () => ({
         }
 
         this._onClickOutside = (event) => {
-            !this.$el.contains(event.target) && document.contains(event.target) && this.selectHide();
+            document.contains(event.target) &&
+                !this.$el.contains(event.target) &&
+                !this._floatingEl?.contains(event.target) &&
+                this.selectHide();
         };
 
         this.onFloatingShow = () => {

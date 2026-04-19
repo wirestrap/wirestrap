@@ -15,6 +15,7 @@
     'defaultAttributes' => config('wirestrap.input.default_attributes', []),
     'dropdownOffset' => config('wirestrap.autocomplete.dropdown_offset', 0),
     'position' => config('wirestrap.autocomplete.position', 'absolute'),
+    'teleport' => config('wirestrap.autocomplete.teleport', null),
 ])
 
 @php
@@ -81,7 +82,7 @@
     <div
         class="{{ $autocompleteClass }}"
         x-data="wsAutocomplete"
-        :class="{ 'ws-autocomplete-has-value': hasValue }"
+        x-bind="autocompleteRoot"
         @if ($wireOptions) data-ws-wire-options="{{ $wireOptions }}" @endif
         @if ($wireOptionsWatch) data-ws-wire-options-watch="{{ $wireOptionsWatch }}" @endif
         @if ($wiremodel) data-ws-wiremodel="{{ $wiremodel }}" @endif
@@ -95,8 +96,7 @@
     >
         <div
             class="ws-autocomplete-input-wrapper{{ $wrapperInvalidClass }}"
-            x-ref="inputWrapper"
-            x-on:click.self="$refs.input.focus()"
+            x-bind="inputWrapper"
         >
             @if ($hasIcon && $multiple)
                 <span class="ws-form-input-icon ws-form-input-icon-{{ $iconPlacement }}">
@@ -104,26 +104,7 @@
                 </span>
             @endif
 
-            <div wire:ignore class="ws-d-contents">
-                <template x-if="multiple">
-                    <template x-for="(tag, index) in selectedTags" :key="tag">
-                        <span class="ws-autocomplete-tag" :class="{ 'ws-autocomplete-tag-invalid': invalidIndices.includes(index) }">
-                            <span class="ws-autocomplete-tag-label" x-text="tag"></span>
-
-                            <button
-                                type="button"
-                                class="ws-autocomplete-tag-remove"
-                                x-on:pointerdown.prevent
-                                x-on:click.stop="removeTag(tag)"
-                                tabindex="-1"
-                                :aria-label="$root.getAttribute('data-ws-label-remove') + ' ' + tag"
-                            >
-                                <span></span>
-                            </button>
-                        </span>
-                    </template>
-                </template>
-            </div>
+            <div wire:ignore class="ws-d-contents" x-ref="tagList"></div>
 
             <div class="ws-autocomplete-field">
                 <div class="ws-autocomplete-ghost" aria-hidden="true">
@@ -135,6 +116,8 @@
                     x-ref="input"
                     x-bind="autocompleteInput"
                     @if ($resolvedId) id="{{ $resolvedId }}" @endif
+                    @if ($resolvedId) aria-controls="{{ $resolvedId }}-listbox" @endif
+                    @if ($resolvedId && $teleport) aria-owns="{{ $resolvedId }}-listbox" @endif
                     type="text"
                     class="ws-form-input ws-autocomplete-input{{ $inputInvalidClass }}"
                     @if ($resolvedPlaceholder !== null) placeholder="{{ $resolvedPlaceholder }}" @endif
@@ -151,21 +134,26 @@
             </div>
         </div>
 
-        <div
-            x-bind="floatable"
-            data-ws-floatable
-            data-floating-placement="bottom"
-            style="display: none"
-            wire:ignore
-        >
-            <template x-for="suggestion in filteredSuggestions" :key="suggestion">
-                <div
-                    class="ws-autocomplete-option"
-                    role="option"
-                    data-ws-option
-                    x-text="suggestion"
-                ></div>
-            </template>
+        <div wire:ignore>
+            @if ($teleport) @teleport($teleport) @endif
+            <div
+                x-bind="floatable"
+                class="ws-autocomplete-dropdown"
+                data-ws-floatable
+                data-floating-placement="bottom"
+                style="display: none"
+                @if ($resolvedId) id="{{ $resolvedId }}-listbox" @endif
+            >
+                <template x-for="suggestion in filteredSuggestions" :key="suggestion">
+                    <div
+                        class="ws-autocomplete-option"
+                        role="option"
+                        data-ws-option
+                        x-text="suggestion"
+                    ></div>
+                </template>
+            </div>
+            @if ($teleport) @endteleport @endif
         </div>
     </div>
 

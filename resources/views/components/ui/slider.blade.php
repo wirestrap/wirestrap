@@ -40,8 +40,7 @@
         <button
             type="button"
             class="ws-slider-arrow ws-slider-arrow-prev"
-            x-on:click="scrollPrev()"
-            x-bind:disabled="!canScrollPrev"
+            x-bind="prevArrow"
             aria-label="{{ __('Previous') }}"
         ></button>
     @endif
@@ -60,8 +59,7 @@
         <button
             type="button"
             class="ws-slider-arrow ws-slider-arrow-next"
-            x-on:click="scrollNext()"
-            x-bind:disabled="!canScrollNext"
+            x-bind="nextArrow"
             aria-label="{{ __('Next') }}"
         ></button>
     @endif

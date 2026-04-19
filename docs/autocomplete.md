@@ -29,6 +29,17 @@ Text input with suggestion dropdown and inline ghost text. Supports single-value
 ```
 
 ```blade
+{{-- teleport: moves the dropdown to body, escaping overflow and stacking contexts --}}
+<x-wirestrap::autocomplete
+    id="city-input"
+    wire:model="city"
+    wire-options="getCities"
+    label="City"
+    teleport="body"
+/>
+```
+
+```blade
 {{-- Multiple mode: wire:model binds to an array property --}}
 <x-wirestrap::autocomplete
     wire:model="tags"
@@ -55,6 +66,7 @@ Text input with suggestion dropdown and inline ghost text. Supports single-value
 | `live` | `bool` | `false` | In multiple mode, sync to Livewire on each tag change. |
 | `dropdown-offset` | `int` | `config` | Y-axis offset in pixels between the trigger and the dropdown. |
 | `position` | `string` | `config` | Floating positioning strategy: `absolute` or `fixed`. |
+| `teleport` | `string\|null` | `config` | CSS selector of the teleport target (e.g. `body`). Moves the dropdown outside the component's DOM tree, escaping all stacking contexts. Requires `id`. Prefer over `position="fixed"` when the dropdown is clipped by a parent. |
 | `disabled` | `bool` | `false` | Disable the component. |
 | `has-validation` | `bool` | `config` | Adds invalid class when wire:model has an error. |
 | `has-validation-message` | `bool` | `config` | Renders error message below. |

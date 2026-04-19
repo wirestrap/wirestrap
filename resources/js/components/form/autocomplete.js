@@ -41,6 +41,28 @@ Alpine.data('wsAutocomplete', () => ({
     /**
      * Binding
      */
+    autocompleteRoot: {
+        ['x-bind:class']() {
+            return { 'ws-autocomplete-has-value': this.hasValue };
+        },
+    },
+
+    inputWrapper: {
+        ['x-ref']: 'inputWrapper',
+        ['x-on:click'](event) {
+            const removeBtn = event.target.closest('[data-ws-tag-remove]');
+            if (removeBtn) {
+                this.removeTag(removeBtn.dataset.wsTagRemove);
+                return;
+            }
+
+            event.target === this.$el && this.$refs.input.focus();
+        },
+        ['x-on:pointerdown'](event) {
+            event.target.closest('[data-ws-tag-remove]') && event.preventDefault();
+        },
+    },
+
     autocompleteInput: {
         ['x-on:input'](event) {
             this._dropdownActive = true;
@@ -152,6 +174,7 @@ Alpine.data('wsAutocomplete', () => ({
         if (this.multiple && this.$wire) {
             this._morphedUnsub = this.$wire.$hook('morphed', () => {
                 this.invalidIndices = this._readInvalidIndices();
+                this.renderTags();
             });
         }
         this.live = this.$el.getAttribute('data-ws-live') === 'true';
@@ -196,9 +219,11 @@ Alpine.data('wsAutocomplete', () => ({
             } else if (this.$wire && this.autocompleteWiremodel) {
                 const current = this.$wire.$get(this.autocompleteWiremodel);
                 this.selectedTags = Array.isArray(current) ? [...current] : [];
+                this.renderTags();
 
                 this._valueWatchUnsub = this.$wire.$watch(this.autocompleteWiremodel, (value) => {
                     this.selectedTags = Array.isArray(value) ? [...value] : [];
+                    this.renderTags();
                 });
             }
         });
@@ -288,6 +313,7 @@ Alpine.data('wsAutocomplete', () => ({
         }
 
         this.selectedTags = [...this.selectedTags, value];
+        this.renderTags();
         this.$refs.input.value = '';
         this.query = '';
         this.ghostSuffix = '';
@@ -308,10 +334,49 @@ Alpine.data('wsAutocomplete', () => ({
                 .filter((i) => i !== removedIndex)
                 .map((i) => (i > removedIndex ? i - 1 : i));
         }
+
+        this.renderTags();
         this.$refs.input.focus();
 
         if (this.$wire && this.autocompleteWiremodel) {
             this.$wire.$set(this.autocompleteWiremodel, this.selectedTags, this.live);
+        }
+    },
+
+    /**
+     * Tags
+     */
+    renderTags() {
+        if (!this.multiple || !this.$refs.tagList) {
+            return;
+        }
+
+        const container = this.$refs.tagList;
+        container.replaceChildren();
+
+        const labelRemove = this.$el.getAttribute('data-ws-label-remove') ?? '';
+
+        for (let i = 0; i < this.selectedTags.length; i++) {
+            const tag = this.selectedTags[i];
+
+            const tagEl = document.createElement('span');
+            tagEl.className = 'ws-autocomplete-tag' + (this.invalidIndices.includes(i) ? ' ws-autocomplete-tag-invalid' : '');
+
+            const labelEl = document.createElement('span');
+            labelEl.className = 'ws-autocomplete-tag-label';
+            labelEl.textContent = tag;
+            tagEl.appendChild(labelEl);
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'ws-autocomplete-tag-remove';
+            btn.dataset.wsTagRemove = tag;
+            btn.tabIndex = -1;
+            btn.setAttribute('aria-label', labelRemove + ' ' + tag);
+            btn.appendChild(document.createElement('span'));
+            tagEl.appendChild(btn);
+
+            container.appendChild(tagEl);
         }
     },
 
