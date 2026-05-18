@@ -4,10 +4,20 @@ Programmatic toast notifications. Multiple toasts stack on screen, auto-dismiss 
 
 ## Usage
 
+**Alpine**
+
 ```js
 $wirestrap.toast('File saved successfully.')
 $wirestrap.toast({ type: 'success', title: 'Saved', message: 'Your changes have been saved.' })
 $wirestrap.toast({ type: 'danger', title: 'Connection lost', message: 'Reconnecting…', duration: 0 })
+```
+
+**Vanilla JS**
+
+```js
+Wirestrap.toast.add('File saved successfully.')
+Wirestrap.toast.add({ type: 'success', title: 'Saved', message: 'Your changes have been saved.' })
+Wirestrap.toast.add({ type: 'danger', title: 'Connection lost', message: 'Reconnecting…', duration: 0 })
 ```
 
 ```php
@@ -26,7 +36,7 @@ class MyComponent extends Component
 }
 ```
 
-## $wirestrap.toast()
+## $wirestrap.toast() / Wirestrap.toast.add()
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|

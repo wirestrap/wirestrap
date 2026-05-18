@@ -12,8 +12,8 @@
  * Floating elements (flyout, popover, tooltip) share the same show/hide/toggle
  * interface and are dispatched through the ws-floating custom event.
  */
-import { addToast } from './components/ui/toast';
-import { alertShow, alertShowConfirm } from './components/ui/alert';
+import './components/ui/toast';
+import './components/ui/alert';
 
 // Dispatches a ws-floating event to a floating element by its DOM id.
 const _floatingDispatch = (id, action) => {
@@ -35,7 +35,7 @@ Alpine.magic('wirestrap', (el) => ({
     },
 
     alert: {
-        show: alertShow,
+        show: Wirestrap.alert.show,
 
         /**
          * Shorthand confirm: accepts either a plain message string or a full options object.
@@ -53,7 +53,7 @@ Alpine.magic('wirestrap', (el) => ({
                 typeof optionsOrMessage === 'string'
                     ? { message: optionsOrMessage, wire, method, params }
                     : { ...optionsOrMessage, wire };
-            alertShowConfirm(options);
+            Wirestrap.alert.confirm.show(options);
         },
     },
 
@@ -102,7 +102,7 @@ Alpine.magic('wirestrap', (el) => ({
         show: (id, key) => document.getElementById(id)?.dispatchEvent(new CustomEvent('ws-tabs', { detail: key })),
     },
 
-    toast: addToast,
+    toast: Wirestrap.toast.add,
 
     tooltip: {
         show: (id) => _floatingDispatch(id, 'show'),
