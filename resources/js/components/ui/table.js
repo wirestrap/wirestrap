@@ -36,6 +36,10 @@ Alpine.data('wsTable', () => ({
      */
     wsBulkCheck: {
         ['x-on:change'](e) {
+            if (e.target.disabled || e.target.hasAttribute('readonly')) {
+                return;
+            }
+
             const current = [...this._getSelected()];
             const value = e.target.value;
 
@@ -60,17 +64,18 @@ Alpine.data('wsTable', () => ({
     wsBulkSelectAll: {
         ['x-on:change'](e) {
             const checked = e.target.checked;
-            const allValues = this._getCheckboxes().map((cb) => cb.value);
-            this.$wire.$set(this._modelName, checked ? allValues : [], false);
+            const selectableValues = this._getSelectableCheckboxes().map((cb) => cb.value);
+            this.$wire.$set(this._modelName, checked ? selectableValues : [], false);
         },
         ['x-effect']() {
-            const checkboxes = this._getCheckboxes();
+            const checkboxes = this._getSelectableCheckboxes();
             const someChecked = checkboxes.some((cb) => this.selectedItems.includes(cb.value));
             const allChecked = checkboxes.length > 0 && checkboxes.every((cb) => this.selectedItems.includes(cb.value));
             this.$el.indeterminate = someChecked && !allChecked;
+            this.$el.disabled = checkboxes.length === 0;
         },
         ['x-bind:checked']() {
-            const checkboxes = this._getCheckboxes();
+            const checkboxes = this._getSelectableCheckboxes();
             return checkboxes.length > 0 && checkboxes.every((cb) => this.selectedItems.includes(cb.value));
         },
     },
@@ -480,6 +485,10 @@ Alpine.data('wsTable', () => ({
 
     _getCheckboxes() {
         return this._checkboxEls;
+    },
+
+    _getSelectableCheckboxes() {
+        return this._checkboxEls.filter((cb) => !cb.disabled && !cb.hasAttribute('readonly'));
     },
 
     _getSelected() {
