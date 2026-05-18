@@ -1,7 +1,7 @@
 /**
  * Alert & confirm modal system.
  *
- * Provides alertShow() and alertShowConfirm() with global configs.
+ * Provides Wirestrap.alert.show() / Wirestrap.alert.confirm.show() and global configs.
  * Only one alert is shown at a time; others are queued.
  *
  * Alert:
@@ -358,16 +358,12 @@ const _alert = {
 |--------------------------------------------------------------------------
 */
 
-export const alertShow = (options) => {
-    _alert.show(typeof options === 'string' ? { message: options } : options);
-};
-
-export const alertShowConfirm = (options) => {
-    _alert.showConfirm(options);
-};
-
 globalThis.Wirestrap ??= {};
 globalThis.Wirestrap.alert = {
+    show: (options) => {
+        _alert.show(typeof options === 'string' ? { message: options } : options);
+    },
+
     configure(options) {
         if (options.duration !== undefined) _alert._defaultDuration = options.duration;
         if (options.dismissText !== undefined) _alert._dismissText = options.dismissText;
@@ -377,6 +373,10 @@ globalThis.Wirestrap.alert = {
     },
 
     confirm: {
+        show: (options) => {
+            _alert.showConfirm(options);
+        },
+
         configure(options) {
             if (options.type !== undefined) _confirmDefaults.type = options.type;
             if (options.title !== undefined) _confirmDefaults.title = options.title;

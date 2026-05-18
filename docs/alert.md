@@ -1,12 +1,21 @@
 # Alert
 
-Programmatic centered alert dialogs, queued one at a time. Trigger from Alpine via `$wirestrap.alert` or from Livewire PHP via `WithWirestrap::alert()`.
+Programmatic centered alert dialogs, queued one at a time. Trigger from Alpine via `$wirestrap.alert`, via `Wirestrap.alert` in vanilla JS, or from Livewire PHP via `WithWirestrap::alert()`.
 
 ## Usage
+
+**Alpine**
 
 ```js
 $wirestrap.alert.show('Changes saved.')
 $wirestrap.alert.show({ type: 'danger', title: 'Error', message: 'Something went wrong.' })
+```
+
+**Vanilla JS**
+
+```js
+Wirestrap.alert.show('Changes saved.')
+Wirestrap.alert.show({ type: 'danger', title: 'Error', message: 'Something went wrong.' })
 ```
 
 ```blade
@@ -26,7 +35,21 @@ $wirestrap.alert.show({ type: 'danger', title: 'Error', message: 'Something went
 </button>
 ```
 
-## $wirestrap.alert.show()
+**Vanilla JS — confirm** (pass `wire` explicitly, no auto-resolution)
+
+```js
+Wirestrap.alert.confirm.show({
+    type: 'danger',
+    title: 'Delete record',
+    message: 'This action cannot be undone.',
+    wire: Livewire.find(wireId),
+    method: 'delete',
+    params: [recordId],
+    confirmText: 'Yes, delete',
+})
+```
+
+## $wirestrap.alert.show() / Wirestrap.alert.show()
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -39,7 +62,7 @@ $wirestrap.alert.show({ type: 'danger', title: 'Error', message: 'Something went
 | `backdropDismiss` | `bool` | `true` | Dismiss on backdrop click. Alert shakes if disabled and attempted. |
 | `escapeDismiss` | `bool` | `true` | Dismiss on Escape. Alert shakes if disabled and attempted. |
 
-## $wirestrap.alert.confirm()
+## $wirestrap.alert.confirm() / Wirestrap.alert.confirm.show()
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|

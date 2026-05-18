@@ -1,7 +1,7 @@
 /**
  * Toast system.
  *
- * Provides addToast() and global Wirestrap.toast config.
+ * Provides Wirestrap.toast.add() and global Wirestrap.toast config.
  * Toasts are added to a dynamically created container.
  *
  * Timer:
@@ -222,12 +222,12 @@ const _toasts = {
 |--------------------------------------------------------------------------
 */
 
-export const addToast = (options) => {
-    _toasts.add(typeof options === 'string' ? { message: options } : options);
-};
-
 globalThis.Wirestrap ??= {};
 globalThis.Wirestrap.toast = {
+    add: (options) => {
+        _toasts.add(typeof options === 'string' ? { message: options } : options);
+    },
+
     configure(options) {
         if (options.duration !== undefined) _toasts._defaultDuration = options.duration;
         if (options.max !== undefined) _toasts._max = options.max;
