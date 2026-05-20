@@ -88,7 +88,7 @@ th:has([x-bind="wsBulkSelectAll"]) {
         display: table-row;
     }
 
-    &:not([data-ws-init]):first-child:last-child {
+    &[data-ws-animate]:not([data-ws-init]):first-child:last-child {
         td,
         td > * {
             animation: ws-fade-in 200ms ease-out both;
