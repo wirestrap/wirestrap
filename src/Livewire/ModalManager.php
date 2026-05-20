@@ -62,7 +62,6 @@ class ModalManager extends Component
         $this->modals[$component][] = $hash;
         $this->props[$hash] = $props;
         $this->modalProps[$hash] = $modalProps;
-        $this->dispatch('ws-modal-manager:open', hash: $hash);
     }
 
     /**

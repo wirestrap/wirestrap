@@ -288,6 +288,10 @@ Alpine.data('wsModal', () => ({
             this._modalCleanup = () => {
                 modal.removeEventListener('ws-modal', onEvent);
             };
+
+            if (this.$el.getAttribute('data-ws-auto-show') === 'true') {
+                this.modalShow();
+            }
         });
     },
 

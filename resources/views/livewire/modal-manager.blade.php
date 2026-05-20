@@ -7,6 +7,7 @@
                     <div wire:key="ws-modal-{{ $hash }}">
                         <x-wirestrap::modal
                             :id="'modal_' . $hash"
+                            :auto-show="true"
                             :attributes="new Illuminate\View\ComponentAttributeBag($modalProps[$hash])"
                         >
                             @livewire(
