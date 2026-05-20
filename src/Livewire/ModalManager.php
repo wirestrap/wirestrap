@@ -66,14 +66,14 @@ class ModalManager extends Component
     }
 
     /**
-     * @param string|list<string>|null $component
+     * @param string|list<string>|null $components
      * @param string|list<string>|null $key
      */
     #[On('ws-modal-manager:destroy')]
-    public function destroy(string|array|null $component = null, string|array|null $key = null): void
+    public function destroy(string|array|null $components = null, string|array|null $key = null): void
     {
-        if ($component !== null) {
-            foreach ((array) $component as $comp) {
+        if ($components !== null) {
+            foreach ((array) $components as $comp) {
                 foreach (($this->modals[$comp] ?? []) as $hash) {
                     unset($this->props[$hash]);
                     unset($this->modalProps[$hash]);
