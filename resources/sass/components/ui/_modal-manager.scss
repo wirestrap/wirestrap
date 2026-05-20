@@ -1,0 +1,10 @@
+.ws-modal-manager-loading {
+    --ws-modal-manager-loading-zindex: var(--ws-zindex-loading-cursor);
+}
+
+.ws-modal-manager-loading {
+    position: fixed;
+    inset: 0;
+    cursor: wait;
+    z-index: var(--ws-modal-manager-loading-zindex);
+}

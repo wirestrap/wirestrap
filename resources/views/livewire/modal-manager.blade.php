@@ -1,4 +1,5 @@
 <div>
+    <div wire:loading class="ws-modal-manager-loading"></div>
     <div x-data="wsModalManager" x-bind="modalManager">
         @foreach ($modals as $subComponent => $modalList)
             <div wire:key="ws-component-{{ md5($subComponent) }}">
