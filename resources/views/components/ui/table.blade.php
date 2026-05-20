@@ -94,7 +94,7 @@
             <tbody>
                 {{ $slot }}
 
-                <tr data-ws-empty>
+                <tr data-ws-empty {{ $animate ? 'data-ws-animate' : '' }}>
                     <td colspan="{{ $emptyColspan }}" class="ws-table-empty">
                         <div>{{ __($emptyLabel) }}</div>
                     </td>
