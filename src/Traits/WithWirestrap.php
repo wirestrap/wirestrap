@@ -109,7 +109,7 @@ trait WithWirestrap
     ): void {
         $this->dispatch(
             event: 'ws-modal-manager:destroy',
-            component: $component,
+            components: $component,
             key: $key,
         );
     }
