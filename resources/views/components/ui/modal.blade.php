@@ -10,6 +10,7 @@
     'static' => config('wirestrap.modal.static', false),
     'backdrop' => config('wirestrap.modal.backdrop', false),
     'dismissible' => config('wirestrap.modal.dismissible', true),
+    'autoShow' => false,
 ])
 
 @php
@@ -31,6 +32,7 @@
     data-ws-static="{{ $static ? 'true' : 'false' }}"
     data-ws-resizable="{{ $resizable ? 'true' : 'false' }}"
     data-ws-backdrop="{{ $backdrop ? 'true' : 'false' }}"
+    @if ($autoShow) data-ws-auto-show="true" @endif
     @if ($minimizable)
         data-ws-label="{{ $title ?: $modalId }}"
         data-ws-btn-class="ws-modal-minimized-btn"

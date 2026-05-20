@@ -1,4 +1,5 @@
 <div>
+    <div wire:loading class="ws-modal-manager-loading"></div>
     <div x-data="wsModalManager" x-bind="modalManager">
         @foreach ($modals as $subComponent => $modalList)
             <div wire:key="ws-component-{{ md5($subComponent) }}">
@@ -6,6 +7,7 @@
                     <div wire:key="ws-modal-{{ $hash }}">
                         <x-wirestrap::modal
                             :id="'modal_' . $hash"
+                            :auto-show="true"
                             :attributes="new Illuminate\View\ComponentAttributeBag($modalProps[$hash])"
                         >
                             @livewire(

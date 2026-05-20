@@ -18,7 +18,6 @@ import './components/ui/accordion';
 import './components/ui/slider';
 import './components/ui/table';
 import './components/ui/counter';
-import './components/ui/modal-manager';
 import './components/ui/modal';
 import './components/ui/floating-manager';
 import './components/ui/tabs';
