@@ -77,7 +77,7 @@ export function resizable() {
                     const startRight = startLeft + startWidth;
                     // Respect a CSS-defined min-width (e.g. from the component's SCSS variables)
                     // over the JS fallback so theming constraints are honoured at runtime.
-                    const effectiveMinWidth = parseFloat(getComputedStyle(target).minWidth) || minWidth;
+                    const effectiveMinWidth = parseFloat(getComputedStyle(target).minWidth?.match(/[\d.]+px/)?.[0]) || minWidth;
 
                     const onResizeMove = (e) => {
                         if (e.cancelable) {
