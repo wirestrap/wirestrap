@@ -2,6 +2,7 @@
 
 namespace Wirestrap\Livewire;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
@@ -48,9 +49,22 @@ class ModalManager extends Component
         $component = $payload['component'] ?? null;
         $props = $payload['props'] ?? [];
         $modalProps = $payload['modal_props'] ?? [];
+        $expiresAt = $payload['event_expires_at'] ?? null;
 
         if (!$component) {
             return;
+        }
+
+        if (!$expiresAt || now()->timestamp > $expiresAt) {
+            return;
+        }
+
+        if (config('wirestrap.modal_manager.nonce', true)) {
+            $nonce = $payload['nonce'] ?? null;
+
+            if (!$nonce || !Cache::pull("ws-modal-nonce:{$hash}:{$nonce}")) {
+                return;
+            }
         }
 
         if (in_array($hash, $this->modals[$component] ?? [], true)) {

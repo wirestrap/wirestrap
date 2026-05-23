@@ -49,6 +49,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Modal Manager
+    |--------------------------------------------------------------------------
+    |
+    | The modal manager dispatches encrypted Livewire events to render managed
+    | modals. By default, each event payload is bound to a single-use nonce
+    | stored in the default cache store (which must be persistent across requests).
+    |
+    */
+    'modal_manager' => [
+        'nonce' => true,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | UI Components
     |--------------------------------------------------------------------------
     |
