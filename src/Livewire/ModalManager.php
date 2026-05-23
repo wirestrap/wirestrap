@@ -80,8 +80,6 @@ class ModalManager extends Component
 
                 unset($this->modals[$comp]);
             }
-
-            return;
         }
 
         if ($key !== null) {
