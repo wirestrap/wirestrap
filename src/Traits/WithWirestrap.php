@@ -2,6 +2,9 @@
 
 namespace Wirestrap\Traits;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
+
 trait WithWirestrap
 {
     protected function toast(
@@ -91,6 +94,14 @@ trait WithWirestrap
         $hash = is_string($key)
             ? 'ws-' . $key
             : 'ws-' . md5((string) json_encode($payload));
+
+        $payload['event_expires_at'] = now()->addMinute()->timestamp;
+
+        if (config('wirestrap.modal_manager.nonce', true)) {
+            $nonce = (string) Str::uuid();
+            Cache::put("ws-modal-nonce:{$hash}:{$nonce}", true, 60);
+            $payload['nonce'] = $nonce;
+        }
 
         $this->dispatch(
             event: 'ws-modal-manager:show',
