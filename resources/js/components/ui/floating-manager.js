@@ -26,6 +26,12 @@
  *   After each morph, _schedulePrune() removes entries whose DOM elements are gone.
  *   On Livewire navigate, all active entries are torn down synchronously.
  *
+ * Global configuration (Wirestrap.floating.configure):
+ *   keepShownFor - array of CSS selectors whose matching elements are treated as in-scope.
+ *                  Merged with the built-in defaults (.ws-select-dropdown, .ws-autocomplete-dropdown).
+ *                  Useful for third-party widgets (datepickers, selects…) that teleport
+ *                  their panel outside the container, to prevent unwanted close on interaction.
+ *
  * Data attributes read from the container element:
  *   data-ws-float-id        - unique identifier for the container.
  *   data-ws-placement       - @floating-ui/dom placement string (default: "top").
@@ -52,12 +58,26 @@ let _pruneScheduled = false;
 
 /*
 |--------------------------------------------------------------------------
+|   Global config
+|--------------------------------------------------------------------------
+*/
+
+const _config = {
+    // CSS selectors — elements matching these are treated as in-scope (e.g. third-party dropdowns teleported to body).
+    // WireStrap's own select and autocomplete dropdowns are included by default so that a flyout containing
+    // one of these components does not close when the user interacts with the dropdown panel.
+    keepShownFor: ['.ws-select-dropdown', '.ws-autocomplete-dropdown', '.ws-autocomplete-option'],
+};
+
+/*
+|--------------------------------------------------------------------------
 |   Config
 |--------------------------------------------------------------------------
 */
 
 function _readConfig(container) {
     const ds = container.dataset;
+
     return {
         placement: ds.wsPlacement || 'top',
         trigger: ds.wsTrigger || 'hover',
@@ -75,11 +95,14 @@ function _readConfig(container) {
 
 function show(triggerEl) {
     const container = triggerEl.closest('[data-ws-float-id]');
-    if (!container) return;
-    if (_findEntry(container)) return;
+    if (!container || _findEntry(container)) {
+        return;
+    }
 
     const floatable = _findFloatable(container);
-    if (!floatable) return;
+    if (!floatable) {
+        return;
+    }
 
     _transitionTimeouts.get(floatable)?.();
     _transitionTimeouts.delete(floatable);
@@ -94,11 +117,16 @@ function show(triggerEl) {
         flip({ fallbackPlacements: ['top', 'bottom', 'right', 'left'] }),
         shift(),
     ];
+
     if (arrowEl) {
         middleware.push(arrowMiddleware({ element: arrowEl }));
     }
 
-    const floatingConfig = { placement: config.placement, strategy: config.strategy, middleware };
+    const floatingConfig = {
+        placement: config.placement,
+        strategy: config.strategy,
+        middleware,
+    };
 
     floatable.style.position = config.strategy;
     floatable.style.top = '0';
@@ -115,13 +143,17 @@ function show(triggerEl) {
 
 function hide(container) {
     const entry = _findEntry(container);
-    if (!entry) return;
+    if (!entry) {
+        return;
+    }
 
     entry.cleanup();
     entry.floatable.classList.remove('show');
 
     const triggerEl = entry.container.querySelector('[data-ws-float-trigger]');
-    if (triggerEl) triggerEl.classList.remove('open');
+    if (triggerEl) {
+        triggerEl.classList.remove('open');
+    }
 
     _active.splice(_active.indexOf(entry), 1);
 
@@ -149,6 +181,7 @@ function _update(anchor, floatable, floatingConfig, arrowEl) {
 
         if (middlewareData.arrow && arrowEl) {
             const { x: ax, y: ay } = middlewareData.arrow;
+
             Object.assign(arrowEl.style, {
                 position: 'absolute',
                 left: ax != null ? `${ax}px` : '',
@@ -187,7 +220,9 @@ function _findFloatable(container) {
  */
 function _containerFor(el) {
     const direct = el.closest('[data-ws-float-id]');
-    if (direct) return direct;
+    if (direct) {
+        return direct;
+    }
 
     const floatable = el.closest('[data-ws-floatable][data-ws-float-for]');
     if (floatable) {
@@ -201,13 +236,24 @@ function _containerFor(el) {
 
 /**
  * Checks if el is within the container or its associated floatable (handles teleport).
+ * Also returns true if el matches any selector in _config.keepShownFor — useful for
+ * third-party widgets (datepickers, selects…) that teleport their panel to the body.
  */
 function _inScope(container, el) {
-    if (!el) return false;
-    if (container.contains(el)) return true;
+    if (!el) {
+        return false;
+    }
+
+    if (container.contains(el)) {
+        return true;
+    }
 
     const entry = _findEntry(container);
-    return entry?.floatable.contains(el) ?? false;
+    if (entry?.floatable.contains(el)) {
+        return true;
+    }
+
+    return _config.keepShownFor.some((selector) => el.closest(selector) !== null);
 }
 
 /*
@@ -221,8 +267,12 @@ function _pruneDetached() {
 }
 
 function _schedulePrune() {
-    if (_pruneScheduled) return;
+    if (_pruneScheduled) {
+        return;
+    }
+
     _pruneScheduled = true;
+
     requestAnimationFrame(() => {
         _pruneDetached();
         _pruneScheduled = false;
@@ -244,6 +294,7 @@ onNavigate(() => {
         clearTimeout(_hoverTimeouts.get(a.container));
         a.cleanup();
     });
+
     _active.length = 0;
 });
 
@@ -255,7 +306,9 @@ onNavigate(() => {
 
 document.addEventListener('ws-floating', (e) => {
     const container = e.target.closest('[data-ws-float-id]');
-    if (!container) return;
+    if (!container) {
+        return;
+    }
 
     const { action } = e.detail || {};
     const trigger = container.querySelector('[data-ws-float-trigger]');
@@ -272,6 +325,7 @@ document.addEventListener('ws-floating', (e) => {
 function _handleEnter(e) {
     if (e.target.closest('[data-ws-floatable]')) {
         const container = _containerFor(e.target);
+
         if (container && container.dataset.wsTrigger === 'hover') {
             clearTimeout(_hoverTimeouts.get(container));
             _hoverTimeouts.delete(container);
@@ -279,9 +333,14 @@ function _handleEnter(e) {
     }
 
     const trigger = e.target.closest('[data-ws-float-trigger]');
-    if (!trigger) return;
+    if (!trigger) {
+        return;
+    }
+
     const container = trigger.closest('[data-ws-float-id]');
-    if (!container || container.dataset.wsTrigger !== 'hover') return;
+    if (!container || container.dataset.wsTrigger !== 'hover') {
+        return;
+    }
 
     clearTimeout(_hoverTimeouts.get(container));
     _hoverTimeouts.delete(container);
@@ -297,10 +356,15 @@ document.addEventListener('mouseout', (e) => {
         .filter((a) => !_inScope(a.container, e.relatedTarget))
         .forEach((a) => {
             clearTimeout(_hoverTimeouts.get(a.container));
+
             const timeout = setTimeout(() => {
-                if (a.container.matches(':focus-within') || a.floatable.matches(':focus-within')) return;
+                if (a.container.matches(':focus-within') || a.floatable.matches(':focus-within')) {
+                    return;
+                }
+
                 hide(a.container);
             }, 50);
+
             _hoverTimeouts.set(a.container, timeout);
         });
 });
@@ -309,24 +373,51 @@ document.addEventListener('focusin', _handleEnter);
 
 document.addEventListener('focusout', (e) => {
     const container = _containerFor(e.target);
-    if (!container || container.dataset.wsTrigger !== 'hover') return;
+    if (!container || container.dataset.wsTrigger !== 'hover') {
+        return;
+    }
 
     const entry = _findEntry(container);
-    if (!entry) return;
+    if (!entry) {
+        return;
+    }
 
-    if (_inScope(container, e.relatedTarget)) return;
+    if (_inScope(container, e.relatedTarget)) {
+        return;
+    }
 
     if (!entry.container.matches(':hover') && !entry.floatable.matches(':hover')) {
         hide(container);
     }
 });
 
+/*
+|--------------------------------------------------------------------------
+|   Public API
+|--------------------------------------------------------------------------
+*/
+
+globalThis.Wirestrap ??= {};
+globalThis.Wirestrap.floating = {
+    configure(options) {
+        if (options.keepShownFor !== undefined) {
+            _config.keepShownFor = [..._config.keepShownFor, ...options.keepShownFor];
+        }
+    },
+};
+
 document.addEventListener('click', (e) => {
     [..._active].filter((a) => !_inScope(a.container, e.target)).forEach((a) => hide(a.container));
 
     const trigger = e.target.closest('[data-ws-float-trigger]');
-    if (!trigger) return;
+    if (!trigger) {
+        return;
+    }
+
     const container = trigger.closest('[data-ws-float-id]');
-    if (!container || container.dataset.wsTrigger !== 'click') return;
+    if (!container || container.dataset.wsTrigger !== 'click') {
+        return;
+    }
+
     _findEntry(container) ? hide(container) : show(trigger);
 });
