@@ -146,9 +146,8 @@ Alpine.data('wsSelect', () => ({
                 this.selectHide(true);
                 event.stopPropagation();
             } else if (event.key === 'Enter') {
-                // When teleported, keydown events from searchInput do not bubble to the
-                // .ws-select root where x-on:keydown.enter listens: handle Enter here
                 event.preventDefault();
+                event.stopPropagation();
                 this.navigateSelect();
             } else if (event.key === 'ArrowDown') {
                 event.preventDefault();
@@ -426,7 +425,13 @@ Alpine.data('wsSelect', () => ({
             }
 
             this._methodLoaded = true; // marks lazyLoader as loaded
-            this.renderSelection();
+
+            // Skipping this when there is no selection avoids replacing the
+            // placeholder DOM node between pointerdown and click, which would
+            // suppress the click event and leave the dropdown closed
+            if (this._hasRealSelection()) {
+                this.renderSelection();
+            }
         });
     },
 
