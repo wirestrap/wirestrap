@@ -146,9 +146,8 @@ Alpine.data('wsSelect', () => ({
                 this.selectHide(true);
                 event.stopPropagation();
             } else if (event.key === 'Enter') {
-                // When teleported, keydown events from searchInput do not bubble to the
-                // .ws-select root where x-on:keydown.enter listens: handle Enter here
                 event.preventDefault();
+                event.stopPropagation();
                 this.navigateSelect();
             } else if (event.key === 'ArrowDown') {
                 event.preventDefault();
