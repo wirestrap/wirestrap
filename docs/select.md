@@ -74,6 +74,45 @@ public function getCountries(): array
 ```
 
 ```blade
+{{-- wire-options-params: static value passed as argument to the method --}}
+<x-wirestrap::select
+    id="city-select"
+    wire:model="city"
+    label="City"
+    wire-options="getCities"
+    wire-options-params="france"
+/>
+```
+
+```blade
+{{-- wire-options-params: Livewire property resolved at call time --}}
+<x-wirestrap::select
+    id="city-select"
+    wire:model="city"
+    label="City"
+    wire-options="getCities"
+    :wire-options-params="['ws-wire' => 'selectedCountry']"
+    wire-options-watch="selectedCountry"
+/>
+```
+
+```blade
+{{-- wire-options-params: multiple mixed arguments --}}
+<x-wirestrap::select
+    id="city-select"
+    wire:model="city"
+    label="City"
+    wire-options="getCities"
+    :wire-options-params="[['ws-wire' => 'selectedCountry'], 'active', 10]"
+    wire-options-watch="selectedCountry"
+/>
+```
+
+```php
+public function getCities(string $country, string $status, int $limit): array { ... }
+```
+
+```blade
 {{-- html_prefix / html_suffix: raw HTML wrapping or decorating the label --}}
 <x-wirestrap::select
     id="status-select"
@@ -125,6 +164,7 @@ public function getStatuses(): array
 | `label` | `slot\|string\|null` | `null` | Label text or slot content. |
 | `options` | `array\|null` | `null` | Options passed as an array. Short form: `['value' => 'Label']`. Full form: `[['value' => ..., 'label' => ..., 'disabled' => ..., 'optgroup' => ..., 'class' => ..., 'html_prefix' => ..., 'html_suffix' => ...]]`. Reacts to Livewire re-renders automatically. Mutually exclusive with `wire-options`. |
 | `wire-options` | `string\|null` | `null` | Livewire method returning the options array. Called once on first open; cached. Called immediately on load if a value is already selected. |
+| `wire-options-params` | `mixed\|list<mixed>\|null` | `null` | Argument(s) passed to the `wire-options` method. A scalar is passed as a single argument; an array is spread as positional arguments. To pass a Livewire property resolved at call time, use `['ws-wire' => 'dotPath']` instead of the value. Requires `wire-options`. |
 | `wire-options-watch` | `string\|null` | `null` | Livewire property to watch. Invalidates cache on change; reloads immediately if dropdown is open. Requires `wire-options`. |
 | `floating` | `bool` | `false` | Floating label layout. |
 | `placeholder` | `string` | `config` | Text shown when no option is selected. |
