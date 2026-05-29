@@ -128,13 +128,13 @@ Alpine.data('wsTabs', () => ({
         oldPanel.style.opacity = '0';
 
         this._timeout1 = setTimeout(() => {
-            oldPanel.style.display = 'none';
+            oldPanel.classList.add('ws-tabs-panel--hidden');
             oldPanel.style.transition = '';
             oldPanel.style.opacity = '';
 
             // Place new panel at opacity 0 before showing it
             newPanel.style.opacity = '0';
-            newPanel.style.display = 'block';
+            newPanel.classList.remove('ws-tabs-panel--hidden');
             newPanel.dispatchEvent(new CustomEvent('ws-show'));
 
             // First rAF: let the browser paint the newly shown panel (display: block, opacity: 0).
