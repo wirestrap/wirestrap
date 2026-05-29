@@ -97,7 +97,7 @@ Alpine.data('wsSelect', () => ({
         },
         ['x-on:keydown'](event) {
             if (!this.floatingShown) {
-                if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === ' ') {
                     event.preventDefault();
                     this.selectShow();
                 }
