@@ -84,9 +84,9 @@
                     wire:ignore.self
                     id="ws-tabs-{{ $id }}-panel-{{ $key }}"
                     data-ws-tab="{{ $key }}"
+                    class="ws-tabs-panel{{ $key !== $defaultTab ? ' ws-tabs-panel--hidden' : '' }}"
                     role="tabpanel"
                     aria-labelledby="ws-tabs-{{ $id }}-btn-{{ $key }}"
-                    @if ($key !== $defaultTab) style="display: none" @endif
                 >
                     {{ $tab }}
                 </div>

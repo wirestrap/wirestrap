@@ -60,3 +60,11 @@
     padding-top: var(--ws-tabs-content-padding-top);
     overflow: hidden;
 }
+
+.ws-tabs-panel {
+    display: block;
+}
+
+.ws-tabs-panel.ws-tabs-panel--hidden {
+    display: none;
+}
