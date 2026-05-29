@@ -8,6 +8,7 @@
     'offsetDistance' => config('wirestrap.tooltip.offset_distance', 8),
     'position' => config('wirestrap.tooltip.position', 'absolute'),
     'arrow' => config('wirestrap.tooltip.arrow', true),
+    'interactive' => config('wirestrap.tooltip.interactive', false),
 ])
 
 @php
@@ -26,6 +27,7 @@
     data-ws-offset-skidding="{{ $offsetSkidding }}"
     data-ws-offset-distance="{{ $offsetDistance }}"
     data-ws-position="{{ $position }}"
+    @if($interactive) data-ws-interactive @endif
     {{
         $attributes->except([
             'id',
@@ -37,6 +39,7 @@
             'data-ws-position',
             'data-ws-anchor',
             'data-ws-float-trigger',
+            'data-ws-interactive',
         ])
     }}
 >
