@@ -1,4 +1,4 @@
-import { computePosition, autoUpdate, offset, flip, shift, size } from '@floating-ui/dom';
+import { computePosition, autoUpdate, offset, flip, shift, size, hide } from '@floating-ui/dom';
 import { afterTransition } from '../utils/transition';
 
 /**
@@ -22,6 +22,7 @@ export function defaultDropdownConfig(offsetY = 0, strategy = 'absolute') {
                     elements.floating.style.width = `${rects.reference.width}px`;
                 },
             }),
+            hide(),
         ],
     };
 }
@@ -102,6 +103,11 @@ export function floatingElement() {
 
             computePosition(this._floatingReference, this._floatingEl, this._floatingConfig).then(
                 ({ x, y, placement, middlewareData }) => {
+                    if (middlewareData.hide?.referenceHidden) {
+                        this.floatingHide();
+                        return;
+                    }
+
                     Object.assign(this._floatingEl.style, {
                         left: `${x}px`,
                         top: `${y}px`,
