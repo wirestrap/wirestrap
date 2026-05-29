@@ -208,6 +208,7 @@ Alpine.data('wsSelect', () => ({
     wireOptionsMethod: null,
     wireOptionsMethodWatch: null,
     _placeholderText: '',
+    _emptyOptionsLabel: '',
 
     /**
      * Cleanup
@@ -321,6 +322,7 @@ Alpine.data('wsSelect', () => ({
 
         this.$nextTick(() => {
             this._placeholderText = this.$el.getAttribute('data-ws-placeholder') ?? 'Select an option';
+            this._emptyOptionsLabel = this.$el.getAttribute('data-ws-empty-options-label') ?? 'No results';
 
             if (this.$refs.selection.offsetParent !== null) {
                 this.floatingInit(this.$refs.selection, this.$refs.floatable, this.getFloatingConfig());
@@ -667,6 +669,13 @@ Alpine.data('wsSelect', () => ({
             }
 
             el.appendChild(inner);
+            container.appendChild(el);
+        }
+
+        if (this.displayedOptions.length === 0 && (!this.wireOptionsMethod || this._methodLoaded)) {
+            const el = document.createElement('div');
+            el.className = 'ws-select-empty';
+            el.textContent = this._emptyOptionsLabel;
             container.appendChild(el);
         }
 

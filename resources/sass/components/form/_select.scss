@@ -47,6 +47,7 @@
     --ws-select-search-border-color: var(--ws-border-color);
     --ws-select-search-border-radius: var(--ws-border-radius);
     --ws-select-search-focus-border-color: var(--ws-focus-color);
+    --ws-select-empty-color: var(--ws-muted);
 }
 
 // Trigger
@@ -332,6 +333,13 @@
         padding-top: .25rem;
     }
 
+    .ws-select-empty {
+        padding: var(--ws-select-option-padding);
+        margin-bottom: var(--ws-spacing-4);
+        color: var(--ws-select-empty-color);
+        user-select: none;
+    }
+
     .ws-select-optgroup-label {
         padding: var(--ws-select-optgroup-label-padding);
         font-size: var(--ws-select-optgroup-label-font-size);
@@ -410,6 +418,10 @@
                     background-color: var(--ws-select-option-highlighted-background);
                 }
             }
+        }
+
+        &:last-child {
+            margin-bottom: var(--ws-spacing-4);
         }
     }
 }

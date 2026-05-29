@@ -224,6 +224,7 @@ return [
         'live' => false,
         'placeholder' => 'Select an option',
         'search_placeholder' => 'Search ...',
+        'empty_options_label' => 'No results',
         'empty_value' => null,
         'dropdown_offset' => 0,
         'position' => 'absolute',

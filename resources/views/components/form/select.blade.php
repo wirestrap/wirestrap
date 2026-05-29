@@ -10,6 +10,7 @@
     'search' => config('wirestrap.select.search', false),
     'placeholder' => config('wirestrap.select.placeholder', 'Select an option'),
     'searchPlaceholder' => config('wirestrap.select.search_placeholder', 'Search ...'),
+    'emptyOptionsLabel' => config('wirestrap.select.empty_options_label', 'No results'),
     'emptyValue' => config('wirestrap.select.empty_value', null),
     'options' => null,
     'wireOptions' => null,
@@ -83,6 +84,7 @@
         data-ws-wiremodel="{{ $wiremodel }}"
         data-ws-multiple="{{ $multiple === true ? 'true' : 'false' }}"
         data-ws-placeholder="{{ __($placeholder) }}"
+        data-ws-empty-options-label="{{ __($emptyOptionsLabel) }}"
         data-ws-live="{{ $live === true ? 'true' : 'false' }}"
         @if ($wireOptions) data-ws-wire-options="{{ $wireOptions }}" @endif
         @if ($wireOptionsParams !== null) data-ws-wire-options-params="{{ json_encode(is_array($wireOptionsParams) ? $wireOptionsParams : [$wireOptionsParams]) }}" @endif
@@ -95,7 +97,7 @@
             $attributes->whereDoesntStartWith('wire:model')->except([
                 'class', 'x-data', 'data-ws-wiremodel', 'data-ws-multiple', 'data-ws-placeholder',
                 'data-ws-live', 'data-ws-wire-options', 'data-ws-wire-options-params', 'data-ws-wire-options-watch', 'data-ws-options',
-                'data-ws-dropdown-offset', 'data-ws-position',
+                'data-ws-dropdown-offset', 'data-ws-position', 'data-ws-empty-options-label',
             ])->merge($defaultAttributes)
         }}
     >
