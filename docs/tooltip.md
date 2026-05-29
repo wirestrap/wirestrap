@@ -30,6 +30,7 @@ Floating tooltip built on `@floating-ui/dom`. Wraps any trigger element. Focusin
 | `placement` | `string` | `config` | Preferred placement: top, bottom, left, right, and -start/-end variants. Flips if out of bounds. |
 | `trigger` | `string` | `config` | Show trigger: hover or click. |
 | `arrow` | `bool` | `true` | Show directional arrow. |
+| `interactive` | `bool` | `false` | When true, hovering the tooltip panel keeps it visible. |
 | `teleport` | `string\|null` | `config` | CSS selector of the element to teleport the tooltip into (e.g. `"body"`, `"#app"`). Avoids overflow/z-index issues. Requires id. |
 | `offset-distance` | `int` | `config` | Distance between trigger and tooltip in px. |
 | `offset-skidding` | `int` | `config` | Lateral offset in px. |

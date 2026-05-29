@@ -78,6 +78,7 @@ return [
         'offset_distance' => 8,
         'position' => 'absolute',
         'arrow' => true,
+        'interactive' => false,
         'class' => '',
     ],
 
@@ -89,6 +90,7 @@ return [
         'offset_distance' => 8,
         'position' => 'absolute',
         'arrow' => true,
+        'interactive' => true,
         'class' => '',
     ],
 
@@ -100,6 +102,7 @@ return [
         'offset_skidding' => 0,
         'offset_distance' => 0,
         'position' => 'absolute',
+        'interactive' => true,
         'class' => '',
     ],
 

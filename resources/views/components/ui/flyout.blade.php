@@ -7,6 +7,7 @@
     'offsetSkidding' => config('wirestrap.flyout.offset_skidding', 0),
     'offsetDistance' => config('wirestrap.flyout.offset_distance', 0),
     'position' => config('wirestrap.flyout.position', 'absolute'),
+    'interactive' => config('wirestrap.flyout.interactive', true),
 ])
 
 @php
@@ -25,6 +26,7 @@
     data-ws-offset-skidding="{{ $offsetSkidding }}"
     data-ws-offset-distance="{{ $offsetDistance }}"
     data-ws-position="{{ $position }}"
+    @if($interactive) data-ws-interactive @endif
     {{
         $attributes->except([
             'id',
@@ -36,6 +38,7 @@
             'data-ws-position',
             'data-ws-anchor',
             'data-ws-float-trigger',
+            'data-ws-interactive',
         ])
     }}
 >

@@ -39,6 +39,8 @@
  *   data-ws-offset-skidding - cross-axis offset in px.
  *   data-ws-offset-distance - main-axis offset in px.
  *   data-ws-position        - @floating-ui/dom strategy ("absolute" or "fixed").
+ *   data-ws-interactive     - boolean attribute. When present, hovering the floatable
+ *                             panel keeps it visible.
  */
 import { computePosition, autoUpdate, offset, flip, shift, arrow as arrowMiddleware } from '@floating-ui/dom';
 import { afterTransition } from '../../utils/transition';
@@ -244,12 +246,16 @@ function _inScope(container, el) {
         return false;
     }
 
-    if (container.contains(el)) {
-        return true;
+    const entry = _findEntry(container);
+
+    // Elements inside the floatable are in-scope only when the component is interactive.
+    // This check must come before container.contains() to handle the non-teleported case,
+    // where the floatable lives inside the container.
+    if (entry && entry.floatable.contains(el)) {
+        return container.hasAttribute('data-ws-interactive');
     }
 
-    const entry = _findEntry(container);
-    if (entry?.floatable.contains(el)) {
+    if (container.contains(el)) {
         return true;
     }
 
@@ -326,7 +332,7 @@ function _handleEnter(e) {
     if (e.target.closest('[data-ws-floatable]')) {
         const container = _containerFor(e.target);
 
-        if (container && container.dataset.wsTrigger === 'hover') {
+        if (container && container.dataset.wsTrigger === 'hover' && container.hasAttribute('data-ws-interactive')) {
             clearTimeout(_hoverTimeouts.get(container));
             _hoverTimeouts.delete(container);
         }
