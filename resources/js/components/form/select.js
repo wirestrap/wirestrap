@@ -15,8 +15,12 @@
  *   data-ws-placeholder    - placeholder text.
  *   data-ws-empty-value    - value treated as "no selection" (toggles ws-selected class).
  *   data-ws-live           - "true" to trigger a server round-trip on each change.
- *   data-ws-wire-options   - Livewire method name returning the options array.
- *   data-ws-wire-options-watch - dot-path to a Livewire property; reload options on change.
+ *   data-ws-wire-options         - Livewire method name returning the options array.
+ *   data-ws-wire-options-params  - JSON-encoded argument(s) passed to the method: a scalar or
+ *                                  a list<mixed> (a scalar prop is automatically wrapped in an array
+ *                                  by the Blade component). Each item is passed as-is except objects
+ *                                  with a "ws-wire" key, resolved via $wire.$get(param['ws-wire']) at call time.
+ *   data-ws-wire-options-watch   - dot-path to a Livewire property; reload options on change.
  */
 import { floatingElement, defaultDropdownConfig } from '../../mixins/floating-element.js';
 import { listNavigation } from '../../mixins/list-navigation.js';
@@ -411,7 +415,15 @@ Alpine.data('wsSelect', () => ({
         }
 
         this.options = [];
-        this.$wire.$call(this.wireOptionsMethod).then((result) => {
+        const paramsJson = this.$root.getAttribute('data-ws-wire-options-params');
+        const params = paramsJson ? JSON.parse(paramsJson) : [];
+        const args = params.map((param) => {
+            if (param !== null && typeof param === 'object' && 'ws-wire' in param) {
+                return this.$wire.$get(param['ws-wire']);
+            }
+            return param;
+        });
+        this.$wire.$call(this.wireOptionsMethod, ...args).then((result) => {
             if (Array.isArray(result)) {
                 this.options = result.map((item) => ({
                     value: String(item.value),
