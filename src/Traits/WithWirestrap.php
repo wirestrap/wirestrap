@@ -65,12 +65,12 @@ trait WithWirestrap
         $this->js('$wirestrap.alert.show(' . json_encode($options) . ')');
     }
 
-    private function modalShow(string $id): void
+    protected function modalShow(string $id): void
     {
         $this->js('$wirestrap.modal.show(' . json_encode($id) . ')');
     }
 
-    private function modalHide(string $id): void
+    protected function modalHide(string $id): void
     {
         $this->js('$wirestrap.modal.hide(' . json_encode($id) . ')');
     }
