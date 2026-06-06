@@ -16,11 +16,12 @@
  *   data-ws-empty-value    - value treated as "no selection" (toggles ws-selected class).
  *   data-ws-live           - "true" to trigger a server round-trip on each change.
  *   data-ws-wire-options         - Livewire method name returning the options array.
- *   data-ws-wire-options-params  - JSON-encoded argument(s) passed to the method: a scalar or
- *                                  a list<mixed> (a scalar prop is automatically wrapped in an array
- *                                  by the Blade component). Each item is passed as-is except objects
- *                                  with a "ws-wire" key, resolved via $wire.$get(param['ws-wire']) at call time.
- *   data-ws-wire-options-watch   - dot-path to a Livewire property; reload options on change.
+ *   data-ws-wire-options-params  - JSON-encoded list of arguments passed to the method. Each item is
+ *                                  passed as-is except objects with a "ws-wire" key, resolved via
+ *                                  $wire.$get(param['ws-wire']) at call time.
+ *   data-ws-wire-options-watch   - dot-path to a Livewire property; invalidates cache on change.
+ *   data-ws-wire-options-reset   - JSON-encoded value to set the model to when the watched property changes.
+ *   data-ws-wire-options-reset-live - "true" to trigger a server round-trip when applying the reset.
  */
 import { floatingElement, defaultDropdownConfig } from '../../mixins/floating-element.js';
 import { listNavigation } from '../../mixins/list-navigation.js';
@@ -207,6 +208,8 @@ Alpine.data('wsSelect', () => ({
     selectPosition: 'absolute',
     wireOptionsMethod: null,
     wireOptionsMethodWatch: null,
+    wireOptionsResetValue: null,
+    wireOptionsResetLive: false,
     _placeholderText: '',
     _emptyOptionsLabel: '',
 
@@ -273,6 +276,8 @@ Alpine.data('wsSelect', () => ({
         this.selectPosition = this.$el.getAttribute('data-ws-position') || 'absolute';
         this.wireOptionsMethod = this.$el.getAttribute('data-ws-wire-options');
         this.wireOptionsMethodWatch = this.$el.getAttribute('data-ws-wire-options-watch');
+        this.wireOptionsResetValue = this.$el.getAttribute('data-ws-wire-options-reset');
+        this.wireOptionsResetLive = this.$el.getAttribute('data-ws-wire-options-reset-live') === 'true';
 
         const domOptionsJson = this.$el.getAttribute('data-ws-options');
         if (domOptionsJson) {
@@ -342,8 +347,18 @@ Alpine.data('wsSelect', () => ({
             if (this.wireOptionsMethodWatch && this.$wire) {
                 this._watchUnsub = this.$wire.$watch(this.wireOptionsMethodWatch, () => {
                     this.lazyReset();
-                    if (this.floatingShown || this._hasRealSelection()) {
-                        this.loadOptions();
+
+                    if (this.wireOptionsResetValue !== null && this.selectWiremodel) {
+                        const resetVal = JSON.parse(this.wireOptionsResetValue);
+                        this.$wire.$set(this.selectWiremodel, resetVal, this.wireOptionsResetLive);
+
+                        if (this.floatingShown) {
+                            this.loadOptions();
+                        }
+                    } else {
+                        if (this.floatingShown || this._hasRealSelection()) {
+                            this.loadOptions();
+                        }
                     }
                 });
             }
