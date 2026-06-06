@@ -242,5 +242,6 @@ return [
         'position' => 'absolute',
         'teleport' => null,
         'min_chars' => 0,
+        'no_dropdown' => false,
     ],
 ];

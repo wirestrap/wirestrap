@@ -17,6 +17,7 @@
     'position' => config('wirestrap.autocomplete.position', 'absolute'),
     'teleport' => config('wirestrap.autocomplete.teleport', null),
     'minChars' => config('wirestrap.autocomplete.min_chars', 0),
+    'noDropdown' => config('wirestrap.autocomplete.no_dropdown', false),
 ])
 
 @php
@@ -119,6 +120,7 @@
         data-ws-multiple="{{ $multiple ? 'true' : 'false' }}"
         data-ws-live="{{ $live ? 'true' : 'false' }}"
         data-ws-min-chars="{{ $minChars }}"
+        @if ($noDropdown) data-ws-no-dropdown="true" @endif
         data-ws-dropdown-offset="{{ $dropdownOffset }}"
         data-ws-position="{{ $position }}"
         data-ws-label-remove="{{ __('Remove') }}"

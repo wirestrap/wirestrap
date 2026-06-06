@@ -113,6 +113,7 @@ Alpine.data('wsAutocomplete', () => ({
     autocompleteDropdownOffset: 0,
     autocompletePosition: 'absolute',
     minChars: 0,
+    noDropdown: false,
     wireOptionsMethod: null,
     wireOptionsMethodWatch: null,
     wireOptionsResetValue: null,
@@ -138,7 +139,7 @@ Alpine.data('wsAutocomplete', () => ({
     },
 
     get filteredSuggestions() {
-        if (!this._dropdownActive) {
+        if (this.noDropdown || !this._dropdownActive) {
             return [];
         }
 
@@ -175,6 +176,7 @@ Alpine.data('wsAutocomplete', () => ({
         this.autocompleteDropdownOffset = parseInt(this.$el.getAttribute('data-ws-dropdown-offset') || 0, 10);
         this.autocompletePosition = this.$el.getAttribute('data-ws-position') || 'absolute';
         this.minChars = parseInt(this.$el.getAttribute('data-ws-min-chars') || 0, 10);
+        this.noDropdown = this.$el.getAttribute('data-ws-no-dropdown') === 'true';
 
         this._refreshHandler = () => {
             this.lazyReset();
@@ -418,7 +420,7 @@ Alpine.data('wsAutocomplete', () => ({
     onFocus() {
         this._dropdownActive = true;
 
-        this.wireOptionsMethod && this.lazyLoad(() => this.loadSuggestions());
+        !this.noDropdown && this.wireOptionsMethod && this.lazyLoad(() => this.loadSuggestions());
     },
 
     onFocusout(event) {
