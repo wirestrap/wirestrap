@@ -7,7 +7,7 @@ Text input with suggestion dropdown and inline ghost text. Supports single-value
 ## Usage
 
 ```blade
-{{-- wire-options: calls $this->getCities() on first focus, result cached --}}
+{{-- wire-options: string = method name; array = [method, ...params] --}}
 <x-wirestrap::autocomplete
     wire:model="city"
     wire-options="getCities"
@@ -16,15 +16,28 @@ Text input with suggestion dropdown and inline ghost text. Supports single-value
     icon="bi-geo-alt"
     floating
 />
+
+{{-- Cascading: pass $this->selectedCountry at call time, reset city on country change --}}
+<x-wirestrap::autocomplete
+    wire:model="city"
+    :wire-options="['getCities', ['ws-wire' => 'selectedCountry']]"
+    :wire-options-watch="['selectedCountry', null]"
+    label="City"
+/>
+{{-- wire-options-watch variants:
+     'prop'              → cache invalidation only
+     ['prop', val]       → + reset model to val on change
+     ['prop', val, true] → + trigger a server round-trip on reset --}}
 ```
 
 ```blade
-{{-- wire-options-watch: invalidates cache when $this->selectedCountry changes --}}
+{{-- Multiple mode: wire:model binds to an array property --}}
 <x-wirestrap::autocomplete
-    wire:model="city"
-    wire-options="getCities"
-    wire-options-watch="selectedCountry"
-    label="City"
+    wire:model="tags"
+    wire-options="getTechnologies"
+    label="Technologies"
+    multiple
+    live
 />
 ```
 
@@ -39,25 +52,14 @@ Text input with suggestion dropdown and inline ghost text. Supports single-value
 />
 ```
 
-```blade
-{{-- Multiple mode: wire:model binds to an array property --}}
-<x-wirestrap::autocomplete
-    wire:model="tags"
-    wire-options="getTechnologies"
-    label="Technologies"
-    multiple
-    live
-/>
-```
-
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | `string\|null` | `null` | Input id. Auto-resolved from wire:model when omitted. |
 | `label` | `slot\|string\|null` | `null` | Label text or slot content. |
-| `wire-options` | `string\|null` | `null` | Livewire method returning `list<string>`. Called once on first focus; cached. |
-| `wire-options-watch` | `string\|null` | `null` | Livewire property to watch. Invalidates cache on change; reloads immediately if dropdown is open. Requires `wire-options`. |
+| `wire-options` | `string\|list<mixed>\|null` | `null` | Livewire method returning `list<string>`. String: method name. Array: `[method, ...params]` — remaining elements are passed as positional arguments; use `['ws-wire' => 'dotPath']` to resolve a Livewire property at call time. Called once on first focus; cached. |
+| `wire-options-watch` | `string\|list<mixed>\|null` | `null` | Livewire property to watch. Invalidates cache on change; reloads immediately if dropdown is open. Array form `[property, resetValue]` also resets the model on change; third element `true` triggers a server round-trip on reset. Requires `wire-options`. |
 | `floating` | `bool` | `false` | Floating label layout. |
 | `placeholder` | `string\|null` | `null` | Placeholder text. Forced to a space in floating mode. |
 | `icon` | `string\|array` | `null` | Icon forwarded to the configured icon component. |

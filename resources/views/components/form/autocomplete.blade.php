@@ -8,8 +8,8 @@
     'disabled' => false,
     'multiple' => false,
     'live' => false,
-    'wireOptions' => null,
-    'wireOptionsWatch' => null,
+    'wireOptions' => null,      /** @var string|list<mixed>|null */
+    'wireOptionsWatch' => null, /** @var string|list<mixed>|null */
     'hasValidation' => config('wirestrap.input.has_validation', true),
     'hasValidationMessage' => config('wirestrap.input.has_validation_message', true),
     'defaultAttributes' => config('wirestrap.input.default_attributes', []),
@@ -69,6 +69,31 @@
         $floating && $hasIcon ? 'ws-form-has-icon-' . $iconPlacement : null,
         $floating && $hasError ? $classInvalid : null,
     ]));
+
+    // Parse wire-options: string = method, array = [method, ...params]
+    $wireOptionsMethod = null;
+    $wireOptionsParamsJson = null;
+    if (is_array($wireOptions)) {
+        $wireOptionsMethod = $wireOptions[0] ?? null;
+        $params = array_slice($wireOptions, 1);
+        $wireOptionsParamsJson = $params ? json_encode(array_values($params)) : null;
+    } else {
+        $wireOptionsMethod = $wireOptions;
+    }
+
+    // Parse wire-options-watch: string = property, array = [property, resetValue?, liveReset?]
+    $wireOptionsWatchProp = null;
+    $wireOptionsResetJson = null;
+    $wireOptionsResetLive = false;
+    if (is_array($wireOptionsWatch)) {
+        $wireOptionsWatchProp = $wireOptionsWatch[0] ?? null;
+        if (array_key_exists(1, $wireOptionsWatch)) {
+            $wireOptionsResetJson = json_encode($wireOptionsWatch[1]);
+            $wireOptionsResetLive = (bool) ($wireOptionsWatch[2] ?? false);
+        }
+    } else {
+        $wireOptionsWatchProp = $wireOptionsWatch;
+    }
 @endphp
 
 <div class="{{ $wrapperClass }}">
@@ -83,8 +108,11 @@
         class="{{ $autocompleteClass }}"
         x-data="wsAutocomplete"
         x-bind="autocompleteRoot"
-        @if ($wireOptions) data-ws-wire-options="{{ $wireOptions }}" @endif
-        @if ($wireOptionsWatch) data-ws-wire-options-watch="{{ $wireOptionsWatch }}" @endif
+        @if ($wireOptionsMethod) data-ws-wire-options="{{ $wireOptionsMethod }}" @endif
+        @if ($wireOptionsParamsJson !== null) data-ws-wire-options-params="{{ $wireOptionsParamsJson }}" @endif
+        @if ($wireOptionsWatchProp) data-ws-wire-options-watch="{{ $wireOptionsWatchProp }}" @endif
+        @if ($wireOptionsResetJson !== null) data-ws-wire-options-reset="{{ $wireOptionsResetJson }}" @endif
+        @if ($wireOptionsResetLive) data-ws-wire-options-reset-live="true" @endif
         @if ($wiremodel) data-ws-wiremodel="{{ $wiremodel }}" @endif
         @if ($multiple && !empty($invalidIndices)) data-ws-invalid-indices="{{ json_encode($invalidIndices) }}" @endif
         data-ws-multiple="{{ $multiple ? 'true' : 'false' }}"

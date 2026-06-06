@@ -20,8 +20,13 @@
  *   all confirm the current query as a new tag.
  *
  * Data attributes read from the root element:
- *   data-ws-wire-options       - Livewire method name that returns the suggestion array.
- *   data-ws-wire-options-watch - dot-path to a Livewire property; reload on change.
+ *   data-ws-wire-options             - Livewire method name that returns the suggestion array.
+ *   data-ws-wire-options-params      - JSON-encoded list of arguments passed to the method. Each item is
+ *                                      passed as-is except objects with a "ws-wire" key, resolved via
+ *                                      $wire.$get(param['ws-wire']) at call time.
+ *   data-ws-wire-options-watch       - dot-path to a Livewire property; invalidates cache on change.
+ *   data-ws-wire-options-reset       - JSON-encoded value to set the model to when the watched property changes.
+ *   data-ws-wire-options-reset-live  - "true" to trigger a server round-trip when applying the reset.
  *   data-ws-multiple           - "true" for tag mode.
  *   data-ws-live               - "true" to use live: true when syncing tags to Livewire.
  *   data-ws-wiremodel          - dot-path to the Livewire property for tag mode sync.
@@ -109,6 +114,8 @@ Alpine.data('wsAutocomplete', () => ({
     autocompletePosition: 'absolute',
     wireOptionsMethod: null,
     wireOptionsMethodWatch: null,
+    wireOptionsResetValue: null,
+    wireOptionsResetLive: false,
 
     /**
      * Cleanup
@@ -161,6 +168,8 @@ Alpine.data('wsAutocomplete', () => ({
     init() {
         this.wireOptionsMethod = this.$el.getAttribute('data-ws-wire-options');
         this.wireOptionsMethodWatch = this.$el.getAttribute('data-ws-wire-options-watch');
+        this.wireOptionsResetValue = this.$el.getAttribute('data-ws-wire-options-reset');
+        this.wireOptionsResetLive = this.$el.getAttribute('data-ws-wire-options-reset-live') === 'true';
         this.autocompleteDropdownOffset = parseInt(this.$el.getAttribute('data-ws-dropdown-offset') || 0, 10);
         this.autocompletePosition = this.$el.getAttribute('data-ws-position') || 'absolute';
 
@@ -208,6 +217,17 @@ Alpine.data('wsAutocomplete', () => ({
                     // Mark suggestions as stale so the next focus triggers a fresh load.
                     // Only reload immediately if the dropdown is already open.
                     this.lazyReset();
+
+                    if (this.wireOptionsResetValue !== null && this.autocompleteWiremodel) {
+                        const resetVal = JSON.parse(this.wireOptionsResetValue);
+                        this.$wire.$set(this.autocompleteWiremodel, resetVal, this.wireOptionsResetLive);
+
+                        if (!this.multiple) {
+                            this.query = resetVal !== null ? String(resetVal) : '';
+                            this.autocompleteClose();
+                        }
+                    }
+
                     if (this.floatingShown) {
                         this.loadSuggestions();
                     }
@@ -269,7 +289,16 @@ Alpine.data('wsAutocomplete', () => ({
             return;
         }
 
-        this.$wire.$call(this.wireOptionsMethod).then((result) => {
+        const paramsJson = this.$root.getAttribute('data-ws-wire-options-params');
+        const params = paramsJson ? JSON.parse(paramsJson) : [];
+        const args = params.map((param) => {
+            if (param !== null && typeof param === 'object' && 'ws-wire' in param) {
+                return this.$wire.$get(param['ws-wire']);
+            }
+            return param;
+        });
+
+        this.$wire.$call(this.wireOptionsMethod, ...args).then((result) => {
             this._setSuggestions(Array.isArray(result) ? result : []);
             this._methodLoaded = true; // marks lazyLoader as loaded
         });
