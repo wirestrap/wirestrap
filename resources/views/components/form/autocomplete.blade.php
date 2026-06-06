@@ -176,14 +176,7 @@
                 style="display: none"
                 @if ($resolvedId) id="{{ $resolvedId }}-listbox" @endif
             >
-                <template x-for="suggestion in filteredSuggestions" :key="suggestion">
-                    <div
-                        class="ws-autocomplete-option"
-                        role="option"
-                        data-ws-option
-                        x-text="suggestion"
-                    ></div>
-                </template>
+                <div x-ref="optionList"></div>
             </div>
             @if ($teleport) @endteleport @endif
         </div>

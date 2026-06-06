@@ -2,7 +2,29 @@
 
 Text input with suggestion dropdown and inline ghost text. Supports single-value and multi-tag modes; filtering is client-side.
 
-`wire-options` names a Livewire method returning `list<string>`, called once on first focus and cached. `wire-options-watch` invalidates the cache when a Livewire property changes.
+`wire-options` names a Livewire method called once on first focus and cached. It can return plain strings or option objects:
+
+```php
+#[Renderless]
+public function getContacts(): array
+{
+    return [
+        ['value' => 'alice@example.com', 'label' => 'Alice Martin', 'optgroup' => 'Recent'],
+        ['value' => 'bob@example.com',   'label' => 'Bob Johnson',  'optgroup' => 'All'],
+    ];
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `value` | `string` | Stored value. Injected into the input on selection. |
+| `label` | `string` | Displayed text. Always rendered as plain text (XSS-safe). Filtering matches both `label` and `value`. |
+| `optgroup` | `string\|null` | Group label. Options sharing the same value are grouped client-side. |
+| `class` | `string\|null` | CSS class applied to the option element and the tag (in multiple mode). |
+| `html_prefix` | `string\|null` | Raw HTML rendered before the label. **Never pass user-generated content without escaping it first.** |
+| `html_suffix` | `string\|null` | Raw HTML rendered after the label. **Same XSS warning applies.** |
+
+`wire-options-watch` invalidates the cache when a Livewire property changes.
 
 ## Usage
 
@@ -58,7 +80,7 @@ Text input with suggestion dropdown and inline ghost text. Supports single-value
 |------|------|---------|-------------|
 | `id` | `string\|null` | `null` | Input id. Auto-resolved from wire:model when omitted. |
 | `label` | `slot\|string\|null` | `null` | Label text or slot content. |
-| `wire-options` | `string\|list<mixed>\|null` | `null` | Livewire method returning `list<string>`. String: method name. Array: `[method, ...params]` — remaining elements are passed as positional arguments; use `['ws-wire' => 'dotPath']` to resolve a Livewire property at call time. Called once on first focus; cached. |
+| `wire-options` | `string\|list<mixed>\|null` | `null` | Livewire method returning `list<string>` or `list<option>` (see option fields above). String: method name. Array: `[method, ...params]` — remaining elements are passed as positional arguments; use `['ws-wire' => 'dotPath']` to resolve a Livewire property at call time. Called once on first focus; cached. |
 | `wire-options-watch` | `string\|list<mixed>\|null` | `null` | Livewire property to watch. Invalidates cache on change; reloads immediately if dropdown is open. Array form `[property, resetValue]` also resets the model on change; third element `true` triggers a server round-trip on reset. Requires `wire-options`. |
 | `floating` | `bool` | `false` | Floating label layout. |
 | `placeholder` | `string\|null` | `null` | Placeholder text. Forced to a space in floating mode. |
