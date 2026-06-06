@@ -262,9 +262,19 @@ Alpine.data('wsAutocomplete', () => ({
                 this.selectedTags = Array.isArray(current) ? [...current] : [];
                 this.renderTags();
 
+                // Load suggestions eagerly if tags are already selected so the
+                // suggestion map is available for label/class/html rendering.
+                if (this.selectedTags.length > 0 && this.wireOptionsMethod) {
+                    this.lazyLoad(() => this.loadSuggestions());
+                }
+
                 this._valueWatchUnsub = this.$wire.$watch(this.autocompleteWiremodel, (value) => {
                     this.selectedTags = Array.isArray(value) ? [...value] : [];
                     this.renderTags();
+
+                    if (this.selectedTags.length > 0 && this.wireOptionsMethod) {
+                        this.lazyLoad(() => this.loadSuggestions());
+                    }
                 });
             }
         });
@@ -322,6 +332,9 @@ Alpine.data('wsAutocomplete', () => ({
         this.$wire.$call(this.wireOptionsMethod, ...args).then((result) => {
             this._setSuggestions(Array.isArray(result) ? result : []);
             this._methodLoaded = true; // marks lazyLoader as loaded
+            if (this.multiple) {
+                this.renderTags();
+            }
         });
     },
 
