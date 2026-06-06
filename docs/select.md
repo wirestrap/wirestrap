@@ -91,7 +91,7 @@ public function getCountries(): array
     wire:model="city"
     label="City"
     wire-options="getCities"
-    :wire-options-params="['ws-wire' => 'selectedCountry']"
+    :wire-options-params="[['ws-wire' => 'selectedCountry']]"
     wire-options-watch="selectedCountry"
 />
 ```
