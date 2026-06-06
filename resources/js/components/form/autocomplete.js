@@ -112,6 +112,7 @@ Alpine.data('wsAutocomplete', () => ({
     autocompleteWiremodel: null,
     autocompleteDropdownOffset: 0,
     autocompletePosition: 'absolute',
+    minChars: 0,
     wireOptionsMethod: null,
     wireOptionsMethodWatch: null,
     wireOptionsResetValue: null,
@@ -141,16 +142,17 @@ Alpine.data('wsAutocomplete', () => ({
             return [];
         }
 
-        const q = this._normalize(this.query);
-        if (!q) {
+        if (this.query.length < this.minChars) {
             return [];
         }
+
+        const q = this._normalize(this.query);
 
         return this.suggestions.filter((s, i) => {
             const normalized = this._normalizedSuggestions[i];
 
-            // Exclude suggestions that don't start with the query, or are an exact match
-            if (!normalized.startsWith(q) || normalized === q) {
+            // When query is non-empty: exclude suggestions that don't start with it, or are an exact match
+            if (q && (!normalized.startsWith(q) || normalized === q)) {
                 return false;
             }
 
@@ -172,6 +174,7 @@ Alpine.data('wsAutocomplete', () => ({
         this.wireOptionsResetLive = this.$el.getAttribute('data-ws-wire-options-reset-live') === 'true';
         this.autocompleteDropdownOffset = parseInt(this.$el.getAttribute('data-ws-dropdown-offset') || 0, 10);
         this.autocompletePosition = this.$el.getAttribute('data-ws-position') || 'absolute';
+        this.minChars = parseInt(this.$el.getAttribute('data-ws-min-chars') || 0, 10);
 
         this._refreshHandler = () => {
             this.lazyReset();

@@ -64,6 +64,7 @@ Text input with suggestion dropdown and inline ghost text. Supports single-value
 | `placeholder` | `string\|null` | `null` | Placeholder text. Forced to a space in floating mode. |
 | `icon` | `string\|array` | `null` | Icon forwarded to the configured icon component. |
 | `icon-placement` | `string` | `'start'` | Icon side: start or end. |
+| `min-chars` | `int` | `config` | Minimum number of characters required before suggestions appear. `0` shows all suggestions on focus. |
 | `multiple` | `bool` | `false` | Tag mode. wire:model must bind to an array property. |
 | `live` | `bool` | `false` | In multiple mode, sync to Livewire on each tag change. |
 | `dropdown-offset` | `int` | `config` | Y-axis offset in pixels between the trigger and the dropdown. |

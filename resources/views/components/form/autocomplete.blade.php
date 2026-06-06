@@ -16,6 +16,7 @@
     'dropdownOffset' => config('wirestrap.autocomplete.dropdown_offset', 0),
     'position' => config('wirestrap.autocomplete.position', 'absolute'),
     'teleport' => config('wirestrap.autocomplete.teleport', null),
+    'minChars' => config('wirestrap.autocomplete.min_chars', 0),
 ])
 
 @php
@@ -117,6 +118,7 @@
         @if ($multiple && !empty($invalidIndices)) data-ws-invalid-indices="{{ json_encode($invalidIndices) }}" @endif
         data-ws-multiple="{{ $multiple ? 'true' : 'false' }}"
         data-ws-live="{{ $live ? 'true' : 'false' }}"
+        data-ws-min-chars="{{ $minChars }}"
         data-ws-dropdown-offset="{{ $dropdownOffset }}"
         data-ws-position="{{ $position }}"
         data-ws-label-remove="{{ __('Remove') }}"
