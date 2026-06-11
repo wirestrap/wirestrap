@@ -23,8 +23,8 @@ public function getCountries(): array
 | `disabled` | `bool` | Prevents selection. Default `false`. |
 | `optgroup` | `string\|null` | Group label. Options sharing the same value are grouped client-side. |
 | `class` | `string\|null` | CSS class on the option element and selection item. |
-| `html_prefix` | `string\|null` | Raw HTML rendered before the label. Combined with `label` and `html_suffix` as a single `innerHTML` — opening tags wrap the label naturally. |
-| `html_suffix` | `string\|null` | Raw HTML rendered after the label. See `html_prefix`. |
+| `html_prefix` | `string\|null` | Raw HTML rendered before the label. Combined with `label` and `html_suffix` as a single `innerHTML` — opening tags wrap the label naturally. **Never pass user-generated content without escaping it first.** |
+| `html_suffix` | `string\|null` | Raw HTML rendered after the label. See `html_prefix`. **Same XSS warning applies.** |
 
 ## Usage
 

@@ -241,5 +241,7 @@ return [
         'dropdown_offset' => 0,
         'position' => 'absolute',
         'teleport' => null,
+        'min_chars' => 0,
+        'no_dropdown' => false,
     ],
 ];

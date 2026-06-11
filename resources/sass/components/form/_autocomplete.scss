@@ -30,6 +30,9 @@
     --ws-autocomplete-option-padding: var(--ws-spacing-3) var(--ws-spacing-6);
     --ws-autocomplete-option-highlighted-bg: var(--ws-tertiary-bg);
     --ws-autocomplete-option-highlighted-color: var(--ws-primary);
+    --ws-autocomplete-optgroup-label-font-size: 1.05rem;
+    --ws-autocomplete-optgroup-label-font-weight: 600;
+    --ws-autocomplete-optgroup-label-padding: var(--ws-spacing-6);
     --ws-autocomplete-z-index: var(--ws-zindex-select);
 }
 
@@ -122,6 +125,10 @@
     border: 1px solid transparent;
 }
 
+.ws-autocomplete .ws-autocomplete-ghost:not(:has(.ws-autocomplete-ghost-suffix:empty)) ~ input::placeholder {
+    color: transparent;
+}
+
 .ws-autocomplete-ghost-match {
     color: transparent;
     flex-shrink: 0;
@@ -135,18 +142,36 @@
     white-space: pre;
 }
 
+// Dropdown optgroup label
+.ws-autocomplete-optgroup-label {
+    padding: var(--ws-autocomplete-optgroup-label-padding);
+    font-size: var(--ws-autocomplete-optgroup-label-font-size);
+    font-weight: var(--ws-autocomplete-optgroup-label-font-weight);
+    user-select: none;
+}
+
 // Dropdown option
 .ws-autocomplete-option {
     padding: var(--ws-autocomplete-option-padding);
     cursor: pointer;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: flex;
+    align-items: center;
+
+    &[data-ws-optgroup] {
+        padding-left: calc(var(--ws-autocomplete-optgroup-label-padding) * 2);
+    }
 
     &.highlighted {
         background-color: var(--ws-autocomplete-option-highlighted-bg);
         color: var(--ws-autocomplete-option-highlighted-color);
         outline: 0;
+    }
+
+    > * {
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }
 
@@ -298,12 +323,20 @@
 }
 
 .ws-autocomplete-tag-label {
+    display: flex;
+    align-items: center;
     overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
     min-width: 0;
     font-size: var(--ws-autocomplete-font-size);
     line-height: var(--ws-autocomplete-line-height);
+
+    > * {
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 
 .ws-autocomplete-tag-remove {

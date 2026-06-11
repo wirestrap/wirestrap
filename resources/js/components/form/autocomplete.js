@@ -9,6 +9,8 @@
  *   (data-ws-wire-options). An optional data-ws-wire-options-watch property path triggers
  *   a reload whenever its value changes in the Livewire component.
  *   The ws:refresh custom event forces a reload programmatically.
+ *   The method may return list<string> or list<{value: string, label: string}>; strings
+ *   are normalised to {value, label} internally.
  *
  * Ghost text:
  *   When a suggestion starts with the current query, the remaining suffix is
@@ -20,8 +22,13 @@
  *   all confirm the current query as a new tag.
  *
  * Data attributes read from the root element:
- *   data-ws-wire-options       - Livewire method name that returns the suggestion array.
- *   data-ws-wire-options-watch - dot-path to a Livewire property; reload on change.
+ *   data-ws-wire-options             - Livewire method name that returns the suggestion array.
+ *   data-ws-wire-options-params      - JSON-encoded list of arguments passed to the method. Each item is
+ *                                      passed as-is except objects with a "ws-wire" key, resolved via
+ *                                      $wire.$get(param['ws-wire']) at call time.
+ *   data-ws-wire-options-watch       - dot-path to a Livewire property; invalidates cache on change.
+ *   data-ws-wire-options-reset       - JSON-encoded value to set the model to when the watched property changes.
+ *   data-ws-wire-options-reset-live  - "true" to trigger a server round-trip when applying the reset.
  *   data-ws-multiple           - "true" for tag mode.
  *   data-ws-live               - "true" to use live: true when syncing tags to Livewire.
  *   data-ws-wiremodel          - dot-path to the Livewire property for tag mode sync.
@@ -95,8 +102,8 @@ Alpine.data('wsAutocomplete', () => ({
     ghostSuffix: '',
     suggestions: [],
     _normalizedSuggestions: [],
-    multiple: false,
-    live: false,
+    _normalizedValues: [],
+    _suggestionMap: null,
     selectedTags: [],
     invalidIndices: [],
     _dropdownActive: false,
@@ -107,8 +114,14 @@ Alpine.data('wsAutocomplete', () => ({
     autocompleteWiremodel: null,
     autocompleteDropdownOffset: 0,
     autocompletePosition: 'absolute',
+    multiple: false,
+    live: false,
+    autocompleteMinChars: 0,
+    autocompleteNoDropdown: false,
     wireOptionsMethod: null,
     wireOptionsMethodWatch: null,
+    wireOptionsResetValue: null,
+    wireOptionsResetLive: false,
 
     /**
      * Cleanup
@@ -130,24 +143,35 @@ Alpine.data('wsAutocomplete', () => ({
     },
 
     get filteredSuggestions() {
-        if (!this._dropdownActive) {
+        if (this.autocompleteNoDropdown || !this._dropdownActive) {
+            return [];
+        }
+
+        if (this.query.length < this.autocompleteMinChars) {
             return [];
         }
 
         const q = this._normalize(this.query);
-        if (!q) {
-            return [];
-        }
 
         return this.suggestions.filter((s, i) => {
-            const normalized = this._normalizedSuggestions[i];
+            const normalizedLabel = this._normalizedSuggestions[i];
+            const normalizedValue = this._normalizedValues[i];
 
-            // Exclude suggestions that don't start with the query, or are an exact match
-            if (!normalized.startsWith(q) || normalized === q) {
-                return false;
+            if (q) {
+                const labelMatches = normalizedLabel.startsWith(q);
+                const valueMatches = normalizedValue.includes(q);
+
+                if (!labelMatches && !valueMatches) {
+                    return false;
+                }
+
+                // Exact value match: already captured in the input
+                if (normalizedValue === q) {
+                    return false;
+                }
             }
 
-            if (this.multiple && this.selectedTags.some((t) => this._normalize(t) === normalized)) {
+            if (this.multiple && this.selectedTags.some((t) => this._normalize(t) === normalizedValue)) {
                 return false;
             }
 
@@ -161,14 +185,20 @@ Alpine.data('wsAutocomplete', () => ({
     init() {
         this.wireOptionsMethod = this.$el.getAttribute('data-ws-wire-options');
         this.wireOptionsMethodWatch = this.$el.getAttribute('data-ws-wire-options-watch');
+        this.wireOptionsResetValue = this.$el.getAttribute('data-ws-wire-options-reset');
+        this.wireOptionsResetLive = this.$el.getAttribute('data-ws-wire-options-reset-live') === 'true';
         this.autocompleteDropdownOffset = parseInt(this.$el.getAttribute('data-ws-dropdown-offset') || 0, 10);
         this.autocompletePosition = this.$el.getAttribute('data-ws-position') || 'absolute';
+        this.autocompleteMinChars = parseInt(this.$el.getAttribute('data-ws-min-chars') || 0, 10);
+        this.autocompleteNoDropdown = this.$el.getAttribute('data-ws-no-dropdown') === 'true';
 
-        this._refreshHandler = () => {
-            this.lazyReset();
-            this.loadSuggestions();
-        };
-        this.$el.addEventListener('ws:refresh', this._refreshHandler);
+        if (this.wireOptionsMethod) {
+            this._refreshHandler = () => {
+                this.lazyReset();
+                this.loadSuggestions();
+            };
+            this.$el.addEventListener('ws:refresh', this._refreshHandler);
+        }
         this.multiple = this.$el.getAttribute('data-ws-multiple') === 'true';
         this.invalidIndices = this._readInvalidIndices();
         if (this.multiple && this.$wire) {
@@ -188,15 +218,15 @@ Alpine.data('wsAutocomplete', () => ({
         this.$watch('filteredSuggestions', (suggestions) => {
             const inputFocused = this.$refs.input && document.activeElement === this.$refs.input;
 
+            // Render imperatively so DOM is ready for updateOptionElements() immediately.
+            this.renderSuggestions(suggestions);
+            this.updateOptionElements();
+
             if (suggestions.length > 0 && inputFocused) {
                 this.autocompleteOpen();
             } else {
                 this.autocompleteClose();
             }
-
-            // Defer DOM query to next tick: Alpine has not yet re-rendered the suggestion
-            // list elements when this watcher fires, so querySelectorAll would return stale results.
-            this.$nextTick(() => this.updateOptionElements());
         });
 
         this.$nextTick(() => {
@@ -208,6 +238,17 @@ Alpine.data('wsAutocomplete', () => ({
                     // Mark suggestions as stale so the next focus triggers a fresh load.
                     // Only reload immediately if the dropdown is already open.
                     this.lazyReset();
+
+                    if (this.wireOptionsResetValue !== null && this.autocompleteWiremodel) {
+                        const resetVal = JSON.parse(this.wireOptionsResetValue);
+                        this.$wire.$set(this.autocompleteWiremodel, resetVal, this.wireOptionsResetLive);
+
+                        if (!this.multiple) {
+                            this.query = resetVal !== null ? String(resetVal) : '';
+                            this.autocompleteClose();
+                        }
+                    }
+
                     if (this.floatingShown) {
                         this.loadSuggestions();
                     }
@@ -221,9 +262,19 @@ Alpine.data('wsAutocomplete', () => ({
                 this.selectedTags = Array.isArray(current) ? [...current] : [];
                 this.renderTags();
 
+                // Load suggestions eagerly if tags are already selected so the
+                // suggestion map is available for label/class/html rendering.
+                if (this.selectedTags.length > 0 && this.wireOptionsMethod) {
+                    this.lazyLoad(() => this.loadSuggestions());
+                }
+
                 this._valueWatchUnsub = this.$wire.$watch(this.autocompleteWiremodel, (value) => {
                     this.selectedTags = Array.isArray(value) ? [...value] : [];
                     this.renderTags();
+
+                    if (this.selectedTags.length > 0 && this.wireOptionsMethod) {
+                        this.lazyLoad(() => this.loadSuggestions());
+                    }
                 });
             }
         });
@@ -232,7 +283,7 @@ Alpine.data('wsAutocomplete', () => ({
     destroy() {
         this._watchUnsub?.();
         this._valueWatchUnsub?.();
-        this.$el.removeEventListener('ws:refresh', this._refreshHandler);
+        this._refreshHandler && this.$el.removeEventListener('ws:refresh', this._refreshHandler);
         this._morphedUnsub?.();
         this.floatingDestroy();
     },
@@ -269,30 +320,56 @@ Alpine.data('wsAutocomplete', () => ({
             return;
         }
 
-        this.$wire.$call(this.wireOptionsMethod).then((result) => {
+        const paramsJson = this.$root.getAttribute('data-ws-wire-options-params');
+        const params = paramsJson ? JSON.parse(paramsJson) : [];
+        const args = params.map((param) => {
+            if (param !== null && typeof param === 'object' && 'ws-wire' in param) {
+                return this.$wire.$get(param['ws-wire']);
+            }
+            return param;
+        });
+
+        this.$wire.$call(this.wireOptionsMethod, ...args).then((result) => {
             this._setSuggestions(Array.isArray(result) ? result : []);
             this._methodLoaded = true; // marks lazyLoader as loaded
+            if (this.multiple) {
+                this.renderTags();
+            }
         });
     },
 
     _setSuggestions(raw) {
-        // Deduplicate by normalized value: the server may return case/accent variants
-        // of the same string. Keep the first occurrence (original casing preserved).
+        // Deduplicate by normalized value. Both string and {value, label, html_prefix, html_suffix, optgroup}
+        // forms are accepted; strings are normalised to {value: s, label: s}.
         const seen = new Set();
         const suggestions = [];
-        const normalizedSuggestions = [];
+        const normalizedLabels = [];
+        const normalizedValues = [];
+        const suggestionMap = new Map();
 
         for (const s of raw) {
-            const normalized = this._normalize(s);
-            if (!seen.has(normalized)) {
-                seen.add(normalized);
-                suggestions.push(s);
-                normalizedSuggestions.push(normalized);
+            const isObj = s !== null && typeof s === 'object';
+            const value = isObj ? String(s.value ?? '') : String(s);
+            const label = isObj ? String(s.label ?? value) : String(s);
+            const normalizedValue = this._normalize(value);
+
+            if (!seen.has(normalizedValue)) {
+                seen.add(normalizedValue);
+                const htmlPrefix = isObj && s.html_prefix != null ? String(s.html_prefix) : null;
+                const htmlSuffix = isObj && s.html_suffix != null ? String(s.html_suffix) : null;
+                const optgroup = isObj && s.optgroup != null ? String(s.optgroup) : null;
+                const optClass = isObj && s.class != null ? String(s.class) : null;
+                suggestions.push({ value, label, optgroup, htmlPrefix, htmlSuffix, optClass });
+                normalizedLabels.push(this._normalize(label));
+                normalizedValues.push(normalizedValue);
+                suggestionMap.set(value, { label, htmlPrefix, htmlSuffix, optClass });
             }
         }
 
         this.suggestions = suggestions;
-        this._normalizedSuggestions = normalizedSuggestions;
+        this._normalizedSuggestions = normalizedLabels;
+        this._normalizedValues = normalizedValues;
+        this._suggestionMap = suggestionMap;
     },
 
     /**
@@ -344,6 +421,67 @@ Alpine.data('wsAutocomplete', () => ({
     },
 
     /**
+     * Suggestions rendering
+     */
+    renderSuggestions(suggestions) {
+        const container = this.$refs.optionList;
+        if (!container) {
+            return;
+        }
+
+        container.replaceChildren();
+
+        // Separate ungrouped and grouped options, preserving insertion order within each group.
+        const ungrouped = [];
+        const groups = new Map();
+
+        for (const s of suggestions) {
+            if (s.optgroup != null) {
+                if (!groups.has(s.optgroup)) {
+                    groups.set(s.optgroup, []);
+                }
+                groups.get(s.optgroup).push(s);
+            } else {
+                ungrouped.push(s);
+            }
+        }
+
+        const items = [];
+        for (const s of ungrouped) {
+            items.push({ type: 'option', data: s });
+        }
+        for (const [label, options] of groups) {
+            items.push({ type: 'group', label });
+            for (const s of options) {
+                items.push({ type: 'option', data: s });
+            }
+        }
+
+        for (const item of items) {
+            if (item.type === 'group') {
+                const el = document.createElement('div');
+                el.className = 'ws-autocomplete-optgroup-label';
+                el.setAttribute('role', 'presentation');
+                el.setAttribute('aria-hidden', 'true');
+                el.textContent = item.label;
+                container.appendChild(el);
+            } else {
+                const { value, label, optgroup, htmlPrefix, htmlSuffix, optClass } = item.data;
+                const el = document.createElement('div');
+                el.className = optClass ? `ws-autocomplete-option ${optClass}` : 'ws-autocomplete-option';
+                el.setAttribute('role', 'option');
+                el.setAttribute('data-ws-option', '');
+                el.setAttribute('data-ws-value', value);
+                if (optgroup != null) {
+                    el.setAttribute('data-ws-optgroup', '');
+                }
+                el.innerHTML = (htmlPrefix ?? '') + '<span>' + this._escapeHtml(label) + '</span>' + (htmlSuffix ?? '');
+                container.appendChild(el);
+            }
+        }
+    },
+
+    /**
      * Tags
      */
     renderTags() {
@@ -357,22 +495,32 @@ Alpine.data('wsAutocomplete', () => ({
         const labelRemove = this.$el.getAttribute('data-ws-label-remove') ?? '';
 
         for (let i = 0; i < this.selectedTags.length; i++) {
-            const tag = this.selectedTags[i];
+            const value = this.selectedTags[i];
+            const entry = this._suggestionMap?.get(value) ?? null;
+            const label = entry?.label ?? value;
+            const { htmlPrefix, htmlSuffix, optClass } = entry ?? { htmlPrefix: null, htmlSuffix: null, optClass: null };
 
             const tagEl = document.createElement('span');
-            tagEl.className = 'ws-autocomplete-tag' + (this.invalidIndices.includes(i) ? ' ws-autocomplete-tag-invalid' : '');
+            tagEl.className =
+                'ws-autocomplete-tag' +
+                (this.invalidIndices.includes(i) ? ' ws-autocomplete-tag-invalid' : '') +
+                (optClass ? ' ' + optClass : '');
 
             const labelEl = document.createElement('span');
             labelEl.className = 'ws-autocomplete-tag-label';
-            labelEl.textContent = tag;
+            if (htmlPrefix || htmlSuffix) {
+                labelEl.innerHTML = (htmlPrefix ?? '') + '<span>' + this._escapeHtml(label) + '</span>' + (htmlSuffix ?? '');
+            } else {
+                labelEl.textContent = label;
+            }
             tagEl.appendChild(labelEl);
 
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'ws-autocomplete-tag-remove';
-            btn.dataset.wsTagRemove = tag;
+            btn.dataset.wsTagRemove = value;
             btn.tabIndex = -1;
-            btn.setAttribute('aria-label', labelRemove + ' ' + tag);
+            btn.setAttribute('aria-label', labelRemove + ' ' + label);
             btn.appendChild(document.createElement('span'));
             tagEl.appendChild(btn);
 
@@ -386,7 +534,7 @@ Alpine.data('wsAutocomplete', () => ({
     onFocus() {
         this._dropdownActive = true;
 
-        this.wireOptionsMethod && this.lazyLoad(() => this.loadSuggestions());
+        !this.autocompleteNoDropdown && this.wireOptionsMethod && this.lazyLoad(() => this.loadSuggestions());
     },
 
     onFocusout(event) {
@@ -453,14 +601,14 @@ Alpine.data('wsAutocomplete', () => ({
             return;
         }
 
-        const suggestion = el.textContent.trim();
-        const normalizedSuggestion = this._normalize(suggestion);
+        // Ghost text is based on the value (what gets injected into the input),
+        // not the label. Slice from the original query length to preserve casing.
+        const value = el.dataset.wsValue ?? el.textContent.trim();
+        const normalizedValue = this._normalize(value);
         const normalizedQuery = this._normalize(this.query);
 
-        // Slice from the original (non-normalized) query length so the ghost text
-        // preserves the original casing and accents of the suggestion.
-        if (normalizedSuggestion.startsWith(normalizedQuery)) {
-            this.ghostSuffix = suggestion.slice(this.query.length);
+        if (normalizedValue.startsWith(normalizedQuery)) {
+            this.ghostSuffix = value.slice(this.query.length);
         } else {
             this.ghostSuffix = '';
         }
@@ -471,7 +619,7 @@ Alpine.data('wsAutocomplete', () => ({
             return;
         }
 
-        const value = el.textContent.trim();
+        const value = el.dataset.wsValue ?? el.textContent.trim();
 
         if (this.multiple) {
             this.addTag(value);
@@ -507,5 +655,11 @@ Alpine.data('wsAutocomplete', () => ({
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase();
+    },
+
+    _escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     },
 }));
