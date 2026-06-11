@@ -68,7 +68,13 @@ const _config = {
     // CSS selectors — elements matching these are treated as in-scope (e.g. third-party dropdowns teleported to body).
     // WireStrap's own select and autocomplete dropdowns are included by default so that a flyout containing
     // one of these components does not close when the user interacts with the dropdown panel.
-    keepShownFor: ['.ws-select-dropdown', '.ws-autocomplete-dropdown', '.ws-autocomplete-option'],
+    keepShownFor: [
+        '.ws-select-dropdown',
+        '.ws-selection-badge-remove',
+        '.ws-autocomplete-dropdown',
+        '.ws-autocomplete-option',
+        '.ws-autocomplete-tag-remove'
+    ],
 };
 
 /*
