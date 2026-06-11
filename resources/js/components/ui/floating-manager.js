@@ -73,7 +73,7 @@ const _config = {
         '.ws-selection-badge-remove',
         '.ws-autocomplete-dropdown',
         '.ws-autocomplete-option',
-        '.ws-autocomplete-tag-remove'
+        '.ws-autocomplete-tag-remove',
     ],
 };
 
