@@ -237,8 +237,8 @@ Alpine.data('wsSelect', () => ({
         let source = this.options;
 
         if (this.searchQuery.trim()) {
-            const query = this.searchQuery.toLowerCase();
-            source = this.options.filter((opt) => String(opt.label).toLowerCase().includes(query));
+            const query = this._normalize(this.searchQuery);
+            source = this.options.filter((opt) => this._normalize(String(opt.label)).includes(query));
         }
 
         const ungrouped = [];
@@ -701,6 +701,13 @@ Alpine.data('wsSelect', () => ({
             this.setHighlight(selectedEl ? this.optionElements.indexOf(selectedEl) : 0);
             this.scrollToHighlighted();
         }
+    },
+
+    _normalize(str) {
+        return String(str)
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
     },
 
     _escapeHtml(text) {
