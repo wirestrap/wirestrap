@@ -63,6 +63,7 @@ export function resizable() {
 
                     target.style.transition = 'none';
                     heightTarget.style.transition = 'none';
+                    document.body.classList.add('ws-dragging');
 
                     if (resizesLeft || resizesRight || resizesBottom) {
                         initAbsoluteIfNeeded();
@@ -109,11 +110,13 @@ export function resizable() {
                     const onResizeEnd = () => {
                         target.style.removeProperty('transition');
                         heightTarget.style.removeProperty('transition');
+                        document.body.classList.remove('ws-dragging');
                         cancelActiveResize?.();
                         cancelActiveResize = null;
                     };
 
                     cancelActiveResize = () => {
+                        document.body.classList.remove('ws-dragging');
                         document.removeEventListener('mousemove', onResizeMove);
                         document.removeEventListener('mouseup', onResizeEnd);
                         document.removeEventListener('touchmove', onResizeMove);
