@@ -588,6 +588,12 @@ Alpine.data('wsAutocomplete', () => ({
                 this.removeTag(this.selectedTags[this.selectedTags.length - 1]);
             }
         } else if (event.key === 'Escape') {
+            if (this.multiple) {
+                this.query = '';
+                this.ghostSuffix = '';
+                this.$refs.input.value = '';
+            }
+
             this.autocompleteClose();
             event.preventDefault();
             event.stopPropagation();
