@@ -58,6 +58,7 @@ export function draggable() {
                 initAbsolutePosition();
                 isDragging = true;
                 this._draggingClass && handle.classList.add(this._draggingClass);
+                document.body.classList.add('ws-dragging');
 
                 const coords = getCoords(e);
                 startX = coords.x;
@@ -95,6 +96,7 @@ export function draggable() {
             const onDragEnd = () => {
                 isDragging = false;
                 this._draggingClass && handle.classList.remove(this._draggingClass);
+                document.body.classList.remove('ws-dragging');
 
                 document.removeEventListener('mousemove', onDragMove);
                 document.removeEventListener('mouseup', onDragEnd);

@@ -1,3 +1,7 @@
 .ws-d-contents {
     display: contents;
 }
+
+body.ws-dragging iframe {
+    pointer-events: none;
+}
