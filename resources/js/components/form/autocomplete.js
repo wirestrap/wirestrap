@@ -384,7 +384,7 @@ Alpine.data('wsAutocomplete', () => ({
         this.onNavigationSelect(el);
     },
 
-    addTag(value) {
+    addTag(value, refocus = true) {
         if (!value || this.selectedTags.some((t) => this._normalize(t) === this._normalize(value))) {
             return;
         }
@@ -395,7 +395,10 @@ Alpine.data('wsAutocomplete', () => ({
         this.query = '';
         this.ghostSuffix = '';
         this.autocompleteClose();
-        this.$refs.input.focus();
+
+        if (refocus) {
+            this.$refs.input.focus();
+        }
 
         if (this.$wire && this.autocompleteWiremodel) {
             this.$wire.$set(this.autocompleteWiremodel, this.selectedTags, this.live);
@@ -539,6 +542,10 @@ Alpine.data('wsAutocomplete', () => ({
 
     onFocusout(event) {
         if (!this.$el.contains(event.relatedTarget)) {
+            if (this.multiple && this.query.trim()) {
+                this.addTag(this.query.trim(), false);
+            }
+
             this.autocompleteClose();
         }
     },
