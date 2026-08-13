@@ -14,7 +14,8 @@ class ModalManager extends Component
     use WithWirestrap;
 
     /**
-     * [component => list<hash>]
+     * Registered modals indexed by component name, each holding a list of internal ids
+     * e.g. ['users.edit-form' => ['edit-user-42', 'edit-user-7']]
      *
      * @var array<string, list<string>>
      */
@@ -22,7 +23,8 @@ class ModalManager extends Component
     public array $modals = [];
 
     /**
-     * [hash => props]
+     * Livewire component props indexed by internal id
+     * e.g. ['edit-user-42' => ['userId' => 42]]
      *
      * @var array<string, array<string|int, mixed>>
      */
@@ -30,7 +32,8 @@ class ModalManager extends Component
     public array $props = [];
 
     /**
-     * [hash => modalProps]
+     * Modal wrapper props (title, size, draggable, etc.) indexed by internal id
+     * e.g. ['edit-user-42' => ['title' => 'Edit user', 'draggable' => true]]
      *
      * @var array<string, array<string|int, mixed>>
      */
@@ -42,8 +45,12 @@ class ModalManager extends Component
         return view('wirestrap::livewire.modal-manager');
     }
 
+    /**
+     * Receive an encrypted modal payload, validate it, and register the modal for rendering.
+     * If a modal with the same id already exists, it is re-shown instead of duplicated.
+     */
     #[On('ws-modal-manager:show')]
-    public function show(string $payload, string $hash): void
+    public function show(string $payload, string $id): void
     {
         $payload = decrypt($payload);
         $component = $payload['component'] ?? null;
@@ -55,57 +62,68 @@ class ModalManager extends Component
             return;
         }
 
+        // Reject expired events
         if (!$expiresAt || now()->timestamp > $expiresAt) {
             return;
         }
 
+        // Consume the single-use nonce to prevent replay
         if (config('wirestrap.modal_manager.nonce', true)) {
             $nonce = $payload['nonce'] ?? null;
 
-            if (!$nonce || !Cache::pull("ws-modal-nonce:{$hash}:{$nonce}")) {
+            if (!$nonce || !Cache::pull("ws-modal-nonce:{$id}:{$nonce}")) {
                 return;
             }
         }
 
-        if (in_array($hash, $this->modals[$component] ?? [], true)) {
-            $this->modalShow('modal_' . $hash);
+        // If the modal already exists, just re-show it instead of creating a duplicate
+        if (in_array($id, $this->modals[$component] ?? [], true)) {
+            $this->modalShow('modal_' . $id);
 
             return;
         }
 
-        $this->modals[$component][] = $hash;
-        $this->props[$hash] = $props;
-        $this->modalProps[$hash] = $modalProps;
+        $this->modals[$component][] = $id;
+        $this->props[$id] = $props;
+        $this->modalProps[$id] = $modalProps;
     }
 
     /**
+     * Destroy managed modals by component name, key, or all.
+     * Passing neither parameter destroys all managed modals.
+     *
      * @param string|list<string>|null $components
      * @param string|list<string>|null $key
      */
     #[On('ws-modal-manager:destroy')]
     public function destroy(string|array|null $components = null, string|array|null $key = null): void
     {
+        // Destroy all modals for the given component name(s)
         if ($components !== null) {
             foreach ((array) $components as $comp) {
-                foreach (($this->modals[$comp] ?? []) as $hash) {
-                    unset($this->props[$hash]);
-                    unset($this->modalProps[$hash]);
+                foreach (($this->modals[$comp] ?? []) as $id) {
+                    unset($this->props[$id]);
+                    unset($this->modalProps[$id]);
                 }
 
                 unset($this->modals[$comp]);
             }
         }
 
+        // Destroy specific modals by key, regardless of which component they belong to
         if ($key !== null) {
-            $hashes = array_map(fn(string $k): string => 'ws-' . $k, (array) $key);
+            $keys = (array) $key; // Normalize string|array
 
-            foreach ($this->modals as $comp => $compHashes) {
-                $filtered = array_values(array_filter($compHashes, fn(string $h): bool => !in_array($h, $hashes, true)));
+            foreach ($this->modals as $comp => $compIds) {
+                // Keep only ids that are not in the destroy list
+                $filtered = array_values(array_filter($compIds, fn(string $id): bool => !in_array($id, $keys, true)));
 
-                if (count($filtered) === count($compHashes)) {
+                // No match in this component
+                if (count($filtered) === count($compIds)) {
                     continue;
                 }
 
+                // All modals removed for this component: clean up the entry entirely
                 if ($filtered === []) {
                     unset($this->modals[$comp]);
                 } else {
@@ -113,16 +131,17 @@ class ModalManager extends Component
                 }
             }
 
-            foreach ($hashes as $hash) {
-                unset($this->props[$hash]);
-                unset($this->modalProps[$hash]);
+            foreach ($keys as $id) {
+                unset($this->props[$id]);
+                unset($this->modalProps[$id]);
             }
-
-            return;
         }
 
-        $this->modals = [];
-        $this->props = [];
-        $this->modalProps = [];
+        // No component or key specified: destroy all managed modals
+        if ($components === null && $key === null) {
+            $this->modals = [];
+            $this->props = [];
+            $this->modalProps = [];
+        }
     }
 }
