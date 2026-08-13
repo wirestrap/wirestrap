@@ -135,13 +135,13 @@ class ModalManager extends Component
                 unset($this->props[$id]);
                 unset($this->modalProps[$id]);
             }
-
-            return;
         }
 
         // No component or key specified: destroy all managed modals
-        $this->modals = [];
-        $this->props = [];
-        $this->modalProps = [];
+        if ($components === null && $key === null) {
+            $this->modals = [];
+            $this->props = [];
+            $this->modalProps = [];
+        }
     }
 }
