@@ -2,17 +2,17 @@
     <div wire:loading class="ws-modal-manager-loading"></div>
     @foreach ($modals as $subComponent => $modalList)
         <div wire:key="ws-component-{{ md5($subComponent) }}">
-            @foreach ($modalList as $hash)
-                <div wire:key="ws-modal-{{ $hash }}">
+            @foreach ($modalList as $id)
+                <div wire:key="ws-modal-{{ $id }}">
                     <x-wirestrap::modal
-                        :id="'modal_' . $hash"
+                        :id="'modal_' . $id"
                         :auto-show="true"
-                        :attributes="new Illuminate\View\ComponentAttributeBag($modalProps[$hash])"
+                        :attributes="new Illuminate\View\ComponentAttributeBag($modalProps[$id])"
                     >
                         @livewire(
                             $subComponent,
-                            $props[$hash] + ['modalId' => 'modal_' . $hash],
-                            'wire_' . $hash
+                            $props[$id] + ['modalId' => 'modal_' . $id],
+                            'wire_' . $id
                         )
                     </x-wirestrap::modal>
                 </div>

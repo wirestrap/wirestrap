@@ -7,6 +7,9 @@ use Illuminate\Support\Str;
 
 trait WithWirestrap
 {
+    /**
+     * Display a toast notification via the Alpine $wirestrap magic.
+     */
     protected function toast(
         string $type = '',
         string $message = '',
@@ -26,6 +29,9 @@ trait WithWirestrap
         $this->js('$wirestrap.toast(' . json_encode($options) . ')');
     }
 
+    /**
+     * Display an alert dialog via the Alpine $wirestrap magic.
+     */
     protected function alert(
         string $type = '',
         string $message = '',
@@ -65,19 +71,35 @@ trait WithWirestrap
         $this->js('$wirestrap.alert.show(' . json_encode($options) . ')');
     }
 
+    /**
+     * Show a standalone modal by its DOM id.
+     */
     protected function modalShow(string $id): void
     {
         $this->js('$wirestrap.modal.show(' . json_encode($id) . ')');
     }
 
+    /**
+     * Hide a standalone modal by its DOM id.
+     */
     protected function modalHide(string $id): void
     {
         $this->js('$wirestrap.modal.hide(' . json_encode($id) . ')');
     }
 
     /**
-     * @param array<string|int, mixed> $props
-     * @param array<string|int, mixed> $modalProps
+     * Open a managed modal by injecting a Livewire component into the ModalManager.
+     *
+     * The payload is encrypted and dispatched as a Livewire event. The ModalManager
+     * decrypts it, validates expiry and nonce, then renders the component inside a modal.
+     *
+     * The child component receives a `$modalId` prop that can be used to close or show itself
+     * (e.g. `$this->modalHide($this->modalId)` after a form submission).
+     *
+     * @param string $component Livewire component name in dot notation (e.g. 'users.edit-form').
+     * @param array<string|int, mixed> $props Props passed to the child Livewire component.
+     * @param array<string|int, mixed> $modalProps Props passed to the modal wrapper (title, size, draggable, etc.).
+     * @param string|null $key Optional id for deduplication and targeted destruction via modalDestroyManaged().
      */
     protected function modalShowManaged(
         string $component,
@@ -91,28 +113,33 @@ trait WithWirestrap
             'modal_props' => $modalProps,
         ];
 
-        $hash = is_string($key)
-            ? 'ws-' . $key
-            : 'ws-' . md5((string) json_encode($payload));
+        // Use the user-provided key as modal id, or fall back to a content-based hash
+        // so that identical payloads reuse the same modal instead of opening duplicates.
+        $id = $key ?? md5((string) json_encode($payload));
 
+        // Short TTL to reject stale or replayed events.
         $payload['event_expires_at'] = now()->addMinute()->timestamp;
 
+        // Single-use nonce stored in cache to prevent event replay.
         if (config('wirestrap.modal_manager.nonce', true)) {
             $nonce = (string) Str::uuid();
-            Cache::put("ws-modal-nonce:{$hash}:{$nonce}", true, 60);
+            Cache::put("ws-modal-nonce:{$id}:{$nonce}", true, 60);
             $payload['nonce'] = $nonce;
         }
 
+        // Payload is encrypted so the component name and props cannot be tampered with client-side.
         $this->dispatch(
             event: 'ws-modal-manager:show',
             payload: encrypt($payload),
-            hash: $hash,
+            id: $id,
         );
     }
 
     /**
-     * @param string|list<string>|null $component
-     * @param string|list<string>|null $key
+     * Destroy managed modals by component name, key, or all.
+     *
+     * @param string|list<string>|null $component Component name(s) to destroy all modals for.
+     * @param string|list<string>|null $key Key(s) originally passed to modalShowManaged().
      */
     protected function modalDestroyManaged(
         string|array|null $component = null,
