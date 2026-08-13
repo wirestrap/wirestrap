@@ -78,7 +78,7 @@ class ModalManager extends Component
 
         // If the modal already exists, just re-show it instead of creating a duplicate
         if (in_array($id, $this->modals[$component] ?? [], true)) {
-            $this->modalShow('modal_' . $id);
+            $this->modalShow($id);
 
             return;
         }
