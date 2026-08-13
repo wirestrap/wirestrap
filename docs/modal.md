@@ -60,9 +60,9 @@ $this->modalShowManaged(
 | `$component` | `string` | Livewire component name in dot notation (e.g. `'users.edit-form'`). |
 | `$props` | `array` | Props passed to the child Livewire component. |
 | `$modalProps` | `array` | Props passed to the modal wrapper (e.g. title, size, draggable). |
-| `$key` | `string\|null` | Optional key for targeted removal via `modalDestroyManaged(key: ...)`. Defaults to a hash of the payload. |
+| `$key` | `string\|null` | Optional key used as the modal id. Defaults to a hash of the payload. |
 
-The child component receives a `$modalId` prop. Use `$this->modalHide($this->modalId)` to close from PHP. Calls with identical component + props + modalProps re-show the already-open modal.
+The child component receives a `$modalId` prop equal to the key. Use `$this->modalHide($this->modalId)` to close from PHP, or `$this->modalDestroyManaged(key: $this->modalId)` to destroy itself. Calls with identical component + props + modalProps re-show the already-open modal.
 
 ## modalDestroyManaged (WithWirestrap)
 

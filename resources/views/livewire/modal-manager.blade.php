@@ -5,13 +5,13 @@
             @foreach ($modalList as $id)
                 <div wire:key="ws-modal-{{ $id }}">
                     <x-wirestrap::modal
-                        :id="'modal_' . $id"
+                        :id="$id"
                         :auto-show="true"
                         :attributes="new Illuminate\View\ComponentAttributeBag($modalProps[$id])"
                     >
                         @livewire(
                             $subComponent,
-                            $props[$id] + ['modalId' => 'modal_' . $id],
+                            $props[$id] + ['modalId' => $id],
                             'wire_' . $id
                         )
                     </x-wirestrap::modal>
