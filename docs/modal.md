@@ -45,6 +45,7 @@ $this->modalShowManaged(
 | `minimizable` | `bool` | `config` | Minimize to taskbar button. |
 | `expandable` | `bool` | `config` | Fullscreen toggle button. |
 | `resizable` | `bool` | `config` | Resize handles on east, west, south, south-east, south-west edges. |
+| `destroy-on-dismiss` | `bool` | `config` | Dispatch `ws-modal-manager:destroy` when the modal is dismissed. For managed modals that should be destroyed on close. |
 
 ## $wirestrap.modal
 

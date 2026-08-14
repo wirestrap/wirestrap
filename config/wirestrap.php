@@ -161,6 +161,7 @@ return [
         'expandable' => false,
         'resizable' => false,
         'backdrop' => false,
+        'destroy_on_dismiss' => false,
         'class' => '',
     ],
 

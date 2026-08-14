@@ -226,6 +226,7 @@ Alpine.data('wsModal', () => ({
             this._isStatic = this.$el.getAttribute('data-ws-static') === 'true';
             this._hasBackdrop = this.$el.getAttribute('data-ws-backdrop') === 'true';
             this._isResizable = this.$el.getAttribute('data-ws-resizable') === 'true';
+            this._destroyOnDismiss = this.$el.getAttribute('data-ws-destroy-on-dismiss') === 'true';
 
             // Support data-ws-dismiss="modal" inside slot content for convenience.
             this._onDismissClick = (e) => {
@@ -446,6 +447,10 @@ Alpine.data('wsModal', () => ({
 
                 if (this._isResizable && !wasMinimized) {
                     this.resizableReset();
+                }
+
+                if (this._destroyOnDismiss && !wasMinimized) {
+                    this.$dispatch('ws-modal-manager:destroy', { key: modal.id });
                 }
             }
         });
