@@ -10,6 +10,7 @@
     'static' => config('wirestrap.modal.static', false),
     'backdrop' => config('wirestrap.modal.backdrop', false),
     'dismissible' => config('wirestrap.modal.dismissible', true),
+    'destroyOnDismiss' => config('wirestrap.modal.destroy_on_dismiss', false),
     'autoShow' => false,
 ])
 
@@ -32,6 +33,7 @@
     data-ws-static="{{ $static ? 'true' : 'false' }}"
     data-ws-resizable="{{ $resizable ? 'true' : 'false' }}"
     data-ws-backdrop="{{ $backdrop ? 'true' : 'false' }}"
+    @if ($destroyOnDismiss) data-ws-destroy-on-dismiss="true" @endif
     @if ($autoShow) data-ws-auto-show="true" @endif
     @if ($minimizable)
         data-ws-label="{{ $title ?: $modalId }}"
