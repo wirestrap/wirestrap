@@ -12,7 +12,7 @@
                         @livewire(
                             $subComponent,
                             $props[$id] + ['modalId' => $id],
-                            'wire_' . $id
+                            key('wire_' . $id)
                         )
                     </x-wirestrap::modal>
                 </div>
