@@ -4,3 +4,7 @@
 /CLAUDE.md
 package-lock.json
 composer.lock
+tests/Browser/dist/
+tests/Browser/Screenshots/
+tests/Browser/console/
+.phpunit.cache

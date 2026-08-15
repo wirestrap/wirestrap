@@ -6,12 +6,16 @@
     "lint-ci": "eslint resources/js --max-warnings 0",
     "format": "prettier resources/js --write",
     "format-ci": "prettier resources/js --check",
+    "build:test": "vite build --config tests/vite.config.test.js",
     "all": "npm run format && npm run lint"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@floating-ui/dom": "^1.7",
     "eslint": "^10.2.0",
     "globals": "^17.4.0",
-    "prettier": "^3.8.1"
+    "playwright": "^1.62.1",
+    "prettier": "^3.8.1",
+    "vite": "^6.0"
   }
 }

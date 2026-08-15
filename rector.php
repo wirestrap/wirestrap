@@ -1,6 +1,5 @@
 <?php
 
-use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
 use Rector\Config\RectorConfig;
 use Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector;
 use Rector\ValueObject\PhpVersion;
@@ -15,7 +14,6 @@ return RectorConfig::configure()
     ->withParallel()
     ->withSkip([
         SafeDeclareStrictTypesRector::class,
-        EncapsedStringsToSprintfRector::class,
     ])
     ->withPhpSets()
     ->withPreparedSets(
