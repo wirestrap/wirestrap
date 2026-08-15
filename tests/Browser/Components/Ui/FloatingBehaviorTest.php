@@ -20,21 +20,33 @@ dataset('interactive-floatables', [
 
 // --- Hidden by default ---
 
-test('floatable is hidden by default', function (string $page, string $trigger, string $floatable) {
+test('floatable is hidden by default', function (
+    string $page,
+    string $trigger,
+    string $floatable,
+) {
     $this->visit("/_ws/test/{$page}")
         ->assertMissing($floatable);
 })->with('hover-floatables');
 
 // --- Hover trigger ---
 
-test('floatable appears on hover', function (string $page, string $trigger, string $floatable) {
+test('floatable appears on hover', function (
+    string $page,
+    string $trigger,
+    string $floatable,
+) {
     $this->visit("/_ws/test/{$page}")
         ->assertMissing($floatable)
         ->hover($trigger)
         ->assertVisible($floatable);
 })->with('hover-floatables');
 
-test('floatable hides on unhover', function (string $page, string $trigger, string $floatable) {
+test('floatable hides on unhover', function (
+    string $page,
+    string $trigger,
+    string $floatable,
+) {
     $this->visit("/_ws/test/{$page}")
         ->hover($trigger)
         ->assertVisible($floatable)
@@ -44,14 +56,22 @@ test('floatable hides on unhover', function (string $page, string $trigger, stri
 
 // --- Click trigger ---
 
-test('floatable shows on click', function (string $page, string $trigger, string $floatable) {
+test('floatable shows on click', function (
+    string $page,
+    string $trigger,
+    string $floatable,
+) {
     $this->visit("/_ws/test/{$page}")
         ->assertMissing($floatable)
         ->click($trigger)
         ->assertVisible($floatable);
 })->with('click-floatables');
 
-test('floatable hides on second click', function (string $page, string $trigger, string $floatable) {
+test('floatable hides on second click', function (
+    string $page,
+    string $trigger,
+    string $floatable,
+) {
     $this->visit("/_ws/test/{$page}")
         ->click($trigger)
         ->assertVisible($floatable)
@@ -59,7 +79,11 @@ test('floatable hides on second click', function (string $page, string $trigger,
         ->assertScript(js_wait_hidden($floatable));
 })->with('click-floatables');
 
-test('floatable closes on click outside', function (string $page, string $trigger, string $floatable) {
+test('floatable closes on click outside', function (
+    string $page,
+    string $trigger,
+    string $floatable,
+) {
     $this->visit("/_ws/test/{$page}")
         ->click($trigger)
         ->assertVisible($floatable)
@@ -69,7 +93,12 @@ test('floatable closes on click outside', function (string $page, string $trigge
 
 // --- Interactive behavior ---
 
-test('interactive floatable stays open when hovering the panel', function (string $page, string $trigger, string $floatable, string $panel) {
+test('interactive floatable stays open when hovering the panel', function (
+    string $page,
+    string $trigger,
+    string $floatable,
+    string $panel,
+) {
     $this->visit("/_ws/test/{$page}")
         ->hover($trigger)
         ->assertVisible($floatable)
@@ -104,14 +133,24 @@ dataset('programmatic-floatables', [
     'popover' => ['ui/popover', 'pop-full', '#pop-full > [data-ws-floatable]', 'popover'],
 ]);
 
-test('$wirestrap magic show opens the floatable', function (string $page, string $id, string $floatable, string $type) {
+test('$wirestrap magic show opens the floatable', function (
+    string $page,
+    string $id,
+    string $floatable,
+    string $type,
+) {
     $this->visit("/_ws/test/{$page}")
         ->assertMissing($floatable)
         ->assertScript(js_wirestrap("{$type}.show('{$id}')"))
         ->assertVisible($floatable);
 })->with('programmatic-floatables');
 
-test('$wirestrap magic hide closes the floatable', function (string $page, string $id, string $floatable, string $type) {
+test('$wirestrap magic hide closes the floatable', function (
+    string $page,
+    string $id,
+    string $floatable,
+    string $type,
+) {
     $this->visit("/_ws/test/{$page}")
         ->assertScript(js_wirestrap("{$type}.show('{$id}')"))
         ->assertVisible($floatable)
@@ -119,7 +158,12 @@ test('$wirestrap magic hide closes the floatable', function (string $page, strin
         ->assertScript(js_wait_hidden($floatable));
 })->with('programmatic-floatables');
 
-test('$wirestrap magic toggle switches the floatable', function (string $page, string $id, string $floatable, string $type) {
+test('$wirestrap magic toggle switches the floatable', function (
+    string $page,
+    string $id,
+    string $floatable,
+    string $type,
+) {
     $this->visit("/_ws/test/{$page}")
         ->assertMissing($floatable)
         ->assertScript(js_wirestrap("{$type}.toggle('{$id}')"))

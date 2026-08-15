@@ -17,7 +17,12 @@ dataset('nested-teleported-parent', [
     'teleported flyout > flyout' => ['#parent-tpf-trigger', '[data-ws-float-for="parent-tpf"]', '#child-tpf-trigger', '#child-tpf > [data-ws-floatable]'],
 ]);
 
-test('parent stays visible when showing child', function (string $parentTrigger, string $parentFloatable, string $childTrigger, string $childFloatable) {
+test('parent stays visible when showing child', function (
+    string $parentTrigger,
+    string $parentFloatable,
+    string $childTrigger,
+    string $childFloatable,
+) {
     $this->visit('/_ws/test/ui/nesting')
         ->hover($parentTrigger)
         ->assertVisible($parentFloatable)
@@ -26,7 +31,13 @@ test('parent stays visible when showing child', function (string $parentTrigger,
         ->assertVisible($parentFloatable);
 })->with('nested-floatables');
 
-test('parent stays visible when hovering child interactive panel', function (string $parentTrigger, string $parentFloatable, string $childTrigger, string $childFloatable, string $childPanel) {
+test('parent stays visible when hovering child interactive panel', function (
+    string $parentTrigger,
+    string $parentFloatable,
+    string $childTrigger,
+    string $childFloatable,
+    string $childPanel,
+) {
     $this->visit('/_ws/test/ui/nesting')
         ->hover($parentTrigger)
         ->assertVisible($parentFloatable)
@@ -37,7 +48,12 @@ test('parent stays visible when hovering child interactive panel', function (str
         ->assertVisible($parentFloatable);
 })->with('nested-interactive-children');
 
-test('teleported parent stays visible when showing child', function (string $parentTrigger, string $parentFloatable, string $childTrigger, string $childFloatable) {
+test('teleported parent stays visible when showing child', function (
+    string $parentTrigger,
+    string $parentFloatable,
+    string $childTrigger,
+    string $childFloatable,
+) {
     $this->visit('/_ws/test/ui/nesting')
         ->hover($parentTrigger)
         ->assertVisible($parentFloatable)
