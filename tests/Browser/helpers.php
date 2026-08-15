@@ -25,6 +25,30 @@ function js_wait_for(string $selector, int $timeout = 5000): string
 }
 
 /**
+ * Returns a JS expression (Promise) that resolves to true once an element
+ * matching the selector is hidden (display: none or removed from DOM).
+ *
+ * Use with assertScript(): ->assertScript(js_wait_hidden('.my-element'))
+ */
+function js_wait_hidden(string $selector, int $timeout = 5000): string
+{
+    return "new Promise((resolve, reject) => {
+        const deadline = Date.now() + {$timeout};
+        const check = () => {
+            const el = document.querySelector('{$selector}');
+            if (!el || getComputedStyle(el).display === 'none') {
+                resolve(true);
+            } else if (Date.now() > deadline) {
+                reject(new Error('Timed out waiting for hidden: {$selector}'));
+            } else {
+                requestAnimationFrame(check);
+            }
+        };
+        check();
+    })";
+}
+
+/**
  * Returns a JS expression that calls a $wirestrap Alpine magic method.
  *
  * Use with assertScript(): ->assertScript(js_wirestrap("accordion.show('my-id', 'key')"))

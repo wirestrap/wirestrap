@@ -1,0 +1,140 @@
+<?php
+
+// --- Livewire attributes ---
+
+test('uses wire:ignore.self not wire:ignore', function () {
+    $rendered = $this->blade('
+        <x-wirestrap::popover id="test" header="Title" content="Body">
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ');
+
+    expect($rendered)->toUseWireIgnoreSelf();
+});
+
+// --- Data attributes ---
+
+test('renders data-ws-placement from prop', function () {
+    $this->blade('
+        <x-wirestrap::popover id="test" content="Body" placement="bottom">
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ')
+    ->assertSee('data-ws-placement="bottom"', false);
+});
+
+test('renders data-ws-trigger from prop', function () {
+    $this->blade('
+        <x-wirestrap::popover id="test" content="Body" trigger="click">
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ')
+    ->assertSee('data-ws-trigger="click"', false);
+});
+
+test('renders data-ws-interactive by default', function () {
+    $this->blade('
+        <x-wirestrap::popover id="test" content="Body">
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ')
+    ->assertSee('data-ws-interactive', false);
+});
+
+test('does not render data-ws-interactive when interactive is false', function () {
+    $this->blade('
+        <x-wirestrap::popover id="test" content="Body" :interactive="false">
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ')
+    ->assertDontSee('data-ws-interactive', false);
+});
+
+// --- Structure ---
+
+test('renders id on wrapper', function () {
+    $this->blade('
+        <x-wirestrap::popover id="my-pop" content="Body">
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ')
+    ->assertSee('id="my-pop"', false);
+});
+
+test('renders arrow by default', function () {
+    $this->blade('
+        <x-wirestrap::popover id="test" content="Body">
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ')
+    ->assertSee('data-ws-arrow', false);
+});
+
+test('hides arrow when arrow is false', function () {
+    $this->blade('
+        <x-wirestrap::popover id="test" content="Body" :arrow="false">
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ')
+    ->assertDontSee('data-ws-arrow', false);
+});
+
+test('floatable is hidden by default', function () {
+    $this->blade('
+        <x-wirestrap::popover id="test" content="Body">
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ')
+    ->assertSee('style="display: none"', false);
+});
+
+// --- Content rendering ---
+
+test('renders header from prop', function () {
+    $this->blade('
+        <x-wirestrap::popover id="test" header="My Header" content="Body">
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ')
+    ->assertSee('My Header');
+});
+
+test('renders header from slot', function () {
+    $this->blade('
+        <x-wirestrap::popover id="test" content="Body">
+            <x-slot:header><em>Rich header</em></x-slot:header>
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ')
+    ->assertSee('<em>Rich header</em>', false);
+});
+
+test('renders content from prop', function () {
+    $this->blade('
+        <x-wirestrap::popover id="test" content="Popover body text">
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ')
+    ->assertSee('Popover body text');
+});
+
+test('renders content from slot', function () {
+    $this->blade('
+        <x-wirestrap::popover id="test">
+            <x-slot:content>Rich <strong>body</strong></x-slot:content>
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ')
+    ->assertSee('<strong>body</strong>', false);
+});
+
+// --- Teleport ---
+
+test('renders data-ws-float-for when teleported', function () {
+    $this->blade('
+        <x-wirestrap::popover id="test" content="Body" teleport="body">
+            <button type="button">Trigger</button>
+        </x-wirestrap::popover>
+    ')
+    ->assertSee('data-ws-float-for="test"', false);
+});
