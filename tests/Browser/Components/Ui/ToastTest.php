@@ -42,11 +42,11 @@ test('default type is primary', function () {
         ->assertPresent('.ws-toast.ws-toast-primary');
 });
 
-test('type variant applies correct class', function () {
+test('type variant applies correct class', function (string $type) {
     $this->visit('/_ws/test/ui/toast')
-        ->assertScript(js_toast("{ message: 'ok', type: 'danger', duration: 0 }"))
-        ->assertPresent('.ws-toast.ws-toast-danger');
-});
+        ->assertScript(js_toast("{ message: 'ok', type: '{$type}', duration: 0 }"))
+        ->assertPresent(".ws-toast.ws-toast-{$type}");
+})->with(['success', 'info', 'warning', 'danger']);
 
 test('toast has role alert', function () {
     $this->visit('/_ws/test/ui/toast')
@@ -130,6 +130,16 @@ test('max limit removes oldest toast', function () {
         ->assertScript(js_toast("{ message: 'three', duration: 0 }"))
         ->assertScript(js_wait_for('.ws-toast.ws-toast-leaving'))
         ->assertScript("document.querySelectorAll('.ws-toast:not(.ws-toast-leaving)').length <= 2");
+});
+
+// --- Configure ---
+
+test('configure sets default duration', function () {
+    $this->visit('/_ws/test/ui/toast')
+        ->assertScript("(() => { Wirestrap.toast.configure({ duration: 300 }); return true; })()")
+        ->assertScript(js_toast("{ message: 'short' }"))
+        ->assertVisible('.ws-toast')
+        ->assertScript(js_wait_no_toasts());
 });
 
 // --- Container ---

@@ -309,22 +309,14 @@ test('focus moves to first focusable element on show', function () {
     $this->visit('/_ws/test/ui/modal')
         ->click('#btn-focus')
         ->assertVisible('#modal-focus')
-        ->assertScript("new Promise((resolve) => {
-            requestAnimationFrame(() => requestAnimationFrame(() => {
-                resolve(document.getElementById('modal-focus').contains(document.activeElement));
-            }));
-        })");
+        ->assertScript(js_wait_focus('#modal-focus', 'contains'));
 });
 
 test('focus moves to modal itself when no focusable element', function () {
     $this->visit('/_ws/test/ui/modal')
         ->click('#btn-focus-no-focusable')
         ->assertVisible('#modal-focus-no-focusable')
-        ->assertScript("new Promise((resolve) => {
-            requestAnimationFrame(() => requestAnimationFrame(() => {
-                resolve(document.activeElement === document.getElementById('modal-focus-no-focusable'));
-            }));
-        })");
+        ->assertScript(js_wait_focus('#modal-focus-no-focusable'));
 });
 
 // --- Programmatic control ($wirestrap magic) ---

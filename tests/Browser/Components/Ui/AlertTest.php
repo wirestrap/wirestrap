@@ -42,11 +42,11 @@ test('default type is primary', function () {
         ->assertPresent('.ws-alert.ws-alert-primary');
 });
 
-test('type variant applies correct class', function () {
+test('type variant applies correct class', function (string $type) {
     $this->visit('/_ws/test/ui/alert')
-        ->assertScript(js_alert("{ message: 'ok', type: 'danger' }"))
-        ->assertPresent('.ws-alert.ws-alert-danger');
-});
+        ->assertScript(js_alert("{ message: 'ok', type: '{$type}' }"))
+        ->assertPresent(".ws-alert.ws-alert-{$type}");
+})->with(['success', 'info', 'warning', 'danger']);
 
 test('alert has role alertdialog and aria-modal', function () {
     $this->visit('/_ws/test/ui/alert')
@@ -220,6 +220,30 @@ test('confirm with params forwards arguments to method', function () {
         ->click('.ws-alert-dismiss')
         ->assertScript(js_wait_for('#moved-flag'))
         ->assertSeeIn('#moved-flag', '42->99');
+});
+
+// --- Configure ---
+
+test('configure sets global defaults', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->assertScript("(() => { Wirestrap.alert.configure({ dismissText: 'Close', backdropDismiss: false }); return true; })()")
+        ->assertScript(js_alert("{ message: 'configured' }"))
+        ->assertSeeIn('.ws-alert-dismiss', 'Close')
+        // Backdrop click should shake, not dismiss
+        ->assertScript("(() => {
+            document.querySelector('.ws-alert-backdrop').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            return !!document.querySelector('.ws-alert.ws-alert-shaking');
+        })()")
+        ->assertPresent('.ws-alert');
+});
+
+test('configure sets confirm defaults', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->assertScript("(() => { Wirestrap.alert.confirm.configure({ confirmText: 'Do it', cancelText: 'Nope' }); return true; })()")
+        ->assertScript("(() => { Wirestrap.alert.confirm.show({ message: 'test' }); return true; })()")
+        ->assertVisible('.ws-alert')
+        ->assertSeeIn('.ws-alert-dismiss', 'Do it')
+        ->assertSeeIn('.ws-alert-cancel', 'Nope');
 });
 
 // --- Alpine magic ---

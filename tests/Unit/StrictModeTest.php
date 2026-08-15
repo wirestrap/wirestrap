@@ -8,6 +8,7 @@ $withoutId = [
     'modal' => '<x-wirestrap::modal>content</x-wirestrap::modal>',
     'slider' => '<x-wirestrap::slider><x-slot:item>content</x-slot:item></x-wirestrap::slider>',
     'menu' => '<x-wirestrap::menu><x-slot:item label="A" href="#">link</x-slot:item></x-wirestrap::menu>',
+    'menu.accordion' => '<x-wirestrap::menu id="test"><x-slot:grp><x-wirestrap::menu.accordion><x-slot:child>link</x-slot:child></x-wirestrap::menu.accordion></x-slot:grp></x-wirestrap::menu>',
     'select' => '<x-wirestrap::select :options="[\'a\' => \'A\']" />',
 ];
 
@@ -17,6 +18,7 @@ $withId = [
     'modal' => '<x-wirestrap::modal id="test">content</x-wirestrap::modal>',
     'slider' => '<x-wirestrap::slider id="test"><x-slot:item>content</x-slot:item></x-wirestrap::slider>',
     'menu' => '<x-wirestrap::menu id="test"><x-slot:item label="A" href="#">link</x-slot:item></x-wirestrap::menu>',
+    'menu.accordion' => '<x-wirestrap::menu id="test"><x-slot:grp><x-wirestrap::menu.accordion id="grp"><x-slot:child>link</x-slot:child></x-wirestrap::menu.accordion></x-slot:grp></x-wirestrap::menu>',
     'select' => '<x-wirestrap::select id="test" :options="[\'a\' => \'A\']" />',
 ];
 

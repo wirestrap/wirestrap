@@ -80,6 +80,35 @@ function js_after_tick(string $check): string
 }
 
 /**
+ * Returns a JS expression (Promise) that resolves to true once the active
+ * element matches the given condition. Polls with requestAnimationFrame.
+ *
+ * Use with assertScript(): ->assertScript(js_wait_focus('#my-modal', 'contains'))
+ *
+ * @param string $mode 'is' = activeElement matches selector, 'contains' = selector contains activeElement
+ */
+function js_wait_focus(string $selector, string $mode = 'is', int $timeout = 5000): string
+{
+    $check = $mode === 'contains'
+        ? "document.querySelector('{$selector}')?.contains(document.activeElement)"
+        : "document.activeElement === document.querySelector('{$selector}')";
+
+    return "new Promise((resolve, reject) => {
+        const deadline = Date.now() + {$timeout};
+        const check = () => {
+            if ({$check}) {
+                resolve(true);
+            } else if (Date.now() > deadline) {
+                reject(new Error('Timed out waiting for focus on: {$selector}'));
+            } else {
+                requestAnimationFrame(check);
+            }
+        };
+        check();
+    })";
+}
+
+/**
  * Returns a JS expression that calls a $wirestrap Alpine magic method.
  *
  * Use with assertScript(): ->assertScript(js_wirestrap("accordion.show('my-id', 'key')"))

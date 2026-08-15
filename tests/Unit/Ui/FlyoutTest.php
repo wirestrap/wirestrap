@@ -100,7 +100,44 @@ test('renders content from slot', function () {
     ->assertSee('<strong>flyout</strong>', false);
 });
 
+// --- Offset and position ---
+
+test('renders data-ws-offset-distance from prop', function () {
+    $this->blade('
+        <x-wirestrap::flyout id="test" content="Hello" :offset-distance="12">
+            <button type="button">Trigger</button>
+        </x-wirestrap::flyout>
+    ')
+    ->assertSee('data-ws-offset-distance="12"', false);
+});
+
+test('renders data-ws-offset-skidding from prop', function () {
+    $this->blade('
+        <x-wirestrap::flyout id="test" content="Hello" :offset-skidding="5">
+            <button type="button">Trigger</button>
+        </x-wirestrap::flyout>
+    ')
+    ->assertSee('data-ws-offset-skidding="5"', false);
+});
+
+test('renders data-ws-position from prop', function () {
+    $this->blade('
+        <x-wirestrap::flyout id="test" content="Hello" position="fixed">
+            <button type="button">Trigger</button>
+        </x-wirestrap::flyout>
+    ')
+    ->assertSee('data-ws-position="fixed"', false);
+});
+
 // --- Teleport ---
+
+test('teleport without id throws MissingComponentIdException', function () {
+    $this->blade('
+        <x-wirestrap::flyout content="Hello" teleport="body">
+            <button type="button">Trigger</button>
+        </x-wirestrap::flyout>
+    ');
+})->throws(\Illuminate\View\ViewException::class, 'Missing ID');
 
 test('renders data-ws-float-for when teleported', function () {
     $this->blade('
