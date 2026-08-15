@@ -49,6 +49,26 @@ function js_wait_hidden(string $selector, int $timeout = 5000): string
 }
 
 /**
+ * Returns a JS expression (Promise) that resolves to true once an element
+ * is completely removed from the DOM. Unlike js_wait_hidden which also
+ * resolves for display:none, this only resolves when the element no longer exists.
+ * Useful for Livewire re-renders that destroy a component.
+ *
+ * Use with assertScript(): ->assertScript(js_wait_removed('my-element-id'))
+ */
+function js_wait_removed(string $id, int $timeout = 10000): string
+{
+    return "new Promise((resolve, reject) => {
+        const deadline = Date.now() + {$timeout};
+        (function check() {
+            if (!document.getElementById('{$id}')) return resolve(true);
+            if (Date.now() > deadline) return reject(new Error('Timed out waiting for #{$id} removal'));
+            requestAnimationFrame(check);
+        })();
+    })";
+}
+
+/**
  * Returns a JS expression that calls a $wirestrap Alpine magic method.
  *
  * Use with assertScript(): ->assertScript(js_wirestrap("accordion.show('my-id', 'key')"))
