@@ -22,7 +22,7 @@ class TableDemo extends Component
 
     public function removeRow(): void
     {
-        $this->rows = array_values(array_filter($this->rows, fn ($r) => $r['id'] !== 2));
+        $this->rows = array_values(array_filter($this->rows, fn($r) => $r['id'] !== 2));
     }
 
     public function reorderRows(): void
@@ -34,7 +34,7 @@ class TableDemo extends Component
     {
         $this->rows = array_values(array_filter(
             $this->rows,
-            fn ($r) => !in_array((string) $r['id'], $this->selectedIds),
+            fn($r) => !in_array((string) $r['id'], $this->selectedIds),
         ));
         $this->selectedIds = [];
     }

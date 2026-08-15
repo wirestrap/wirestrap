@@ -76,7 +76,7 @@ abstract class BrowserTestCase extends TestCase
      */
     protected function defineWebRoutes($router): void
     {
-        $router->get('_ws/wirestrap.css', fn (): BinaryFileResponse => response()->file(
+        $router->get('_ws/wirestrap.css', fn(): BinaryFileResponse => response()->file(
             realpath(__DIR__ . '/../dist/wirestrap.css'),
             ['Content-Type' => 'text/css'],
         ));
@@ -93,7 +93,7 @@ abstract class BrowserTestCase extends TestCase
             ]);
         });
 
-        $router->get('_ws/test/{page}', fn (string $page): View => view('pages.' . str_replace('/', '.', $page)))
+        $router->get('_ws/test/{page}', fn(string $page): View => view('pages.' . str_replace('/', '.', $page)))
             ->where('page', '.*')
             ->middleware('web');
     }

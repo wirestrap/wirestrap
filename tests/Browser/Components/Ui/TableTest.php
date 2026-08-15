@@ -152,7 +152,7 @@ test('bulk action delete removes selected rows', function () {
             document.querySelector('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk]').click();
             return true;
         })()")
-        ->assertScript(js_after_tick("true"))
+        ->assertScript(js_after_tick('true'))
         // Click delete — triggers wire:click which sends deferred $set + action
         ->assertScript("(() => {
             document.querySelector('[data-ws-bulk-container] button').click();

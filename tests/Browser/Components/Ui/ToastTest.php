@@ -124,7 +124,7 @@ test('multiple toasts stack', function () {
 
 test('max limit removes oldest toast', function () {
     $this->visit('/_ws/test/ui/toast')
-        ->assertScript("(() => { Wirestrap.toast.configure({ max: 2 }); return true; })()")
+        ->assertScript('(() => { Wirestrap.toast.configure({ max: 2 }); return true; })()')
         ->assertScript(js_toast("{ message: 'one', duration: 0 }"))
         ->assertScript(js_toast("{ message: 'two', duration: 0 }"))
         ->assertScript(js_toast("{ message: 'three', duration: 0 }"))
@@ -143,7 +143,7 @@ test('container has default placement class', function () {
 test('configure placement changes container class', function () {
     $this->visit('/_ws/test/ui/toast')
         ->assertScript("(() => { Wirestrap.toast.configure({ placement: 'top-start' }); return true; })()")
-        ->assertScript("(() => { Wirestrap.toast.destroy(); return true; })()")
+        ->assertScript('(() => { Wirestrap.toast.destroy(); return true; })()')
         ->assertScript(js_toast("{ message: 'ok', duration: 0 }"))
         ->assertPresent('.ws-toast-container.ws-toast-top-start');
 });
