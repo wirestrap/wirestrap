@@ -56,10 +56,10 @@ abstract class BrowserTestCase extends TestCase
      */
     protected function defineEnvironment($app): void
     {
-        Blade::anonymousComponentPath(__DIR__ . '/Browser/views/components');
-
         $app['config']->set('app.key', 'base64:Hupx3yAySikrM2/edkZQNQHslgDWYfiBfCuSThJ5SK8=');
         $app['config']->set('view.paths', [__DIR__ . '/Browser/views']);
+
+        Blade::anonymousComponentPath(__DIR__ . '/Browser/views/components');
 
         $app['config']->set('livewire.inject_assets', false);
         $app['config']->set('livewire.class_namespace', 'Tests\\Browser\\Livewire');
@@ -93,6 +93,8 @@ abstract class BrowserTestCase extends TestCase
             ]);
         });
 
-        $router->get('_ws/test/{page}', fn (string $page): View => view("pages.{$page}"))->middleware('web');
+        $router->get('_ws/test/{page}', fn (string $page): View => view('pages.' . str_replace('/', '.', $page)))
+            ->where('page', '.*')
+            ->middleware('web');
     }
 }
