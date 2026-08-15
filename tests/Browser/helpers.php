@@ -69,6 +69,17 @@ function js_wait_removed(string $id, int $timeout = 10000): string
 }
 
 /**
+ * Wait one animation frame for Alpine's microtask-based DOM updates to flush.
+ * Returns a Promise that resolves with the result of the check expression.
+ *
+ * Use with assertScript(): ->assertScript(js_after_tick("el.disabled === true"))
+ */
+function js_after_tick(string $check): string
+{
+    return "new Promise(resolve => requestAnimationFrame(() => resolve({$check})))";
+}
+
+/**
  * Returns a JS expression that calls a $wirestrap Alpine magic method.
  *
  * Use with assertScript(): ->assertScript(js_wirestrap("accordion.show('my-id', 'key')"))

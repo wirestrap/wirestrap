@@ -1,14 +1,5 @@
 <?php
 
-/**
- * Wait one animation frame for Alpine's microtask-based DOM updates to flush.
- * Returns a Promise that resolves with the result of the check expression.
- */
-function js_after_tick(string $check): string
-{
-    return "new Promise(resolve => requestAnimationFrame(() => resolve({$check})))";
-}
-
 // --- Arrow state ---
 
 test('prev arrow is disabled at start', function () {
