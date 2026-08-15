@@ -3,7 +3,7 @@
 test('renders i element', function () {
     $rendered = (string) $this->blade('<x-wirestrap::icon icon="person" />');
 
-    expect($rendered)->toContain('<i');
+    expect($rendered)->toContain('<i ');
 });
 
 test('string icon is used as class', function () {
@@ -66,6 +66,6 @@ dataset('with icon', $withIcon);
 test('component renders icon via iconComponent', function (string $blade) {
     $rendered = (string) $this->withViewErrors([])->blade($blade);
 
-    expect($rendered)->toContain('<i');
+    expect($rendered)->toContain('<i ');
     expect($rendered)->toContain('bi-star');
 })->with('with icon');

@@ -11,13 +11,6 @@
             <x-slot:s6><div class="slide-content">Slide 6</div></x-slot:s6>
         </x-wirestrap::slider>
 
-        {{-- No arrows --}}
-        <x-wirestrap::slider id="slider-no-arrows" :columns="2" :arrows="false">
-            <x-slot:a><div>A</div></x-slot:a>
-            <x-slot:b><div>B</div></x-slot:b>
-            <x-slot:c><div>C</div></x-slot:c>
-        </x-wirestrap::slider>
-
         {{-- Scroll by 2 --}}
         <x-wirestrap::slider id="slider-scroll-by" :columns="2" :scroll-by="2">
             <x-slot:a><div>A</div></x-slot:a>

@@ -40,21 +40,6 @@
 
         <br>
 
-        {{-- Trigger slot --}}
-        <x-wirestrap::menu id="menu-trigger">
-            <x-slot:custom_group>
-                <x-wirestrap::menu.accordion id="custom">
-                    <x-slot:trigger>
-                        <i class="bi bi-gear"></i>
-                        <span>Custom trigger</span>
-                    </x-slot:trigger>
-                    <x-slot:child><a href="#">Child</a></x-slot:child>
-                </x-wirestrap::menu.accordion>
-            </x-slot:custom_group>
-        </x-wirestrap::menu>
-
-        <br>
-
         {{-- Events for programmatic control --}}
         <x-wirestrap::menu id="menu-events" :events="true">
             <x-slot:ev_group>

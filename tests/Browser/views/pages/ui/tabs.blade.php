@@ -57,7 +57,5 @@
 
         {{-- Invalid feedback (Livewire) --}}
         <livewire:ui.tabs-validation lazy />
-
-        <div id="elsewhere" style="margin-top: 100px; padding: 20px;">Click here</div>
     </div>
 </x-layouts.app>

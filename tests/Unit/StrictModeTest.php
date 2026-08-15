@@ -35,13 +35,13 @@ test('strict mode throws when id is missing', function (string $blade) {
 test('strict mode passes when id is provided', function (string $blade) {
     config()->set('wirestrap.strict_mode', true);
 
+    $this->expectNotToPerformAssertions();
     $this->withViewErrors([])->blade($blade);
-    expect(true)->toBeTrue();
 })->with('with id');
 
 test('no exception when strict mode is disabled', function (string $blade) {
     config()->set('wirestrap.strict_mode', false);
 
+    $this->expectNotToPerformAssertions();
     $this->withViewErrors([])->blade($blade);
-    expect(true)->toBeTrue();
 })->with('without id');
