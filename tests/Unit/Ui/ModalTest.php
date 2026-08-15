@@ -19,7 +19,8 @@ test('renders x-data wsModal on root', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('x-data="wsModal"', false);
+    ')
+    ->assertSee('x-data="wsModal"', false);
 });
 
 // --- Data attributes (always present) ---
@@ -29,7 +30,8 @@ test('boolean data attribute defaults to false', function (string $attr) {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee("data-ws-{$attr}=\"false\"", false);
+    ')
+    ->assertSee("data-ws-{$attr}=\"false\"", false);
 })->with(['draggable', 'static', 'resizable', 'backdrop']);
 
 test('boolean data attribute is true when prop is set', function (string $attr) {
@@ -37,7 +39,8 @@ test('boolean data attribute is true when prop is set', function (string $attr) 
         <x-wirestrap::modal id=\"m\" {$attr}>
             <p>Content</p>
         </x-wirestrap::modal>
-    ")->assertSee("data-ws-{$attr}=\"true\"", false);
+    ")
+    ->assertSee("data-ws-{$attr}=\"true\"", false);
 })->with(['draggable', 'static', 'resizable', 'backdrop']);
 
 // --- Conditional data attributes ---
@@ -47,7 +50,8 @@ test('data-ws-destroy-on-dismiss absent by default', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertDontSee('data-ws-destroy-on-dismiss', false);
+    ')
+    ->assertDontSee('data-ws-destroy-on-dismiss', false);
 });
 
 test('data-ws-destroy-on-dismiss present when set', function () {
@@ -55,7 +59,8 @@ test('data-ws-destroy-on-dismiss present when set', function () {
         <x-wirestrap::modal id="m" :destroy-on-dismiss="true">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('data-ws-destroy-on-dismiss="true"', false);
+    ')
+    ->assertSee('data-ws-destroy-on-dismiss="true"', false);
 });
 
 test('data-ws-auto-show absent by default', function () {
@@ -63,7 +68,8 @@ test('data-ws-auto-show absent by default', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertDontSee('data-ws-auto-show', false);
+    ')
+    ->assertDontSee('data-ws-auto-show', false);
 });
 
 test('data-ws-auto-show present when set', function () {
@@ -71,7 +77,8 @@ test('data-ws-auto-show present when set', function () {
         <x-wirestrap::modal id="m" :auto-show="true">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('data-ws-auto-show="true"', false);
+    ')
+    ->assertSee('data-ws-auto-show="true"', false);
 });
 
 // --- Minimizable data attributes ---
@@ -81,7 +88,8 @@ test('data-ws-label uses title when minimizable', function () {
         <x-wirestrap::modal id="m" title="My Title" minimizable>
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('data-ws-label="My Title"', false);
+    ')
+    ->assertSee('data-ws-label="My Title"', false);
 });
 
 test('data-ws-label falls back to id when no title', function () {
@@ -89,7 +97,8 @@ test('data-ws-label falls back to id when no title', function () {
         <x-wirestrap::modal id="my-modal" minimizable>
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('data-ws-label="my-modal"', false);
+    ')
+    ->assertSee('data-ws-label="my-modal"', false);
 });
 
 test('data-ws-btn-class set when minimizable', function () {
@@ -97,7 +106,8 @@ test('data-ws-btn-class set when minimizable', function () {
         <x-wirestrap::modal id="m" minimizable>
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('data-ws-btn-class="ws-modal-minimized-btn"', false);
+    ')
+    ->assertSee('data-ws-btn-class="ws-modal-minimized-btn"', false);
 });
 
 test('data-ws-label absent when not minimizable', function () {
@@ -105,7 +115,8 @@ test('data-ws-label absent when not minimizable', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertDontSee('data-ws-label', false);
+    ')
+    ->assertDontSee('data-ws-label', false);
 });
 
 // --- Modal element ---
@@ -115,7 +126,8 @@ test('renders id on modal element', function () {
         <x-wirestrap::modal id="my-modal">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('id="my-modal"', false);
+    ')
+    ->assertSee('id="my-modal"', false);
 });
 
 test('renders role dialog', function () {
@@ -123,7 +135,8 @@ test('renders role dialog', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('role="dialog"', false);
+    ')
+    ->assertSee('role="dialog"', false);
 });
 
 test('renders tabindex -1', function () {
@@ -131,7 +144,8 @@ test('renders tabindex -1', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('tabindex="-1"', false);
+    ')
+    ->assertSee('tabindex="-1"', false);
 });
 
 test('renders aria-hidden true', function () {
@@ -139,7 +153,8 @@ test('renders aria-hidden true', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('aria-hidden="true"', false);
+    ')
+    ->assertSee('aria-hidden="true"', false);
 });
 
 test('renders ws-modal class', function () {
@@ -147,7 +162,8 @@ test('renders ws-modal class', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('ws-modal', false);
+    ')
+    ->assertSee('ws-modal', false);
 });
 
 test('forwards custom class to modal element', function () {
@@ -155,7 +171,8 @@ test('forwards custom class to modal element', function () {
         <x-wirestrap::modal id="m" class="custom-modal">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('custom-modal', false);
+    ')
+    ->assertSee('custom-modal', false);
 });
 
 // --- ARIA ---
@@ -165,7 +182,8 @@ test('aria-labelledby links to title when title is set', function () {
         <x-wirestrap::modal id="my-modal" title="Test Title">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('aria-labelledby="my-modal-title"', false);
+    ')
+    ->assertSee('aria-labelledby="my-modal-title"', false);
 });
 
 test('aria-labelledby absent when no title', function () {
@@ -173,7 +191,8 @@ test('aria-labelledby absent when no title', function () {
         <x-wirestrap::modal id="my-modal">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertDontSee('aria-labelledby', false);
+    ')
+    ->assertDontSee('aria-labelledby', false);
 });
 
 // --- Title ---
@@ -184,9 +203,9 @@ test('title renders h5 with id and class', function () {
             <p>Content</p>
         </x-wirestrap::modal>
     ')
-        ->assertSee('Settings')
-        ->assertSee('id="my-modal-title"', false)
-        ->assertSee('ws-modal-title', false);
+    ->assertSee('Settings')
+    ->assertSee('id="my-modal-title"', false)
+    ->assertSee('ws-modal-title', false);
 });
 
 test('no title element when title omitted', function () {
@@ -194,7 +213,8 @@ test('no title element when title omitted', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertDontSee('ws-modal-title', false);
+    ')
+    ->assertDontSee('ws-modal-title', false);
 });
 
 // --- Footer ---
@@ -207,7 +227,8 @@ test('footer renders when slot provided', function () {
                 <button>Action</button>
             </x-slot:footer>
         </x-wirestrap::modal>
-    ')->assertSee('ws-modal-footer', false);
+    ')
+    ->assertSee('ws-modal-footer', false);
 });
 
 test('footer slot class forwarded', function () {
@@ -218,7 +239,8 @@ test('footer slot class forwarded', function () {
                 <button>Action</button>
             </x-slot:footer>
         </x-wirestrap::modal>
-    ')->assertSee('ws-modal-footer custom-footer', false);
+    ')
+    ->assertSee('ws-modal-footer custom-footer', false);
 });
 
 test('no footer when not provided', function () {
@@ -226,7 +248,8 @@ test('no footer when not provided', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertDontSee('ws-modal-footer', false);
+    ')
+    ->assertDontSee('ws-modal-footer', false);
 });
 
 // --- Dialog sizing ---
@@ -236,7 +259,8 @@ test('size class applied to dialog', function () {
         <x-wirestrap::modal id="m" size="800">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('ws-modal-800', false);
+    ')
+    ->assertSee('ws-modal-800', false);
 });
 
 test('no size class by default', function () {
@@ -244,7 +268,8 @@ test('no size class by default', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertDontSee('ws-modal-dialog ws-modal-', false);
+    ')
+    ->assertDontSee('ws-modal-dialog ws-modal-', false);
 });
 
 // --- Close button ---
@@ -254,7 +279,8 @@ test('close button present when dismissible', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('ws-modal-close', false);
+    ')
+    ->assertSee('ws-modal-close', false);
 });
 
 test('close button absent when dismissible false', function () {
@@ -262,7 +288,8 @@ test('close button absent when dismissible false', function () {
         <x-wirestrap::modal id="m" :dismissible="false">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertDontSee('ws-modal-close', false);
+    ')
+    ->assertDontSee('ws-modal-close', false);
 });
 
 test('close button has aria-label', function () {
@@ -270,7 +297,8 @@ test('close button has aria-label', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('aria-label="Close"', false);
+    ')
+    ->assertSee('aria-label="Close"', false);
 });
 
 // --- Expand button ---
@@ -280,7 +308,8 @@ test('expand button present when expandable', function () {
         <x-wirestrap::modal id="m" expandable>
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('ws-modal-expand-btn', false);
+    ')
+    ->assertSee('ws-modal-expand-btn', false);
 });
 
 test('expand button absent by default', function () {
@@ -288,7 +317,8 @@ test('expand button absent by default', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertDontSee('ws-modal-expand-btn', false);
+    ')
+    ->assertDontSee('ws-modal-expand-btn', false);
 });
 
 test('expand button has aria-pressed false', function () {
@@ -296,7 +326,8 @@ test('expand button has aria-pressed false', function () {
         <x-wirestrap::modal id="m" expandable>
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('aria-pressed="false"', false);
+    ')
+    ->assertSee('aria-pressed="false"', false);
 });
 
 test('expand button has aria-label', function () {
@@ -304,7 +335,8 @@ test('expand button has aria-label', function () {
         <x-wirestrap::modal id="m" expandable>
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('aria-label="Toggle fullscreen"', false);
+    ')
+    ->assertSee('aria-label="Toggle fullscreen"', false);
 });
 
 // --- Minimize button ---
@@ -314,7 +346,8 @@ test('minimize button present when minimizable', function () {
         <x-wirestrap::modal id="m" minimizable>
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('ws-modal-minimize-btn', false);
+    ')
+    ->assertSee('ws-modal-minimize-btn', false);
 });
 
 test('minimize button absent by default', function () {
@@ -322,7 +355,8 @@ test('minimize button absent by default', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertDontSee('ws-modal-minimize-btn', false);
+    ')
+    ->assertDontSee('ws-modal-minimize-btn', false);
 });
 
 test('minimize button has aria-label', function () {
@@ -330,7 +364,8 @@ test('minimize button has aria-label', function () {
         <x-wirestrap::modal id="m" minimizable>
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('aria-label="Minimize"', false);
+    ')
+    ->assertSee('aria-label="Minimize"', false);
 });
 
 // --- Resize handles ---
@@ -341,11 +376,11 @@ test('resize handles rendered when resizable', function () {
             <p>Content</p>
         </x-wirestrap::modal>
     ')
-        ->assertSee('data-ws-resize="e"', false)
-        ->assertSee('data-ws-resize="w"', false)
-        ->assertSee('data-ws-resize="s"', false)
-        ->assertSee('data-ws-resize="se"', false)
-        ->assertSee('data-ws-resize="sw"', false);
+    ->assertSee('data-ws-resize="e"', false)
+    ->assertSee('data-ws-resize="w"', false)
+    ->assertSee('data-ws-resize="s"', false)
+    ->assertSee('data-ws-resize="se"', false)
+    ->assertSee('data-ws-resize="sw"', false);
 });
 
 test('no resize handles when not resizable', function () {
@@ -353,7 +388,8 @@ test('no resize handles when not resizable', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertDontSee('ws-modal-resize-handle', false);
+    ')
+    ->assertDontSee('ws-modal-resize-handle', false);
 });
 
 // --- Drag handle ---
@@ -363,7 +399,8 @@ test('header has drag handle class when draggable', function () {
         <x-wirestrap::modal id="m" draggable>
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertSee('ws-modal-header ws-drag-handle', false);
+    ')
+    ->assertSee('ws-modal-header ws-drag-handle', false);
 });
 
 test('header has no drag handle class by default', function () {
@@ -371,5 +408,6 @@ test('header has no drag handle class by default', function () {
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')->assertDontSee('ws-drag-handle', false);
+    ')
+    ->assertDontSee('ws-drag-handle', false);
 });

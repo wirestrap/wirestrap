@@ -64,7 +64,8 @@ $withIcon = [
 dataset('with icon', $withIcon);
 
 test('component renders icon via iconComponent', function (string $blade) {
-    $rendered = (string) $this->withViewErrors([])->blade($blade);
+    $rendered = (string) $this->withViewErrors([])
+        ->blade($blade);
 
     expect($rendered)->toContain('<i ');
     expect($rendered)->toContain('bi-star');

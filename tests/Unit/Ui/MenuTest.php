@@ -39,7 +39,8 @@ test('data-ws-single is true when single prop is set', function () {
         <x-wirestrap::menu id="nav" :single="true">
             <x-slot:item>content</x-slot:item>
         </x-wirestrap::menu>
-    ')->assertSee('data-ws-single="true"', false);
+    ')
+    ->assertSee('data-ws-single="true"', false);
 });
 
 test('data-ws-single defaults to false', function () {
@@ -47,7 +48,8 @@ test('data-ws-single defaults to false', function () {
         <x-wirestrap::menu id="nav">
             <x-slot:item>content</x-slot:item>
         </x-wirestrap::menu>
-    ')->assertSee('data-ws-single="false"', false);
+    ')
+    ->assertSee('data-ws-single="false"', false);
 });
 
 test('data-ws-events is true when events prop is set', function () {
@@ -55,7 +57,8 @@ test('data-ws-events is true when events prop is set', function () {
         <x-wirestrap::menu id="nav" :events="true">
             <x-slot:item>content</x-slot:item>
         </x-wirestrap::menu>
-    ')->assertSee('data-ws-events="true"', false);
+    ')
+    ->assertSee('data-ws-events="true"', false);
 });
 
 test('data-ws-events defaults to false', function () {
@@ -63,7 +66,8 @@ test('data-ws-events defaults to false', function () {
         <x-wirestrap::menu id="nav">
             <x-slot:item>content</x-slot:item>
         </x-wirestrap::menu>
-    ')->assertSee('data-ws-events="false"', false);
+    ')
+    ->assertSee('data-ws-events="false"', false);
 });
 
 // --- Menu: Root element ---
@@ -73,7 +77,8 @@ test('renders nav element with x-data wsMenu', function () {
         <x-wirestrap::menu id="nav">
             <x-slot:item>content</x-slot:item>
         </x-wirestrap::menu>
-    ')->assertSee('x-data="wsMenu"', false);
+    ')
+    ->assertSee('x-data="wsMenu"', false);
 });
 
 test('renders id on root element', function () {
@@ -81,7 +86,8 @@ test('renders id on root element', function () {
         <x-wirestrap::menu id="my-nav">
             <x-slot:item>content</x-slot:item>
         </x-wirestrap::menu>
-    ')->assertSee('id="my-nav"', false);
+    ')
+    ->assertSee('id="my-nav"', false);
 });
 
 test('renders ws-menu class on root', function () {
@@ -89,7 +95,8 @@ test('renders ws-menu class on root', function () {
         <x-wirestrap::menu id="nav">
             <x-slot:item>content</x-slot:item>
         </x-wirestrap::menu>
-    ')->assertSee('ws-menu', false);
+    ')
+    ->assertSee('ws-menu', false);
 });
 
 test('forwards custom class to root element', function () {
@@ -97,7 +104,8 @@ test('forwards custom class to root element', function () {
         <x-wirestrap::menu id="nav" class="sidebar-nav">
             <x-slot:item>content</x-slot:item>
         </x-wirestrap::menu>
-    ')->assertSee('sidebar-nav', false);
+    ')
+    ->assertSee('sidebar-nav', false);
 });
 
 test('forwards extra attributes to root element', function () {
@@ -105,7 +113,8 @@ test('forwards extra attributes to root element', function () {
         <x-wirestrap::menu id="nav" data-custom="value">
             <x-slot:item>content</x-slot:item>
         </x-wirestrap::menu>
-    ')->assertSee('data-custom="value"', false);
+    ')
+    ->assertSee('data-custom="value"', false);
 });
 
 // --- Menu.accordion: Structure ---
@@ -119,7 +128,8 @@ test('trigger has data-ws-menu-accordion attribute', function () {
                 </x-wirestrap::menu.accordion>
             </x-slot:grp>
         </x-wirestrap::menu>
-    ')->assertSee('data-ws-menu-accordion="settings"', false);
+    ')
+    ->assertSee('data-ws-menu-accordion="settings"', false);
 });
 
 test('panel has data-ws-menu-accordion-panel attribute', function () {
@@ -131,7 +141,8 @@ test('panel has data-ws-menu-accordion-panel attribute', function () {
                 </x-wirestrap::menu.accordion>
             </x-slot:grp>
         </x-wirestrap::menu>
-    ')->assertSee('data-ws-menu-accordion-panel="settings"', false);
+    ')
+    ->assertSee('data-ws-menu-accordion-panel="settings"', false);
 });
 
 test('panel has id for ARIA linking', function () {
@@ -143,7 +154,8 @@ test('panel has id for ARIA linking', function () {
                 </x-wirestrap::menu.accordion>
             </x-slot:grp>
         </x-wirestrap::menu>
-    ')->assertSee('id="ws-menu-accordion-panel-settings"', false);
+    ')
+    ->assertSee('id="ws-menu-accordion-panel-settings"', false);
 });
 
 test('aria-controls links trigger to panel', function () {
@@ -155,7 +167,8 @@ test('aria-controls links trigger to panel', function () {
                 </x-wirestrap::menu.accordion>
             </x-slot:grp>
         </x-wirestrap::menu>
-    ')->assertSee('aria-controls="ws-menu-accordion-panel-settings"', false);
+    ')
+    ->assertSee('aria-controls="ws-menu-accordion-panel-settings"', false);
 });
 
 // --- Menu.accordion: Label ---
@@ -169,7 +182,8 @@ test('trigger renders label text', function () {
                 </x-wirestrap::menu.accordion>
             </x-slot:grp>
         </x-wirestrap::menu>
-    ')->assertSee('Settings');
+    ')
+    ->assertSee('Settings');
 });
 
 test('trigger falls back to id when label is omitted', function () {
@@ -181,7 +195,8 @@ test('trigger falls back to id when label is omitted', function () {
                 </x-wirestrap::menu.accordion>
             </x-slot:grp>
         </x-wirestrap::menu>
-    ')->assertSee('my-group');
+    ')
+    ->assertSee('my-group');
 });
 
 test('trigger slot overrides label', function () {
@@ -195,8 +210,8 @@ test('trigger slot overrides label', function () {
             </x-slot:grp>
         </x-wirestrap::menu>
     ')
-        ->assertSee('bi-gear', false)
-        ->assertDontSee('Fallback');
+    ->assertSee('bi-gear', false)
+    ->assertDontSee('Fallback');
 });
 
 // --- Menu.accordion: Initial state ---
@@ -210,7 +225,8 @@ test('open group panel has data-ws-open', function () {
                 </x-wirestrap::menu.accordion>
             </x-slot:grp>
         </x-wirestrap::menu>
-    ')->assertSee('data-ws-open="true"', false);
+    ')
+    ->assertSee('data-ws-open="true"', false);
 });
 
 test('closed group panel is hidden', function () {
@@ -222,7 +238,8 @@ test('closed group panel is hidden', function () {
                 </x-wirestrap::menu.accordion>
             </x-slot:grp>
         </x-wirestrap::menu>
-    ')->assertSee('style="display: none"', false);
+    ')
+    ->assertSee('style="display: none"', false);
 });
 
 test('open group trigger has open class', function () {
@@ -234,5 +251,6 @@ test('open group trigger has open class', function () {
                 </x-wirestrap::menu.accordion>
             </x-slot:grp>
         </x-wirestrap::menu>
-    ')->assertSee('ws-menu-accordion-trigger open', false);
+    ')
+    ->assertSee('ws-menu-accordion-trigger open', false);
 });

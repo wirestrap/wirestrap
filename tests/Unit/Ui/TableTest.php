@@ -24,7 +24,8 @@ test('renders x-data wsTable on root', function () {
         <x-wirestrap::table :columns="[\'Name\']">
             <tr><td>A</td></tr>
         </x-wirestrap::table>
-    ')->assertSee('x-data="wsTable"', false);
+    ')
+    ->assertSee('x-data="wsTable"', false);
 });
 
 test('renders tooltip config data attributes on root', function () {
