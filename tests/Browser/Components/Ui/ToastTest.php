@@ -136,7 +136,7 @@ test('max limit removes oldest toast', function () {
 
 test('configure sets default duration', function () {
     $this->visit('/_ws/test/ui/toast')
-        ->assertScript("(() => { Wirestrap.toast.configure({ duration: 300 }); return true; })()")
+        ->assertScript('(() => { Wirestrap.toast.configure({ duration: 300 }); return true; })()')
         ->assertScript(js_toast("{ message: 'short' }"))
         ->assertVisible('.ws-toast')
         ->assertScript(js_wait_no_toasts());
