@@ -54,7 +54,7 @@
     "pint-ci": "./vendor/bin/pint --parallel --test",
     "rector": "./vendor/bin/rector --dry-run",
     "analyse": "./vendor/bin/phpstan analyse",
-    "test:browser": "./vendor/bin/pest --parallel --testsuite=Browser",
+    "test:browser": "./vendor/bin/pest --parallel --processes=3 --testsuite=Browser",
     "test:unit": "./vendor/bin/pest --testsuite=Unit",
     "test": [
         "@test:unit",
