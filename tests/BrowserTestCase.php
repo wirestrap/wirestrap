@@ -76,10 +76,17 @@ abstract class BrowserTestCase extends TestCase
      */
     protected function defineWebRoutes($router): void
     {
-        $router->get('_ws/wirestrap.css', fn(): BinaryFileResponse => response()->file(
-            realpath(__DIR__ . '/../dist/wirestrap.css'),
-            ['Content-Type' => 'text/css'],
-        ));
+        $router->get('_ws/wirestrap.css', function (): BinaryFileResponse {
+            $path = realpath(__DIR__ . '/Browser/dist/wirestrap.css');
+
+            if (!$path || !file_exists($path)) {
+                abort(500, 'WireStrap test CSS not built. Run: npm run build:test');
+            }
+
+            return response()->file($path, [
+                'Content-Type' => 'text/css',
+            ]);
+        });
 
         $router->get('_ws/wirestrap.js', function (): BinaryFileResponse {
             $path = realpath(__DIR__ . '/Browser/dist/wirestrap.js');

@@ -4,7 +4,7 @@ import { resolve } from 'path';
 export default defineConfig({
     build: {
         outDir: resolve(__dirname, 'Browser/dist'),
-        emptyOutDir: true,
+        emptyOutDir: false,
         lib: {
             entry: resolve(__dirname, '../resources/js/wirestrap.js'),
             formats: ['iife'],
