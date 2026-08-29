@@ -33,7 +33,8 @@ function js_wait_no_alerts(int $timeout = 5000): string
 test('string shorthand creates alert with message', function () {
     $this->visit('/_ws/test/ui/alert')
         ->assertScript(js_alert())
-        ->assertVisible('.ws-alert .ws-alert-body');
+        ->assertVisible('.ws-alert .ws-alert-body')
+        ->assertScript("document.querySelector('.ws-alert .ws-alert-body').textContent.trim() === 'Hello'");
 });
 
 test('default type is primary', function () {
@@ -145,7 +146,9 @@ test('backdrop shake when backdropDismiss is false', function () {
             document.querySelector('.ws-alert-backdrop').dispatchEvent(new MouseEvent('click', { bubbles: true }));
             return !!document.querySelector('.ws-alert.ws-alert-shaking');
         })()")
-        ->assertPresent('.ws-alert');
+        ->assertPresent('.ws-alert.ws-alert-visible')
+        ->assertNotPresent('.ws-alert.ws-alert-leaving')
+        ->assertScript(js_wait_for('.ws-alert:not(.ws-alert-shaking)'));
 });
 
 test('escape shake when escapeDismiss is false', function () {
@@ -156,7 +159,15 @@ test('escape shake when escapeDismiss is false', function () {
             document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
             return !!document.querySelector('.ws-alert.ws-alert-shaking');
         })()")
-        ->assertPresent('.ws-alert');
+        ->assertPresent('.ws-alert.ws-alert-visible')
+        ->assertNotPresent('.ws-alert.ws-alert-leaving')
+        ->assertScript(js_wait_for('.ws-alert:not(.ws-alert-shaking)'));
+});
+
+test('focus moves to alert on show', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->assertScript(js_alert("{ message: 'focus test' }"))
+        ->assertScript(js_wait_focus('.ws-alert'));
 });
 
 test('auto-dismiss removes alert after duration', function () {
@@ -171,27 +182,31 @@ test('alerts are queued one at a time', function () {
         ->assertScript(js_alert("{ message: 'first' }"))
         ->assertScript(js_alert("{ message: 'second' }"))
         ->assertScript("document.querySelectorAll('.ws-alert').length === 1")
+        ->assertScript("document.querySelector('.ws-alert .ws-alert-body').textContent.trim() === 'first'")
         ->click('.ws-alert-dismiss')
         ->assertScript(js_wait_for('.ws-alert.ws-alert-visible'))
-        ->assertVisible('.ws-alert');
+        ->assertScript("document.querySelector('.ws-alert .ws-alert-body').textContent.trim() === 'second'");
 });
 
 // --- Confirm ---
 
-test('confirm shows cancel and confirm buttons', function () {
+test('confirm shows cancel and confirm buttons with labels', function () {
     $this->visit('/_ws/test/ui/alert')
         ->click('#btn-confirm')
         ->assertVisible('.ws-alert')
         ->assertPresent('.ws-alert .ws-alert-cancel')
-        ->assertPresent('.ws-alert .ws-alert-dismiss');
+        ->assertPresent('.ws-alert .ws-alert-dismiss')
+        ->assertSeeIn('.ws-alert-dismiss', 'Yes')
+        ->assertSeeIn('.ws-alert-cancel', 'No');
 });
 
-test('cancel button dismisses confirm', function () {
+test('cancel button dismisses confirm without calling method', function () {
     $this->visit('/_ws/test/ui/alert')
         ->click('#btn-confirm')
         ->assertVisible('.ws-alert')
         ->click('.ws-alert-cancel')
-        ->assertScript(js_wait_no_alerts());
+        ->assertScript(js_wait_no_alerts())
+        ->assertNotPresent('#deleted-flag');
 });
 
 test('confirm calls Livewire method', function () {
@@ -201,6 +216,17 @@ test('confirm calls Livewire method', function () {
         ->click('.ws-alert-dismiss')
         ->assertScript(js_wait_for('#deleted-flag'))
         ->assertVisible('#deleted-flag');
+});
+
+test('confirm button disables on click', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->click('#btn-confirm')
+        ->assertVisible('.ws-alert')
+        ->assertScript("(() => {
+            const btn = document.querySelector('.ws-alert-dismiss');
+            btn.click();
+            return btn.disabled;
+        })()");
 });
 
 test('confirm shorthand shows confirm and calls method', function () {
@@ -260,12 +286,15 @@ test('php alert() creates an alert', function () {
     $this->visit('/_ws/test/ui/alert')
         ->click('#btn-php-basic')
         ->assertScript(js_wait_for('.ws-alert.ws-alert-success'))
-        ->assertVisible('.ws-alert.ws-alert-success');
+        ->assertVisible('.ws-alert.ws-alert-success')
+        ->assertScript("document.querySelector('.ws-alert .ws-alert-body').textContent.trim() === 'PHP alert message'");
 });
 
 test('php alert() with title renders header', function () {
     $this->visit('/_ws/test/ui/alert')
         ->click('#btn-php-titled')
-        ->assertScript(js_wait_for('.ws-alert'))
-        ->assertPresent('.ws-alert .ws-alert-header');
+        ->assertScript(js_wait_for('.ws-alert.ws-alert-info'))
+        ->assertPresent('.ws-alert .ws-alert-header')
+        ->assertScript("document.querySelector('.ws-alert .ws-alert-title').textContent.trim() === 'Info'")
+        ->assertScript("document.querySelector('.ws-alert .ws-alert-body').textContent.trim() === 'PHP titled alert'");
 });

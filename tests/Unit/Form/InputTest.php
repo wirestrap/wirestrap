@@ -231,10 +231,12 @@ test('no password toggle by default', function () {
 
 // --- Disabled ---
 
-test('disabled attribute is rendered', function () {
-    $this->withViewErrors([])
+test('disabled attribute is rendered on input', function () {
+    $html = $this->withViewErrors([])
         ->blade('<x-wirestrap::input disabled />')
-        ->assertSee('disabled', false);
+        ->__toString();
+
+    expect($html)->toHaveAttributeOn('ws-form-input', 'disabled');
 });
 
 // --- Validation ---
@@ -275,10 +277,8 @@ test('floating error message renders outside wrapper', function () {
         ->blade('<x-wirestrap::input wire:model="field" floating label="Email" />')
         ->__toString();
 
-    $closingDivPos = strrpos($html, '</div>', strrpos($html, 'ws-form-floating') - strlen($html));
-    $feedbackPos = strrpos($html, 'ws-form-feedback-invalid');
-
-    expect($feedbackPos)->toBeGreaterThan($closingDivPos);
+    // Feedback must NOT be inside the floating wrapper
+    expect(htmlContainsInside($html, 'ws-form-floating', 'ws-form-feedback-invalid'))->toBeFalse();
 });
 
 test('non-floating error message renders inside wrapper', function () {
@@ -286,10 +286,8 @@ test('non-floating error message renders inside wrapper', function () {
         ->blade('<x-wirestrap::input wire:model="field" />')
         ->__toString();
 
-    $feedbackPos = strpos($html, 'ws-form-feedback-invalid');
-    $lastClosingDivPos = strrpos($html, '</div>');
-
-    expect($feedbackPos)->toBeLessThan($lastClosingDivPos);
+    // Feedback must be inside the root wrapper
+    expect(htmlContainsInside($html, null, 'ws-form-feedback-invalid'))->toBeTrue();
 });
 
 test('non-floating icon with error adds invalid class to inner wrapper', function () {

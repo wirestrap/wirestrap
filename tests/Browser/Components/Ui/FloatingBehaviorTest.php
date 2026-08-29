@@ -122,7 +122,9 @@ test('focusing input inside trigger keeps tooltip open', function () {
     $this->visit('/_ws/test/ui/tooltip')
         ->assertMissing('#tip-focus-tip')
         ->click('#trigger-focus')
-        ->assertVisible('#tip-focus-tip');
+        ->assertVisible('#tip-focus-tip')
+        ->click('#elsewhere')
+        ->assertScript(js_wait_hidden('#tip-focus-tip'));
 });
 
 // --- Programmatic control ($wirestrap magic) ---
@@ -142,6 +144,7 @@ test('$wirestrap magic show opens the floatable', function (
     $this->visit("/_ws/test/{$page}")
         ->assertMissing($floatable)
         ->assertScript(js_wirestrap("{$type}.show('{$id}')"))
+        ->assertScript(js_wait_for($floatable . '.show'))
         ->assertVisible($floatable);
 })->with('programmatic-floatables');
 
@@ -167,6 +170,7 @@ test('$wirestrap magic toggle switches the floatable', function (
     $this->visit("/_ws/test/{$page}")
         ->assertMissing($floatable)
         ->assertScript(js_wirestrap("{$type}.toggle('{$id}')"))
+        ->assertScript(js_wait_for($floatable . '.show'))
         ->assertVisible($floatable)
         ->assertScript(js_wirestrap("{$type}.toggle('{$id}')"))
         ->assertScript(js_wait_hidden($floatable));

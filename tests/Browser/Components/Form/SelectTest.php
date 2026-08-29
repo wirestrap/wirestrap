@@ -190,7 +190,13 @@ test('search filters options', function () {
     openSelect($page, 'sel-search')
         ->fill('#sel-search-search', 're')
         ->assertScript(js_after_tick("
-            document.querySelectorAll('#sel-search-listbox .ws-select-option').length === 2
+            (() => {
+                const opts = document.querySelectorAll('#sel-search-listbox .ws-select-option');
+                const values = [...opts].map(o => o.dataset.wsValue);
+                return opts.length === 2
+                    && values.includes('red')
+                    && values.includes('green');
+            })()
         "));
 });
 
@@ -369,10 +375,11 @@ test('selecting static option updates display', function () {
 test('ws-selected not applied when value equals empty-value', function () {
     $page = waitForSelectPage($this);
 
-    // emptyVal defaults to '0' which equals empty-value="0"
-    $page->assertScript(js_after_tick("
-        !document.querySelector('[wire\\\\:key=\"ws-select-sel-empty-val\"]').classList.contains('ws-selected')
-    "));
+    // Wait for Alpine to initialize the component (aria-haspopup is set by the selection binding)
+    $page->assertScript(js_wait_for('#sel-empty-val[aria-haspopup="listbox"]'))
+        ->assertScript(js_after_tick("
+            !document.querySelector('[wire\\\\:key=\"ws-select-sel-empty-val\"]').classList.contains('ws-selected')
+        "));
 });
 
 test('ws-selected applied when real value selected', function () {
@@ -589,14 +596,14 @@ test('search matches accented labels with unaccented query', function () {
         "));
 });
 
-test('search matches unaccented labels with accented query', function () {
+test('search normalizes accents in query', function () {
     $page = waitForSelectPage($this);
     openSelect($page, 'sel-accented')
-        ->fill('#sel-accented-search', 'joh')
+        ->fill('#sel-accented-search', 'josè')
         ->assertScript(js_after_tick("
             (() => {
                 const opts = document.querySelectorAll('#sel-accented-listbox .ws-select-option');
-                return opts.length === 1 && opts[0].dataset.wsValue === 'en';
+                return opts.length === 1 && opts[0].dataset.wsValue === 'es';
             })()
         "));
 });
@@ -785,4 +792,66 @@ test('single selection returns focus to selection after pick', function () {
         ->keys('#sel-keyboard', 'Enter')
         ->assertScript(js_wait_hidden('#sel-keyboard-listbox'))
         ->assertScript(js_wait_focus('#sel-keyboard'));
+});
+
+// --- Disabled option click ---
+
+test('clicking disabled option does not select it', function () {
+    $page = waitForSelectPage($this);
+    openSelect($page, 'sel-disabled-opt')
+        ->assertScript("(() => {
+            document.querySelector('#sel-disabled-opt-listbox [data-ws-value=\"green\"]').click();
+            return true;
+        })()")
+        ->assertScript(js_after_tick("
+            (() => {
+                const placeholder = document.querySelector('#sel-disabled-opt .ws-selection-placeholder');
+                const listbox = document.querySelector('#sel-disabled-opt-listbox');
+                return placeholder !== null && getComputedStyle(listbox).display !== 'none';
+            })()
+        "));
+});
+
+// --- Focusout ---
+
+test('focusout closes dropdown without search', function () {
+    $page = waitForSelectPage($this);
+    openSelect($page, 'sel-keyboard')
+        ->assertScript("(() => {
+            document.querySelector('#sel-single').focus();
+            return true;
+        })()")
+        ->assertScript(js_wait_hidden('#sel-keyboard-listbox'));
+});
+
+test('focusout closes dropdown with search', function () {
+    $page = waitForSelectPage($this);
+    openSelect($page, 'sel-search')
+        ->assertScript(js_wait_focus('#sel-search-search'))
+        ->assertScript("(() => {
+            document.querySelector('#sel-single').focus();
+            return true;
+        })()")
+        ->assertScript(js_wait_hidden('#sel-search-listbox'));
+});
+
+// --- Arrow navigation after filtering ---
+
+test('arrow key navigation works after filtering', function () {
+    $page = waitForSelectPage($this);
+    // Options: Red, Green, Blue — filtering "re" keeps Red and Green
+    openSelect($page, 'sel-search')
+        ->fill('#sel-search-search', 're')
+        ->assertScript(js_after_tick("
+            document.querySelectorAll('#sel-search-listbox .ws-select-option').length === 2
+        "))
+        ->keys('#sel-search-search', 'ArrowDown')
+        ->assertScript(js_after_tick("
+            document.querySelector('#sel-search-listbox .ws-select-option.highlighted').dataset.wsValue === 'green'
+        "))
+        ->keys('#sel-search-search', 'Enter')
+        ->assertScript(js_wait_hidden('#sel-search-listbox'))
+        ->assertScript(js_after_tick("
+            document.querySelector('#sel-search .ws-selection-simple span').textContent === 'Green'
+        "));
 });

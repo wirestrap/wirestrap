@@ -9,5 +9,16 @@
             <tr><td>Data</td></tr>
         </x-wirestrap::table>
 
+        {{-- Truncation tooltip (long label, no data-ws-tip-always) --}}
+        <x-wirestrap::table id="table-truncate" :columns="['
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro, blanditiis. Commodi vitae modi, voluptatem, voluptatibus repudiandae dolore porro cumque delectus iusto nostrum tenetur ea asperiores maxime dignissimos veniam inventore expedita.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro, blanditiis. Commodi vitae modi, voluptatem, voluptatibus repudiandae dolore porro cumque delectus iusto nostrum tenetur ea asperiores maxime dignissimos veniam inventore expedita.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro, blanditiis. Commodi vitae modi, voluptatem, voluptatibus repudiandae dolore porro cumque delectus iusto nostrum tenetur ea asperiores maxime dignissimos veniam inventore expedita.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro, blanditiis. Commodi vitae modi, voluptatem, voluptatibus repudiandae dolore porro cumque delectus iusto nostrum tenetur ea asperiores maxime dignissimos veniam inventore expedita.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro, blanditiis. Commodi vitae modi, voluptatem, voluptatibus repudiandae dolore porro cumque delectus iusto nostrum tenetur ea asperiores maxime dignissimos veniam inventore expedita.
+        ']">
+            <tr><td>Data</td></tr>
+        </x-wirestrap::table>
+
     </div>
 </x-layouts.app>

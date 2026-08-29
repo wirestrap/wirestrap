@@ -51,6 +51,7 @@ test('single mode opens clicked panel', function () {
 
 test('single mode closes other panels when opening one', function () {
     $this->visit('/_ws/test/ui/accordion')
+        ->assertVisible('#acc-single [data-ws-accordion-panel="beta"]')
         ->click('#acc-single [data-ws-accordion-item="alpha"]')
         ->assertVisible('#acc-single [data-ws-accordion-panel="alpha"]')
         ->assertAttribute('#acc-single [data-ws-accordion-item="beta"]', 'aria-expanded', 'false')

@@ -42,15 +42,26 @@ test('renders x-data wsCounter on root', function () {
 });
 
 test('renders x-cloak on root', function () {
-    $this->blade('<x-wirestrap::counter id="c" :count="5" />')
-        ->assertSee('x-cloak', false);
+    $html = $this->blade('<x-wirestrap::counter id="c" :count="5" />')
+        ->__toString();
+
+    $doc = new DOMDocument();
+    @$doc->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+    expect($doc->getElementById('c')->hasAttribute('x-cloak'))->toBeTrue();
 });
 
 // --- Livewire integration ---
 
 test('inner span has wire:ignore', function () {
-    $this->blade('<x-wirestrap::counter id="c" :count="5" />')
-        ->assertSee('wire:ignore', false);
+    $html = $this->blade('<x-wirestrap::counter id="c" :count="5" />')
+        ->__toString();
+
+    $doc = new DOMDocument();
+    @$doc->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    $span = $doc->getElementById('c')->getElementsByTagName('span')->item(0);
+
+    expect($span->hasAttribute('wire:ignore'))->toBeTrue();
 });
 
 // --- Root element ---

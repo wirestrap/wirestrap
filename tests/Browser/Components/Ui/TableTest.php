@@ -120,9 +120,20 @@ test('bulk actions bar appears when rows are selected', function () {
             document.querySelector('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk]').click();
             return true;
         })()")
-        ->assertScript(js_after_tick(
-            "document.querySelector('[data-ws-bulk-container]').style.display !== 'none'"
-        ));
+        ->assertScript("new Promise((resolve, reject) => {
+            const deadline = Date.now() + 5000;
+            const check = () => {
+                const el = document.querySelector('[data-ws-bulk-container]');
+                if (el && el.style.display !== 'none' && !el.style.overflow) {
+                    resolve(true);
+                } else if (Date.now() > deadline) {
+                    reject(new Error('Timed out waiting for bulk bar'));
+                } else {
+                    requestAnimationFrame(check);
+                }
+            };
+            check();
+        })");
 });
 
 test('bulk actions bar hides when all deselected', function () {
@@ -195,7 +206,7 @@ test('mouseout hides tooltip', function () {
             span.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: document.body }));
             return true;
         })()")
-        ->assertScript(js_wait_hidden('.ws-tooltip.show'));
+        ->assertScript(js_after_tick("!document.querySelector('.ws-tooltip').classList.contains('show')"));
 });
 
 test('tooltip displays correct text from data-ws-label', function () {
@@ -249,4 +260,98 @@ test('reordering rows changes DOM order', function () {
             };
             check();
         })");
+});
+
+// --- Checkbox unchecking ---
+
+test('unchecking a per-row checkbox deselects it', function () {
+    $this->visit('/_ws/test/ui/table')
+        ->assertScript(js_wait_for('[data-ws-model="selectedIds"]'))
+        // Check first row
+        ->assertScript("(() => {
+            document.querySelector('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk]').click();
+            return true;
+        })()")
+        ->assertScript(js_after_tick(
+            "document.querySelectorAll('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk]:checked').length === 1"
+        ))
+        // Uncheck first row
+        ->assertScript("(() => {
+            document.querySelector('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk]').click();
+            return true;
+        })()")
+        ->assertScript(js_after_tick(
+            "document.querySelectorAll('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk]:checked').length === 0"
+        ));
+});
+
+test('select-all then deselect one row shows indeterminate', function () {
+    $this->visit('/_ws/test/ui/table')
+        ->assertScript(js_wait_for('[data-ws-model="selectedIds"]'))
+        // Select all
+        ->assertScript("(() => {
+            document.querySelector('[data-ws-model=\"selectedIds\"] thead input[type=checkbox]').click();
+            return true;
+        })()")
+        ->assertScript(js_after_tick(
+            "document.querySelectorAll('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk]:checked').length === 2"
+        ))
+        // Deselect first row
+        ->assertScript("(() => {
+            document.querySelector('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk]:not([disabled])').click();
+            return true;
+        })()")
+        ->assertScript(js_after_tick(
+            "document.querySelector('[data-ws-model=\"selectedIds\"] thead input[type=checkbox]').indeterminate === true"
+        ));
+});
+
+test('clicking disabled checkbox does not change selection', function () {
+    $this->visit('/_ws/test/ui/table')
+        ->assertScript(js_wait_for('[data-ws-model="selectedIds"]'))
+        ->assertScript("(() => {
+            const cb = document.querySelector('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk][disabled]');
+            cb.click();
+            return true;
+        })()")
+        ->assertScript(js_after_tick(
+            "document.querySelector('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk][disabled]').checked === false"
+        ));
+});
+
+// --- Livewire sync ---
+
+test('selectedIds syncs to Livewire after round-trip', function () {
+    $this->visit('/_ws/test/ui/table')
+        ->assertScript(js_wait_for('[data-ws-model="selectedIds"]'))
+        // Check first row (deferred $wire.$set)
+        ->assertScript("(() => {
+            document.querySelector('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk]').click();
+            return true;
+        })()")
+        ->assertScript(js_after_tick(
+            "document.querySelectorAll('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk]:checked').length === 1"
+        ))
+        // Trigger a Livewire round-trip to flush the deferred $set
+        ->click('#btn-add-row')
+        ->assertScript(js_wait_rows('[data-ws-model="selectedIds"]', 4))
+        ->assertScript("document.getElementById('selected-count').textContent.trim() === '1'");
+});
+
+// --- Truncation tooltip ---
+
+test('truncation tooltip shows on hover when text overflows', function () {
+    $this->visit('/_ws/test/ui/table')
+        ->assertScript(js_wait_for('body > .ws-tooltip'))
+        ->assertScript("(() => {
+            const span = document.querySelector('#table-truncate thead th span[data-ws-label]');
+            return span.scrollWidth > span.offsetWidth;
+        })()")
+        ->assertScript("(() => {
+            const span = document.querySelector('#table-truncate thead th span[data-ws-label]');
+            span.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+            return true;
+        })()")
+        ->assertScript(js_wait_for('body > .ws-tooltip.show'))
+        ->assertScript("document.querySelector('.ws-tooltip.show .ws-tooltip-content').textContent.includes('Lorem ipsum')");
 });

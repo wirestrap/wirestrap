@@ -166,9 +166,11 @@ test('icon adds ws-form-has-icon-start on selection', function () {
 });
 
 test('icon has aria-hidden', function () {
-    $this->withViewErrors([])
+    $html = $this->withViewErrors([])
         ->blade('<x-wirestrap::select id="test" :options="[\'a\' => \'A\']" icon="bi-search" />')
-        ->assertSee('aria-hidden="true"', false);
+        ->__toString();
+
+    expect($html)->toHaveAttributeOn('ws-form-input-icon', 'aria-hidden');
 });
 
 test('non-floating icon wraps in select-wrapper', function () {
@@ -365,10 +367,7 @@ test('short form options normalized to JSON', function () {
         ])
         ->__toString();
 
-    preg_match('/data-ws-options="([^"]+)"/', $html, $matches);
-    $decoded = json_decode(html_entity_decode($matches[1]), true);
-
-    expect($decoded)->toBe([
+    expect(htmlGetJsonAttribute($html, 'data-ws-options'))->toBe([
         ['value' => 'active', 'label' => 'Active'],
         ['value' => 'inactive', 'label' => 'Inactive'],
     ]);
@@ -384,10 +383,7 @@ test('full form options rendered as JSON', function () {
         ])
         ->__toString();
 
-    preg_match('/data-ws-options="([^"]+)"/', $html, $matches);
-    $decoded = json_decode(html_entity_decode($matches[1]), true);
-
-    expect($decoded)->toBe([
+    expect(htmlGetJsonAttribute($html, 'data-ws-options'))->toBe([
         ['value' => 'fr', 'label' => 'France', 'optgroup' => 'Europe'],
         ['value' => 'us', 'label' => 'United States'],
     ]);
@@ -417,11 +413,7 @@ test('data-ws-wire-options-params with array form', function () {
         ->__toString();
 
     expect($html)->toContain('data-ws-wire-options="getCities"');
-
-    preg_match('/data-ws-wire-options-params="([^"]+)"/', $html, $matches);
-    $decoded = json_decode(html_entity_decode($matches[1]), true);
-
-    expect($decoded)->toBe([['ws-wire' => 'country'], 'active']);
+    expect(htmlGetJsonAttribute($html, 'data-ws-wire-options-params'))->toBe([['ws-wire' => 'country'], 'active']);
 });
 
 test('no wire-options attributes when null', function () {
@@ -508,10 +500,17 @@ test('no aria-labelledby without label', function () {
 
 // --- Disabled ---
 
-test('disabled attribute is rendered', function () {
-    $this->withViewErrors([])
+test('disabled attribute is rendered on ws-select div', function () {
+    $html = $this->withViewErrors([])
         ->blade('<x-wirestrap::select id="test" :options="[\'a\' => \'A\']" disabled />')
-        ->assertSee('disabled', false);
+        ->__toString();
+
+    $doc = new DOMDocument();
+    @$doc->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    $xpath = new DOMXPath($doc);
+    $el = $xpath->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' ws-select ')]")->item(0);
+
+    expect($el->hasAttribute('disabled'))->toBeTrue();
 });
 
 // --- Validation ---
@@ -552,10 +551,8 @@ test('floating error message renders outside wrapper', function () {
         ->blade('<x-wirestrap::select id="test" wire:model="field" :options="[\'a\' => \'A\']" floating label="Pick" />')
         ->__toString();
 
-    $closingDivPos = strrpos($html, '</div>', strrpos($html, 'ws-form-floating') - strlen($html));
-    $feedbackPos = strrpos($html, 'ws-form-feedback-invalid');
-
-    expect($feedbackPos)->toBeGreaterThan($closingDivPos);
+    // Feedback must NOT be inside the floating wrapper
+    expect(htmlContainsInside($html, 'ws-form-floating', 'ws-form-feedback-invalid'))->toBeFalse();
 });
 
 test('non-floating error message renders inside wrapper', function () {
@@ -563,10 +560,8 @@ test('non-floating error message renders inside wrapper', function () {
         ->blade('<x-wirestrap::select id="test" wire:model="field" :options="[\'a\' => \'A\']" />')
         ->__toString();
 
-    $feedbackPos = strpos($html, 'ws-form-feedback-invalid');
-    $lastClosingDivPos = strrpos($html, '</div>');
-
-    expect($feedbackPos)->toBeLessThan($lastClosingDivPos);
+    // Feedback must be inside the root wrapper
+    expect(htmlContainsInside($html, null, 'ws-form-feedback-invalid'))->toBeTrue();
 });
 
 test('non-floating with icon: invalid class on inner wrapper', function () {
@@ -591,8 +586,7 @@ test('floating with error: invalid class on floating wrapper', function () {
         ->blade('<x-wirestrap::select id="test" wire:model="field" :options="[\'a\' => \'A\']" floating label="Pick" />')
         ->__toString();
 
-    // The ws-form-invalid should appear on the wrapper containing ws-form-floating
-    expect($html)->toMatch('/ws-form-floating[^"]*ws-form-invalid/');
+    expect(htmlGetAttribute($html, 'ws-form-floating', 'class'))->toContain('ws-form-invalid');
 });
 
 // --- Default attributes ---

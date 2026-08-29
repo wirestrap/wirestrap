@@ -210,11 +210,7 @@ test('autosize with non-floating icon places wire:ignore.self on inner wrapper',
         ->blade('<x-wirestrap::textarea icon="bi-chat" />')
         ->__toString();
 
-    $innerWrapperPos = strpos($html, 'ws-form-textarea-wrapper');
-    $wireIgnorePos = strpos($html, 'wire:ignore.self');
-
-    // wire:ignore.self should be on the inner wrapper (textarea-wrapper), not the outer div
-    expect($wireIgnorePos)->toBeGreaterThan($innerWrapperPos);
+    expect($html)->toHaveAttributeOn('ws-form-textarea-wrapper', 'wire:ignore.self');
 });
 
 test('autosize with floating icon places wire:ignore.self on outer wrapper', function () {
@@ -222,11 +218,7 @@ test('autosize with floating icon places wire:ignore.self on outer wrapper', fun
         ->blade('<x-wirestrap::textarea floating icon="bi-chat" label="Bio" />')
         ->__toString();
 
-    $outerDivPos = strpos($html, '<div');
-    $wireIgnorePos = strpos($html, 'wire:ignore.self');
-
-    // wire:ignore.self should be near the outer div
-    expect($wireIgnorePos)->toBeGreaterThan($outerDivPos);
+    expect($html)->toHaveAttributeOn('ws-form-floating', 'wire:ignore.self');
     expect($html)->not->toContain('ws-form-textarea-wrapper');
 });
 
@@ -240,10 +232,12 @@ test('no wire:ignore.self when autosize is false', function () {
 
 // --- Disabled ---
 
-test('disabled attribute is rendered', function () {
-    $this->withViewErrors([])
+test('disabled attribute is rendered on textarea', function () {
+    $html = $this->withViewErrors([])
         ->blade('<x-wirestrap::textarea disabled />')
-        ->assertSee('disabled', false);
+        ->__toString();
+
+    expect($html)->toHaveAttributeOn('ws-form-textarea', 'disabled');
 });
 
 // --- Validation ---
@@ -284,20 +278,17 @@ test('floating error message renders outside wrapper', function () {
         ->blade('<x-wirestrap::textarea wire:model="field" floating label="Bio" />')
         ->__toString();
 
-    $closingDivPos = strrpos($html, '</div>', strrpos($html, 'ws-form-floating') - strlen($html));
-    $feedbackPos = strrpos($html, 'ws-form-feedback-invalid');
-
-    expect($feedbackPos)->toBeGreaterThan($closingDivPos);
+    // Feedback must NOT be inside the floating wrapper
+    expect(htmlContainsInside($html, 'ws-form-floating', 'ws-form-feedback-invalid'))->toBeFalse();
 });
 
 test('non-floating error message renders inside wrapper', function () {
     $html = $this->withViewErrors(['field' => 'Required'])
-        ->blade('<x-wirestrap::textarea wire:model="field" />')->__toString();
+        ->blade('<x-wirestrap::textarea wire:model="field" />')
+        ->__toString();
 
-    $feedbackPos = strpos($html, 'ws-form-feedback-invalid');
-    $lastClosingDivPos = strrpos($html, '</div>');
-
-    expect($feedbackPos)->toBeLessThan($lastClosingDivPos);
+    // Feedback must be inside the root wrapper
+    expect(htmlContainsInside($html, null, 'ws-form-feedback-invalid'))->toBeTrue();
 });
 
 test('non-floating icon with error adds invalid class to inner wrapper', function () {

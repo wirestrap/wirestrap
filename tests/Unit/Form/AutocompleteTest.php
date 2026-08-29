@@ -49,9 +49,11 @@ test('ghost text elements rendered', function () {
 });
 
 test('ghost text has aria-hidden', function () {
-    $this->withViewErrors([])
+    $html = $this->withViewErrors([])
         ->blade('<x-wirestrap::autocomplete id="test" wire-options="getItems" />')
-        ->assertSee('aria-hidden="true"', false);
+        ->__toString();
+
+    expect($html)->toHaveAttributeOn('ws-autocomplete-ghost', 'aria-hidden');
 });
 
 // --- wire:ignore ---
@@ -61,7 +63,13 @@ test('tag list has wire:ignore', function () {
         ->blade('<x-wirestrap::autocomplete id="test" wire-options="getItems" />')
         ->__toString();
 
-    expect($html)->toContain('wire:ignore');
+    $doc = new DOMDocument();
+    @$doc->loadHTML('<meta charset="utf-8">' . $html);
+    $xpath = new DOMXPath($doc);
+    $el = $xpath->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' ws-d-contents ')]")->item(0);
+
+    expect($el)->not->toBeNull()
+        ->and($el->hasAttribute('wire:ignore'))->toBeTrue();
 });
 
 test('multiple wire:ignore elements present', function () {
@@ -162,8 +170,7 @@ test('no placeholder by default', function () {
         ->blade('<x-wirestrap::autocomplete id="test" wire-options="getItems" />')
         ->__toString();
 
-    // Should not have a placeholder attribute at all
-    expect($html)->not->toMatch('/placeholder="[^"]+"/');
+    expect($html)->not->toContain('placeholder=');
 });
 
 // --- Icon ---
@@ -360,11 +367,7 @@ test('data-ws-wire-options-params with array form', function () {
         ->__toString();
 
     expect($html)->toContain('data-ws-wire-options="getCities"');
-
-    preg_match('/data-ws-wire-options-params="([^"]+)"/', $html, $matches);
-    $decoded = json_decode(html_entity_decode($matches[1]), true);
-
-    expect($decoded)->toBe([['ws-wire' => 'country']]);
+    expect(htmlGetJsonAttribute($html, 'data-ws-wire-options-params'))->toBe([['ws-wire' => 'country']]);
 });
 
 test('no wire-options attributes when null', function () {
@@ -450,8 +453,7 @@ test('disabled attribute rendered on root and input', function () {
         ->blade('<x-wirestrap::autocomplete id="test" wire-options="getItems" disabled />')
         ->__toString();
 
-    preg_match_all('/\bdisabled\b/', $html, $matches);
-    expect(count($matches[0]))->toBeGreaterThanOrEqual(2);
+    expect(htmlCountAttribute($html, 'disabled'))->toBeGreaterThanOrEqual(2);
 });
 
 // --- Validation ---
@@ -504,10 +506,8 @@ test('floating error message renders outside wrapper', function () {
         ->blade('<x-wirestrap::autocomplete id="test" wire:model="city" wire-options="getItems" floating label="City" />')
         ->__toString();
 
-    $closingDivPos = strrpos($html, '</div>', strrpos($html, 'ws-form-floating') - strlen($html));
-    $feedbackPos = strrpos($html, 'ws-form-feedback-invalid');
-
-    expect($feedbackPos)->toBeGreaterThan($closingDivPos);
+    // Feedback must NOT be inside the floating wrapper
+    expect(htmlContainsInside($html, 'ws-form-floating', 'ws-form-feedback-invalid'))->toBeFalse();
 });
 
 test('non-floating error message renders inside wrapper', function () {
@@ -515,10 +515,8 @@ test('non-floating error message renders inside wrapper', function () {
         ->blade('<x-wirestrap::autocomplete id="test" wire:model="city" wire-options="getItems" />')
         ->__toString();
 
-    $feedbackPos = strpos($html, 'ws-form-feedback-invalid');
-    $lastClosingDivPos = strrpos($html, '</div>');
-
-    expect($feedbackPos)->toBeLessThan($lastClosingDivPos);
+    // Feedback must be inside the root wrapper
+    expect(htmlContainsInside($html, null, 'ws-form-feedback-invalid'))->toBeTrue();
 });
 
 test('floating with error: invalid class on floating wrapper', function () {
@@ -526,7 +524,7 @@ test('floating with error: invalid class on floating wrapper', function () {
         ->blade('<x-wirestrap::autocomplete id="test" wire:model="city" wire-options="getItems" floating label="City" />')
         ->__toString();
 
-    expect($html)->toMatch('/ws-form-floating[^"]*ws-form-invalid/');
+    expect(htmlGetAttribute($html, 'ws-form-floating', 'class'))->toContain('ws-form-invalid');
 });
 
 // --- Invalid indices (multiple mode) ---

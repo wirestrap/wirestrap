@@ -90,7 +90,8 @@ test('static mode shakes on outside click instead of closing', function () {
             document.getElementById('modal-static').dispatchEvent(new MouseEvent('click', { bubbles: false }));
             return document.getElementById('modal-static').classList.contains('ws-modal-static');
         })()")
-        ->assertPresent('#modal-static.ws-modal-visible');
+        ->assertPresent('#modal-static.ws-modal-visible')
+        ->assertScript(js_wait_for('#modal-static:not(.ws-modal-static)'));
 });
 
 test('static mode shakes on escape instead of closing', function () {
@@ -101,7 +102,8 @@ test('static mode shakes on escape instead of closing', function () {
             document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
             return document.getElementById('modal-static').classList.contains('ws-modal-static');
         })()")
-        ->assertPresent('#modal-static.ws-modal-visible');
+        ->assertPresent('#modal-static.ws-modal-visible')
+        ->assertScript(js_wait_for('#modal-static:not(.ws-modal-static)'));
 });
 
 test('static mode close button still works', function () {
@@ -182,7 +184,7 @@ test('no scroll lock for draggable modals', function () {
     $this->visit('/_ws/test/ui/modal')
         ->click('#btn-draggable')
         ->assertVisible('#modal-draggable')
-        ->assertScript("document.body.style.overflow !== 'hidden'");
+        ->assertScript("document.body.style.overflow === ''");
 });
 
 // --- Scroll lock reference counting ---
@@ -257,7 +259,10 @@ test('expand button aria-pressed reflects state', function () {
         ->assertVisible('#modal-expandable')
         ->assertAttribute('#modal-expandable .ws-modal-expand-btn', 'aria-pressed', 'false')
         ->click('#modal-expandable .ws-modal-expand-btn')
-        ->assertAttribute('#modal-expandable .ws-modal-expand-btn', 'aria-pressed', 'true');
+        ->assertAttribute('#modal-expandable .ws-modal-expand-btn', 'aria-pressed', 'true')
+        ->click('#modal-expandable .ws-modal-expand-btn')
+        ->assertScript(js_wait_for('#modal-expandable .ws-modal-dialog:not(.ws-modal-fullscreen):not(.ws-expanding)'))
+        ->assertAttribute('#modal-expandable .ws-modal-expand-btn', 'aria-pressed', 'false');
 });
 
 test('expand button restores on second click', function () {
@@ -309,7 +314,7 @@ test('focus moves to first focusable element on show', function () {
     $this->visit('/_ws/test/ui/modal')
         ->click('#btn-focus')
         ->assertVisible('#modal-focus')
-        ->assertScript(js_wait_focus('#modal-focus', 'contains'));
+        ->assertScript(js_wait_focus('#modal-focus .ws-modal-close'));
 });
 
 test('focus moves to modal itself when no focusable element', function () {
@@ -593,6 +598,7 @@ test('drag is clamped within container bounds', function () {
     $this->visit('/_ws/test/ui/modal')
         ->click('#btn-draggable')
         ->assertVisible('#modal-draggable')
+        // Lower bound: drag to negative extreme
         ->assertScript("(() => {
             const handle = document.querySelector('#modal-draggable .ws-modal-header');
             const dialog = document.querySelector('#modal-draggable .ws-modal-dialog');
@@ -605,6 +611,22 @@ test('drag is clamped within container bounds', function () {
             document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
 
             return parseFloat(dialog.style.left) >= 0 && parseFloat(dialog.style.top) >= 0;
+        })()")
+        // Upper bound: drag to positive extreme
+        ->assertScript("(() => {
+            const handle = document.querySelector('#modal-draggable .ws-modal-header');
+            const dialog = document.querySelector('#modal-draggable .ws-modal-dialog');
+            const container = dialog.offsetParent || document.documentElement;
+            const rect = handle.getBoundingClientRect();
+            const startX = rect.left + rect.width / 2;
+            const startY = rect.top + rect.height / 2;
+
+            handle.dispatchEvent(new MouseEvent('mousedown', { clientX: startX, clientY: startY, bubbles: true }));
+            document.dispatchEvent(new MouseEvent('mousemove', { clientX: 9999, clientY: 9999, bubbles: true }));
+            document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+
+            return parseFloat(dialog.style.left) <= container.clientWidth - dialog.offsetWidth
+                && parseFloat(dialog.style.top) <= container.clientHeight - dialog.offsetHeight;
         })()");
 });
 
@@ -672,6 +694,7 @@ test('resizing west handle moves left edge while right edge stays anchored', fun
         ->assertScript("(() => {
             const handle = document.querySelector('#modal-resizable .ws-modal-resize-w');
             const dialog = document.querySelector('#modal-resizable .ws-modal-dialog');
+            const rightBefore = dialog.getBoundingClientRect().right;
             const rect = handle.getBoundingClientRect();
             const startX = rect.left + rect.width / 2;
             const startY = rect.top + rect.height / 2;
@@ -681,10 +704,13 @@ test('resizing west handle moves left edge while right edge stays anchored', fun
 
             const widthAfter = dialog.offsetWidth;
             const leftAfter = parseFloat(dialog.style.left);
+            const rightAfter = dialog.getBoundingClientRect().right;
 
             document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
 
-            return leftAfter < startX && widthAfter > 300;
+            return leftAfter < startX
+                && widthAfter > 300
+                && Math.abs(rightAfter - rightBefore) < 2;
         })()");
 });
 
@@ -728,4 +754,111 @@ test('resize resets after close and reopen', function () {
         ->click('#btn-resizable')
         ->assertVisible('#modal-resizable')
         ->assertScript("!document.querySelector('#modal-resizable .ws-modal-dialog').style.width");
+});
+
+// --- Auto-show ---
+
+test('auto-show modal is visible on page load', function () {
+    $this->visit('/_ws/test/ui/modal-auto-show')
+        ->assertVisible('#modal-auto')
+        ->assertPresent('#modal-auto.ws-modal-visible');
+});
+
+// --- Resize SW corner ---
+
+test('resizing SW corner changes both width and height', function () {
+    $this->visit('/_ws/test/ui/modal')
+        ->click('#btn-resizable')
+        ->assertVisible('#modal-resizable')
+        ->assertScript("(() => {
+            const handle = document.querySelector('#modal-resizable .ws-modal-resize-sw');
+            const dialog = document.querySelector('#modal-resizable .ws-modal-dialog');
+            const content = document.querySelector('#modal-resizable .ws-modal-content');
+            const initialWidth = dialog.offsetWidth;
+            const initialHeight = content.offsetHeight;
+            const rect = handle.getBoundingClientRect();
+            const startX = rect.left + rect.width / 2;
+            const startY = rect.top + rect.height / 2;
+
+            handle.dispatchEvent(new MouseEvent('mousedown', { clientX: startX, clientY: startY, bubbles: true }));
+            document.dispatchEvent(new MouseEvent('mousemove', { clientX: startX - 200, clientY: startY + 100, bubbles: true }));
+            document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+
+            return dialog.offsetWidth > initialWidth && content.offsetHeight > initialHeight;
+        })()");
+});
+
+// --- Focus blur on hide ---
+
+test('focus leaves modal on hide', function () {
+    $this->visit('/_ws/test/ui/modal')
+        ->click('#btn-focus')
+        ->assertVisible('#modal-focus')
+        ->assertScript(js_wait_focus('#modal-focus', 'contains'))
+        ->click('#modal-focus .ws-modal-close')
+        ->assertScript(js_wait_hidden('#modal-focus'))
+        ->assertScript("!document.getElementById('modal-focus').contains(document.activeElement)");
+});
+
+// --- Multiple minimized modals ---
+
+test('multiple modals can be minimized simultaneously', function () {
+    $this->visit('/_ws/test/ui/modal')
+        ->click('#btn-minimizable')
+        ->assertVisible('#modal-minimizable')
+        ->assertScript(js_wirestrap("modal.show('modal-minimizable2')"))
+        ->assertVisible('#modal-minimizable2')
+        ->click('#modal-minimizable2 .ws-modal-minimize-btn')
+        ->assertScript(js_wait_hidden('#modal-minimizable2'))
+        ->click('#modal-minimizable .ws-modal-minimize-btn')
+        ->assertScript(js_wait_hidden('#modal-minimizable'))
+        ->assertScript("document.querySelectorAll('#minimized_modals .ws-modal-minimized-btn').length === 2");
+});
+
+// --- Minimize preserves drag state ---
+
+test('minimize and restore preserves drag position', function () {
+    $this->visit('/_ws/test/ui/modal')
+        ->click('#btn-minimizable')
+        ->assertVisible('#modal-minimizable')
+        ->assertScript("(() => {
+            const handle = document.querySelector('#modal-minimizable .ws-modal-header');
+            const dialog = document.querySelector('#modal-minimizable .ws-modal-dialog');
+            const rect = handle.getBoundingClientRect();
+            const startX = rect.left + rect.width / 2;
+            const startY = rect.top + rect.height / 2;
+
+            handle.dispatchEvent(new MouseEvent('mousedown', { clientX: startX, clientY: startY, bubbles: true }));
+            document.dispatchEvent(new MouseEvent('mousemove', { clientX: startX + 200, clientY: startY + 100, bubbles: true }));
+            document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+
+            window._savedLeft = dialog.style.left;
+            window._savedTop = dialog.style.top;
+            return dialog.style.position === 'absolute';
+        })()")
+        ->click('#modal-minimizable .ws-modal-minimize-btn')
+        ->assertScript(js_wait_hidden('#modal-minimizable'))
+        ->assertPresent('#minimized_modals .ws-modal-minimized-btn')
+        ->click('#minimized_modals .ws-modal-minimized-btn')
+        ->assertVisible('#modal-minimizable')
+        ->assertScript(js_after_tick("
+            (() => {
+                const d = document.querySelector('#modal-minimizable .ws-modal-dialog');
+                return d.style.left === window._savedLeft
+                    && d.style.top === window._savedTop
+                    && d.style.position === 'absolute';
+            })()
+        "));
+});
+
+// --- destroyOnDismiss not fired on minimize ---
+
+test('destroyOnDismiss does not fire on minimize', function () {
+    $this->visit('/_ws/test/ui/modal')
+        ->click('#btn-managed-min-destroy')
+        ->assertVisible('#managed-min-destroy')
+        ->click('#managed-min-destroy .ws-modal-minimize-btn')
+        ->assertScript(js_wait_hidden('#managed-min-destroy'))
+        ->assertPresent('#minimized_modals .ws-modal-minimized-btn')
+        ->assertPresent('#managed-min-destroy');
 });

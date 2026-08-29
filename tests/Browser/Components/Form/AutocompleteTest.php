@@ -292,12 +292,16 @@ test('search normalizes accents', function () {
 
 test('min-chars prevents dropdown before threshold', function () {
     $page = waitForAutocompletePage($this);
-    // min-chars=2, type only 1 character
+    // First prove that 2 chars (≥ min-chars=2) loads suggestions
     $page->click('#ac-minchars')
+        ->fill('#ac-minchars', 're')
+        ->assertScript(js_wait_for('#ac-minchars-listbox .ws-autocomplete-option'));
+
+    // Clear and type only 1 char — dropdown should stay hidden
+    $page->fill('#ac-minchars', '')
         ->fill('#ac-minchars', 'r')
         ->assertScript(js_after_tick("
-            document.querySelector('#ac-minchars-listbox').style.display === 'none'
-            || document.querySelectorAll('#ac-minchars-listbox .ws-autocomplete-option').length === 0
+            document.querySelectorAll('#ac-minchars-listbox .ws-autocomplete-option').length === 0
         "));
 });
 
@@ -329,7 +333,16 @@ test('ghost suffix appears for matching prefix', function () {
 
 test('ghost suffix disappears for non-matching query', function () {
     $page = waitForAutocompletePage($this);
+    // First establish that ghost text IS visible for a matching prefix
     focusAndWait($page, 'ac-ghost')
+        ->fill('#ac-ghost', 'app')
+        ->assertScript(js_after_tick("
+            (() => {
+                const suffix = document.querySelector('#ac-ghost').closest('.ws-autocomplete').querySelector('.ws-autocomplete-ghost-suffix');
+                return suffix && suffix.textContent === 'le';
+            })()
+        "))
+        // Now type a non-matching query and verify ghost disappears
         ->fill('#ac-ghost', 'xyz')
         ->assertScript(js_after_tick("
             (() => {
@@ -390,11 +403,19 @@ test('mouseover updates highlight and keyboard continues from there', function (
 
 // --- Disabled ---
 
-test('disabled input cannot receive focus', function () {
+test('disabled input cannot receive focus and dropdown stays closed', function () {
     $page = waitForAutocompletePage($this);
     $page->assertScript(js_after_tick("
         document.querySelector('#ac-disabled').disabled === true
-    "));
+    "))
+        ->assertScript("(() => {
+            document.querySelector('#ac-disabled').focus();
+            return true;
+        })()")
+        ->assertScript(js_after_tick("
+            document.activeElement !== document.querySelector('#ac-disabled')
+                && document.querySelector('#ac-disabled-listbox').style.display === 'none'
+        "));
 });
 
 // --- Optgroup rendering ---
@@ -504,14 +525,16 @@ test('preloaded tags render on mount', function () {
 
 test('preloaded tags load suggestions eagerly for labels', function () {
     $page = waitForAutocompletePage($this);
-    $root = acRoot('ac-preloaded');
-    $page->assertScript(waitForTags('ac-preloaded'))
+    $root = acRoot('ac-preloaded-labels');
+    // Uses getTagSuggestionsWithLabels() where value='php' has label='PHP', value='js' has label='JavaScript'
+    // If labels were not resolved from suggestions, they would show raw values 'php' and 'js'
+    $page->assertScript(waitForTags('ac-preloaded-labels'))
         ->assertScript(js_after_tick("
             (() => {
                 const labels = {$root}.querySelectorAll('.ws-autocomplete-tag-label');
                 return labels.length === 2
-                    && labels[0].textContent.trim() === 'php'
-                    && labels[1].textContent.trim() === 'js';
+                    && labels[0].textContent.trim() === 'PHP'
+                    && labels[1].textContent.trim() === 'JavaScript';
             })()
         "));
 });
@@ -633,7 +656,9 @@ test('no-dropdown mode still allows tag creation', function () {
 
 test('min-chars 1 does not open dropdown on focus alone', function () {
     $page = waitForAutocompletePage($this);
+    // Wait for Alpine to initialize the input (aria-haspopup is set by the autocompleteInput binding)
     $page->click('#ac-minchars1')
+        ->assertScript(js_wait_for('#ac-minchars1[aria-haspopup="listbox"]'))
         ->assertScript(js_after_tick("
             document.querySelectorAll('#ac-minchars1-listbox .ws-autocomplete-option').length === 0
         "));
@@ -689,4 +714,98 @@ test('validation highlights invalid tags', function () {
                     && !tags[1].classList.contains('ws-autocomplete-tag-invalid');
             })()
         "));
+});
+
+// --- Tab key in multiple mode ---
+
+test('tab adds tag in multiple mode', function () {
+    $page = waitForAutocompletePage($this);
+    $root = acRoot('ac-tags');
+    $page->click('#ac-tags')
+        ->fill('#ac-tags', 'newtag')
+        ->keys('#ac-tags', 'Tab')
+        ->assertScript(js_after_tick("
+            (() => {
+                const tags = {$root}.querySelectorAll('.ws-autocomplete-tag');
+                return tags.length === 1
+                    && tags[0].querySelector('.ws-autocomplete-tag-label').textContent.trim() === 'newtag';
+            })()
+        "));
+});
+
+// --- Escape in multiple mode ---
+
+test('escape clears query in multiple mode', function () {
+    $page = waitForAutocompletePage($this);
+    $page->click('#ac-tags')
+        ->fill('#ac-tags', 'hello')
+        ->keys('#ac-tags', 'Escape')
+        ->assertScript(js_after_tick("
+            document.querySelector('#ac-tags').value === ''
+        "));
+});
+
+// --- filteredSuggestions excludes selected tags ---
+
+test('selected tags are excluded from suggestions', function () {
+    $page = waitForAutocompletePage($this);
+    $root = acRoot('ac-tags');
+    // Focus to load suggestions, select "rust" from dropdown
+    $page->click('#ac-tags')
+        ->assertScript(js_wait_for('#ac-tags-listbox .ws-autocomplete-option'))
+        ->click('#ac-tags-listbox [data-ws-value="rust"]')
+        ->assertScript(js_after_tick("{$root}.querySelectorAll('.ws-autocomplete-tag').length === 1"));
+
+    // Re-focus: "rust" should no longer appear in suggestions
+    $page->click('#ac-tags')
+        ->assertScript(js_wait_for('#ac-tags-listbox .ws-autocomplete-option'))
+        ->assertScript(js_after_tick("
+            document.querySelector('#ac-tags-listbox [data-ws-value=\"rust\"]') === null
+        "));
+});
+
+// --- ArrowDown when closed ---
+
+test('arrow down opens dropdown when closed', function () {
+    $page = waitForAutocompletePage($this);
+    // Focus input first without opening dropdown (escape closes it)
+    focusAndWait($page, 'ac-single')
+        ->keys('#ac-single', 'Escape')
+        ->assertScript(js_wait_hidden('#ac-single-listbox'));
+
+    // ArrowDown should reopen
+    $page->keys('#ac-single', 'ArrowDown')
+        ->assertScript(js_wait_for('#ac-single-listbox .ws-autocomplete-option'));
+});
+
+// --- has-value class ---
+
+test('has-value class applied when input has content', function () {
+    $page = waitForAutocompletePage($this);
+    $root = acRoot('ac-single');
+    // Initially no value
+    $page->assertScript(js_after_tick("!{$root}.classList.contains('ws-autocomplete-has-value')"));
+
+    // Type something → has-value should appear
+    $page->click('#ac-single')
+        ->fill('#ac-single', 'hello')
+        ->assertScript(js_after_tick("{$root}.classList.contains('ws-autocomplete-has-value')"));
+
+    // Clear → has-value should disappear
+    $page->fill('#ac-single', '')
+        ->assertScript(js_after_tick("!{$root}.classList.contains('ws-autocomplete-has-value')"));
+});
+
+// --- Case-insensitive duplicate prevention ---
+
+test('duplicate tag is prevented with different casing', function () {
+    $page = waitForAutocompletePage($this);
+    $root = acRoot('ac-tags');
+    $page->click('#ac-tags')
+        ->fill('#ac-tags', 'Hello')
+        ->keys('#ac-tags', 'Enter')
+        ->assertScript(js_after_tick("{$root}.querySelectorAll('.ws-autocomplete-tag').length === 1"))
+        ->fill('#ac-tags', 'HELLO')
+        ->keys('#ac-tags', 'Enter')
+        ->assertScript(js_after_tick("{$root}.querySelectorAll('.ws-autocomplete-tag').length === 1"));
 });

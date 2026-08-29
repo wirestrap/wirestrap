@@ -475,10 +475,8 @@ test('bulk action icon renders with placement', function () {
         </x-wirestrap::table>
     ');
 
-    $labelPos = strpos($rendered, 'Remove');
-    $iconPos = strpos($rendered, '<i', $labelPos - 50);
-    // Icon should be after label for end placement
-    expect($iconPos)->toBeGreaterThan($labelPos);
+    // Within the button, label text should come before the <i> icon for end placement
+    expect($rendered)->toMatch('/<button[^>]*>.*Remove.*<i[^>]*>.*<\/i>.*<\/button>/s');
 });
 
 test('bulk-actions slot renders custom content', function () {

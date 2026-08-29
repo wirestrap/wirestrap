@@ -8,15 +8,12 @@ test('renders i element', function () {
 
 test('string icon is used as class', function () {
     $this->blade('<x-wirestrap::icon icon="person" />')
-        ->assertSee('person', false);
+        ->assertSee('class="bi person"', false);
 });
 
 test('merges config base class with icon string', function () {
-    $rendered = (string) $this->blade('<x-wirestrap::icon icon="person" />');
-
-    // Config default: 'bi'
-    expect($rendered)->toContain('bi');
-    expect($rendered)->toContain('person');
+    $this->blade('<x-wirestrap::icon icon="bi-search" />')
+        ->assertSee('class="bi bi-search"', false);
 });
 
 test('array icon spreads as attributes', function () {
@@ -26,16 +23,13 @@ test('array icon spreads as attributes', function () {
 });
 
 test('array icon merges config base class', function () {
-    $rendered = (string) $this->blade('<x-wirestrap::icon :icon="[\'class\' => \'my-icon\']" />');
-
-    expect($rendered)->toContain('bi');
-    expect($rendered)->toContain('my-icon');
+    $this->blade('<x-wirestrap::icon :icon="[\'class\' => \'my-icon\']" />')
+        ->assertSee('class="bi my-icon"', false);
 });
 
 test('empty string icon still renders with base class', function () {
-    $rendered = (string) $this->blade('<x-wirestrap::icon icon="" />');
-
-    expect($rendered)->toContain('bi');
+    $this->blade('<x-wirestrap::icon icon="" />')
+        ->assertSee('class="bi"', false);
 });
 
 // --- Config: iconComponent ---

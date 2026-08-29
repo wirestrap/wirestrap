@@ -177,14 +177,15 @@ test('does not render icon element when icon is not set', function () {
 
 // --- Initial state markers ---
 
-test('open item has show class and data-ws-open', function () {
-    $this->blade('
+test('open item has show class on button and data-ws-open on panel', function () {
+    $html = $this->blade('
         <x-wirestrap::accordion id="test">
             <x-slot:one label="One" open>content</x-slot:one>
         </x-wirestrap::accordion>
-    ')
-    ->assertSee('data-ws-open="true"', false)
-    ->assertSee('show', false);
+    ')->__toString();
+
+    expect(htmlGetAttribute($html, 'ws-accordion-button', 'class'))->toContain('show');
+    expect(htmlGetAttribute($html, 'ws-accordion-panel', 'data-ws-open'))->toBe('true');
 });
 
 test('closed item has display none and no data-ws-open', function () {

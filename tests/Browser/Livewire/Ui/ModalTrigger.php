@@ -40,6 +40,21 @@ class ModalTrigger extends Component
         );
     }
 
+    public function openManagedMinDestroyDismiss(): void
+    {
+        $this->modalShowManaged(
+            component: 'ui.modal-child',
+            props: ['label' => 'min-destroy-content'],
+            modalProps: [
+                'title' => 'Min Destroy',
+                'minimizable' => true,
+                'draggable' => true,
+                'destroyOnDismiss' => true,
+            ],
+            key: 'managed-min-destroy',
+        );
+    }
+
     public function destroyByKey(): void
     {
         $this->modalDestroyManaged(key: 'managed-1');

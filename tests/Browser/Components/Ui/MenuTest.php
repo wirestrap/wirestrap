@@ -32,7 +32,18 @@ test('clicking updates aria-expanded', function () {
     $this->visit('/_ws/test/ui/menu')
         ->assertAttribute('#menu-basic [data-ws-menu-accordion="settings"]', 'aria-expanded', 'false')
         ->click('#menu-basic [data-ws-menu-accordion="settings"]')
-        ->assertAttribute('#menu-basic [data-ws-menu-accordion="settings"]', 'aria-expanded', 'true');
+        ->assertAttribute('#menu-basic [data-ws-menu-accordion="settings"]', 'aria-expanded', 'true')
+        ->click('#menu-basic [data-ws-menu-accordion="settings"]')
+        ->assertAttribute('#menu-basic [data-ws-menu-accordion="settings"]', 'aria-expanded', 'false');
+});
+
+test('open class toggles on trigger button', function () {
+    $this->visit('/_ws/test/ui/menu')
+        ->assertNotPresent('#menu-basic [data-ws-menu-accordion="settings"].open')
+        ->click('#menu-basic [data-ws-menu-accordion="settings"]')
+        ->assertPresent('#menu-basic [data-ws-menu-accordion="settings"].open')
+        ->click('#menu-basic [data-ws-menu-accordion="settings"]')
+        ->assertScript(js_wait_for('#menu-basic [data-ws-menu-accordion="settings"]:not(.open)'));
 });
 
 test('multiple groups can be open simultaneously', function () {
@@ -79,6 +90,19 @@ test('single mode nested: opening sibling closes the other', function () {
         ->click('#menu-nested-single [data-ws-menu-accordion="ns-security"]')
         ->assertVisible('#menu-nested-single [data-ws-menu-accordion-panel="ns-security"]')
         ->assertScript(js_wait_hidden('#menu-nested-single [data-ws-menu-accordion-panel="ns-advanced"]'));
+});
+
+// --- Recursive close ---
+
+test('closing parent hides nested children', function () {
+    $this->visit('/_ws/test/ui/menu')
+        ->click('#menu-nested [data-ws-menu-accordion="nest-advanced"]')
+        ->assertVisible('#menu-nested [data-ws-menu-accordion-panel="nest-advanced"]')
+        ->click('#menu-nested [data-ws-menu-accordion="nest-settings"]')
+        ->assertScript(js_wait_hidden('#menu-nested [data-ws-menu-accordion-panel="nest-settings"]'))
+        ->click('#menu-nested [data-ws-menu-accordion="nest-settings"]')
+        ->assertVisible('#menu-nested [data-ws-menu-accordion-panel="nest-settings"]')
+        ->assertMissing('#menu-nested [data-ws-menu-accordion-panel="nest-advanced"]');
 });
 
 // --- Programmatic control ($wirestrap magic) ---

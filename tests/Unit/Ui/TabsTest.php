@@ -45,6 +45,16 @@ test('data-ws-default reflects default prop', function () {
     ->assertSee('data-ws-default="beta"', false);
 });
 
+test('invalid default prop falls back to first tab', function () {
+    $this->blade('
+        <x-wirestrap::tabs id="test" default="nonexistent">
+            <x-slot:alpha label="Alpha">a</x-slot:alpha>
+            <x-slot:beta label="Beta">b</x-slot:beta>
+        </x-wirestrap::tabs>
+    ')
+    ->assertSee('data-ws-default="alpha"', false);
+});
+
 test('data-ws-events is true when events prop is set', function () {
     $this->blade('
         <x-wirestrap::tabs id="test" events>
@@ -228,11 +238,8 @@ test('default tab panel is visible, others are hidden', function () {
     ')->__toString();
 
     // Alpha (default/first) should not have the hidden class
-    expect($rendered)->toContain('data-ws-tab="alpha"');
-    preg_match('/data-ws-tab="alpha"[^>]*class="([^"]*)"/', $rendered, $alphaMatch);
-    expect($alphaMatch[1])->not->toContain('ws-tabs-panel--hidden');
+    expect(htmlGetAttribute($rendered, 'id=ws-tabs-test-panel-alpha', 'class'))->not->toContain('ws-tabs-panel--hidden');
 
     // Beta should have the hidden class
-    preg_match('/data-ws-tab="beta"[^>]*class="([^"]*)"/', $rendered, $betaMatch);
-    expect($betaMatch[1])->toContain('ws-tabs-panel--hidden');
+    expect(htmlGetAttribute($rendered, 'id=ws-tabs-test-panel-beta', 'class'))->toContain('ws-tabs-panel--hidden');
 });

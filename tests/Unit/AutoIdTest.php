@@ -25,12 +25,20 @@ test('explicit id takes precedence over wire:model', function (string $blade) {
         ->assertDontSee('id="user-email"', false);
 })->with('form components');
 
-test('no id rendered when no id and no wire:model', function () {
-    $rendered = (string) $this->withViewErrors([])
-        ->blade('<x-wirestrap::input />');
+$formComponentsNoModel = [
+    'input' => '<x-wirestrap::input />',
+    'textarea' => '<x-wirestrap::textarea />',
+    'autocomplete' => '<x-wirestrap::autocomplete />',
+];
 
-    expect($rendered)->not->toMatch('/ id="/');
-});
+dataset('form components without model', $formComponentsNoModel);
+
+test('no id rendered when no id and no wire:model', function (string $blade) {
+    $rendered = (string) $this->withViewErrors([])
+        ->blade($blade);
+
+    expect($rendered)->not->toContain(' id="');
+})->with('form components without model');
 
 // --- resolveCheckField ---
 
@@ -64,6 +72,34 @@ test('check explicit id takes precedence over wire:model', function (string $bla
         ->assertSee('id="custom"', false)
         ->assertDontSee('id="terms"', false);
 })->with('check components');
+
+// --- wire:model modifiers ---
+
+test('wire:model.live resolves id correctly', function (string $blade) {
+    $blade = str_replace('wire:model="user.email"', 'wire:model.live="user.email"', $blade);
+
+    $this->withViewErrors([])
+        ->blade($blade)
+        ->assertSee('id="user-email"', false);
+})->with('form components');
+
+test('wire:model.blur resolves id correctly', function (string $blade) {
+    $blade = str_replace('wire:model="user.email"', 'wire:model.blur="user.email"', $blade);
+
+    $this->withViewErrors([])
+        ->blade($blade)
+        ->assertSee('id="user-email"', false);
+})->with('form components');
+
+// --- Deeply nested dots ---
+
+test('deeply nested wire:model dots are replaced with dashes', function (string $blade) {
+    $blade = str_replace('wire:model="user.email"', 'wire:model="form.address.city"', $blade);
+
+    $this->withViewErrors([])
+        ->blade($blade)
+        ->assertSee('id="form-address-city"', false);
+})->with('form components');
 
 // --- Label for attribute ---
 

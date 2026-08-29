@@ -129,6 +129,12 @@
             <p>Scroll B</p>
         </x-wirestrap::modal>
 
+        {{-- Second minimizable for multi-minimize test --}}
+        <button id="btn-minimizable2" type="button" x-on:click="$wirestrap.modal.show('modal-minimizable2')">Open minimizable 2</button>
+        <x-wirestrap::modal id="modal-minimizable2" title="Minimizable 2" minimizable draggable>
+            <p>Minimizable 2 content</p>
+        </x-wirestrap::modal>
+
         {{-- Livewire managed modals --}}
         <livewire:wirestrap.modal-manager />
         <livewire:ui.modal-trigger lazy />

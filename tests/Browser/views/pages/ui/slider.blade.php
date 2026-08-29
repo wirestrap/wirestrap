@@ -32,7 +32,7 @@
         </x-wirestrap::slider>
 
         {{-- External control with events --}}
-        <div x-data="{ offset: 0, canPrev: false, canNext: true }"
+        <div x-data="{ offset: -1, canPrev: null, canNext: null }"
              x-on:ws-slider-change="offset = $event.detail.offset; canPrev = $event.detail.canScrollPrev; canNext = $event.detail.canScrollNext">
             <x-wirestrap::slider id="slider-events" :columns="1" :arrows="false" events>
                 <x-slot:a><div>A</div></x-slot:a>

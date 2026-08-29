@@ -5,8 +5,10 @@
 test('autosize sets height variable on init', function () {
     $this->visit('/_ws/test/form/textarea')
         ->assertScript(js_after_tick("
-            getComputedStyle(document.querySelector('#autosize').parentElement)
-                .getPropertyValue('--ws-textarea-height') !== ''
+            /^\\d+px$/.test(
+                getComputedStyle(document.querySelector('#autosize').parentElement)
+                    .getPropertyValue('--ws-textarea-height').trim()
+            )
         "));
 });
 

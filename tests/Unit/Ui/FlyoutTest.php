@@ -1,5 +1,100 @@
 <?php
 
+// --- CSS classes ---
+
+test('renders ws-flyout class on floatable', function () {
+    $this->blade('
+        <x-wirestrap::flyout id="test" content="Hello">
+            <button type="button">Trigger</button>
+        </x-wirestrap::flyout>
+    ')
+    ->assertSee('ws-flyout', false);
+});
+
+// --- Floating attributes ---
+
+test('renders data-ws-floatable on floatable', function () {
+    $this->blade('
+        <x-wirestrap::flyout id="test" content="Hello">
+            <button type="button">Trigger</button>
+        </x-wirestrap::flyout>
+    ')
+    ->assertSee('data-ws-floatable', false);
+});
+
+test('renders data-ws-float-trigger on trigger wrapper', function () {
+    $this->blade('
+        <x-wirestrap::flyout id="test" content="Hello">
+            <button type="button">Trigger</button>
+        </x-wirestrap::flyout>
+    ')
+    ->assertSee('data-ws-float-trigger', false);
+});
+
+test('renders data-ws-float-id with id value', function () {
+    $this->blade('
+        <x-wirestrap::flyout id="my-fly" content="Hello">
+            <button type="button">Trigger</button>
+        </x-wirestrap::flyout>
+    ')
+    ->assertSee('data-ws-float-id="my-fly"', false);
+});
+
+// --- Default prop values ---
+
+test('default placement is bottom-start', function () {
+    $this->blade('
+        <x-wirestrap::flyout id="test" content="Hello">
+            <button type="button">Trigger</button>
+        </x-wirestrap::flyout>
+    ')
+    ->assertSee('data-ws-placement="bottom-start"', false);
+});
+
+test('default trigger is hover', function () {
+    $this->blade('
+        <x-wirestrap::flyout id="test" content="Hello">
+            <button type="button">Trigger</button>
+        </x-wirestrap::flyout>
+    ')
+    ->assertSee('data-ws-trigger="hover"', false);
+});
+
+test('default offset-distance is 0', function () {
+    $this->blade('
+        <x-wirestrap::flyout id="test" content="Hello">
+            <button type="button">Trigger</button>
+        </x-wirestrap::flyout>
+    ')
+    ->assertSee('data-ws-offset-distance="0"', false);
+});
+
+// --- Trigger slot ---
+
+test('trigger slot content rendered inside trigger wrapper', function () {
+    $html = $this->blade('
+        <x-wirestrap::flyout id="test" content="Hello">
+            <button type="button">My Trigger</button>
+        </x-wirestrap::flyout>
+    ')->__toString();
+
+    expect(htmlContainsInside($html, null, 'data-ws-float-trigger'))->toBeTrue();
+    expect(htmlContainsInside($html, null, 'My Trigger'))->toBeTrue();
+});
+
+// --- Content slot attributes ---
+
+test('content slot class is merged on floatable', function () {
+    $html = $this->blade('
+        <x-wirestrap::flyout id="test">
+            <x-slot:content class="extra-class">Some content</x-slot:content>
+            <button type="button">Trigger</button>
+        </x-wirestrap::flyout>
+    ')->__toString();
+
+    expect(htmlGetAttribute($html, 'ws-flyout', 'class'))->toContain('extra-class');
+});
+
 // --- Livewire attributes ---
 
 test('uses wire:ignore.self not wire:ignore', function () {

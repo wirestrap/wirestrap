@@ -90,6 +90,15 @@
         multiple
     />
 
+    {{-- Preloaded tags with distinct labels --}}
+    <x-wirestrap::autocomplete
+        id="ac-preloaded-labels"
+        wire:model="preloadedLabels"
+        wire-options="getTagSuggestionsWithLabels"
+        label="Preloaded Labels"
+        multiple
+    />
+
     {{-- Min chars --}}
     <x-wirestrap::autocomplete
         id="ac-minchars"

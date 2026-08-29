@@ -65,6 +65,30 @@ test('counter animates down when value decreases', function () {
         ->assertScript(js_wait_counter('#counter-int', '200'));
 });
 
+// --- Negative values ---
+
+test('counter animates to negative value', function () {
+    $this->visit('/_ws/test/ui/counter')
+        ->assertScript(js_wait_counter('#counter-int', '500'))
+        ->assertScript("(() => {
+            document.querySelector('#counter-int').setAttribute('data-ws-count', '-100');
+            return true;
+        })()")
+        ->assertScript(js_wait_counter('#counter-int', '-100'));
+});
+
+// --- NaN guard ---
+
+test('non-finite value is ignored', function () {
+    $this->visit('/_ws/test/ui/counter')
+        ->assertScript(js_wait_counter('#counter-int', '500'))
+        ->assertScript("(() => {
+            document.querySelector('#counter-int').setAttribute('data-ws-count', 'abc');
+            return true;
+        })()")
+        ->assertScript(js_after_tick("document.querySelector('#counter-int span').textContent === '500'"));
+});
+
 // --- Reactive mode ---
 
 test('reactive counter re-animates when Livewire property changes', function () {

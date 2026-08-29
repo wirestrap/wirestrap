@@ -80,6 +80,21 @@ test('label for attribute matches resolved id', function (string $blade) {
         ->assertSee('for="my-check"', false);
 })->with('check components');
 
+// --- Label priority ---
+
+test('slot content takes priority over label prop', function (string $blade) {
+    $component = explode('::', explode(' ', $blade)[0])[1];
+    $blade = str_replace('/>', 'label="Prop label">Slot label</x-wirestrap::' . $component . '>', $blade);
+
+    $html = $this->withViewErrors([])
+        ->blade($blade)
+        ->__toString();
+
+    expect($html)
+        ->toContain('Slot label')
+        ->not->toContain('Prop label');
+})->with('check components');
+
 // --- Layout variants ---
 
 test('inline adds inline class', function (string $blade) {
@@ -112,12 +127,14 @@ test('no reverse class by default', function (string $blade) {
 
 // --- Disabled ---
 
-test('disabled attribute is rendered', function (string $blade) {
+test('disabled attribute is rendered on input', function (string $blade) {
     $blade = str_replace('/>', 'disabled />', $blade);
 
-    $this->withViewErrors([])
+    $html = $this->withViewErrors([])
         ->blade($blade)
-        ->assertSee('disabled', false);
+        ->__toString();
+
+    expect($html)->toHaveAttributeOn('ws-form-check-input', 'disabled');
 })->with('check components');
 
 // --- Validation ---
@@ -161,6 +178,41 @@ test('no invalid class when has-validation is false', function (string $blade) {
     $this->withViewErrors(['field' => 'Required'])
         ->blade($blade)
         ->assertDontSee('ws-form-invalid', false);
+})->with('check components');
+
+// --- Radio value + auto-ID ---
+
+test('radio renders value attribute', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::radio wire:model="plan" value="free" label="Free" />')
+        ->assertSee('value="free"', false);
+});
+
+test('radio auto-resolves id from wire:model and value', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::radio wire:model="plan" value="free" label="Free" />')
+        ->assertSee('id="plan-free"', false)
+        ->assertSee('for="plan-free"', false);
+});
+
+test('checkbox auto-resolves id from wire:model and value', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::checkbox wire:model="interests" value="music" label="Music" />')
+        ->assertSee('id="interests-music"', false)
+        ->assertSee('for="interests-music"', false);
+});
+
+// --- Wrapper class forwarding ---
+
+test('custom class is added to wrapper', function (string $blade) {
+    $blade = str_replace('/>', 'class="my-custom" />', $blade);
+
+    $html = $this->withViewErrors([])
+        ->blade($blade)
+        ->__toString();
+
+    expect(htmlContainsInside($html, null, 'my-custom'))->toBeTrue();
+    expect(htmlContainsInside($html, 'ws-form-check-input', 'my-custom'))->toBeFalse();
 })->with('check components');
 
 // --- Default attributes ---

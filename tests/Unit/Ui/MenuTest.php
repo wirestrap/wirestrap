@@ -91,12 +91,14 @@ test('renders id on root element', function () {
 });
 
 test('renders ws-menu class on root', function () {
-    $this->blade('
+    $html = $this->blade('
         <x-wirestrap::menu id="nav">
             <x-slot:item>content</x-slot:item>
         </x-wirestrap::menu>
     ')
-    ->assertSee('ws-menu', false);
+    ->__toString();
+
+    expect(htmlGetAttribute($html, 'id=nav', 'class'))->toContain('ws-menu');
 });
 
 test('forwards custom class to root element', function () {
@@ -196,7 +198,7 @@ test('trigger falls back to id when label is omitted', function () {
             </x-slot:grp>
         </x-wirestrap::menu>
     ')
-    ->assertSee('my-group');
+    ->assertSeeText('my-group');
 });
 
 test('trigger slot overrides label', function () {

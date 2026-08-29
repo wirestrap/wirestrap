@@ -33,7 +33,8 @@ function js_wait_no_toasts(int $timeout = 5000): string
 test('string shorthand creates toast with message', function () {
     $this->visit('/_ws/test/ui/toast')
         ->assertScript(js_toast())
-        ->assertVisible('.ws-toast .ws-toast-body');
+        ->assertVisible('.ws-toast .ws-toast-body')
+        ->assertScript("document.querySelector('.ws-toast .ws-toast-body').textContent.trim() === 'Hello'");
 });
 
 test('default type is primary', function () {
@@ -58,7 +59,8 @@ test('title renders header with icon', function () {
     $this->visit('/_ws/test/ui/toast')
         ->assertScript(js_toast("{ message: 'ok', title: 'Done', duration: 0 }"))
         ->assertPresent('.ws-toast .ws-toast-header .ws-toast-icon')
-        ->assertPresent('.ws-toast .ws-toast-header .ws-toast-title');
+        ->assertPresent('.ws-toast .ws-toast-header .ws-toast-title')
+        ->assertScript("document.querySelector('.ws-toast .ws-toast-title').textContent.trim() === 'Done'");
 });
 
 test('no title means no header', function () {
@@ -84,7 +86,7 @@ test('no progress bar when duration is 0', function () {
 test('toast becomes visible with transition class', function () {
     $this->visit('/_ws/test/ui/toast')
         ->assertScript(js_toast("{ message: 'ok', duration: 0 }"))
-        ->assertPresent('.ws-toast.ws-toast-visible');
+        ->assertScript(js_wait_for('.ws-toast.ws-toast-visible'));
 });
 
 test('click dismisses toast', function () {
@@ -93,6 +95,22 @@ test('click dismisses toast', function () {
         ->assertVisible('.ws-toast')
         ->click('.ws-toast')
         ->assertScript(js_wait_no_toasts());
+});
+
+test('click dismisses timed toast', function () {
+    $this->visit('/_ws/test/ui/toast')
+        ->assertScript(js_toast("{ message: 'timed', duration: 10000 }"))
+        ->assertVisible('.ws-toast')
+        ->assertPresent('.ws-toast .ws-toast-progress-bar')
+        ->click('.ws-toast')
+        ->assertScript(js_wait_no_toasts());
+});
+
+test('html in message is escaped', function () {
+    $this->visit('/_ws/test/ui/toast')
+        ->assertScript(js_toast("{ message: '<b>bold</b>', duration: 0 }"))
+        ->assertScript("document.querySelector('.ws-toast .ws-toast-body').textContent.trim() === '<b>bold</b>'")
+        ->assertNotPresent('.ws-toast .ws-toast-body b');
 });
 
 test('auto-dismiss removes toast after duration', function () {
@@ -129,7 +147,7 @@ test('max limit removes oldest toast', function () {
         ->assertScript(js_toast("{ message: 'two', duration: 0 }"))
         ->assertScript(js_toast("{ message: 'three', duration: 0 }"))
         ->assertScript(js_wait_for('.ws-toast.ws-toast-leaving'))
-        ->assertScript("document.querySelectorAll('.ws-toast:not(.ws-toast-leaving)').length <= 2");
+        ->assertScript("document.querySelectorAll('.ws-toast:not(.ws-toast-leaving)').length === 2");
 });
 
 // --- Configure ---
@@ -139,7 +157,7 @@ test('configure sets default duration', function () {
         ->assertScript('(() => { Wirestrap.toast.configure({ duration: 300 }); return true; })()')
         ->assertScript(js_toast("{ message: 'short' }"))
         ->assertVisible('.ws-toast')
-        ->assertScript(js_wait_no_toasts());
+        ->assertScript(js_wait_no_toasts(2000));
 });
 
 // --- Container ---
@@ -178,14 +196,17 @@ test('php toast() creates a toast', function () {
     $this->visit('/_ws/test/ui/toast')
         ->click('#btn-php-basic')
         ->assertScript(js_wait_for('.ws-toast.ws-toast-success'))
-        ->assertVisible('.ws-toast.ws-toast-success');
+        ->assertVisible('.ws-toast.ws-toast-success')
+        ->assertScript("document.querySelector('.ws-toast .ws-toast-body').textContent.trim() === 'PHP toast message'");
 });
 
 test('php toast() with title renders header', function () {
     $this->visit('/_ws/test/ui/toast')
         ->click('#btn-php-titled')
-        ->assertScript(js_wait_for('.ws-toast'))
-        ->assertPresent('.ws-toast .ws-toast-header');
+        ->assertScript(js_wait_for('.ws-toast.ws-toast-info'))
+        ->assertPresent('.ws-toast .ws-toast-header')
+        ->assertScript("document.querySelector('.ws-toast .ws-toast-title').textContent.trim() === 'Info'")
+        ->assertScript("document.querySelector('.ws-toast .ws-toast-body').textContent.trim() === 'PHP titled toast'");
 });
 
 test('php toast() with duration 0 has no progress bar', function () {

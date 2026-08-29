@@ -19,6 +19,7 @@ class AutocompleteDemo extends Component
     public ?string $accented = null;
     public ?string $ghost = null;
     public array $preloaded = ['php', 'js'];
+    public array $preloadedLabels = ['php', 'js'];
     public ?string $minChars = null;
     public ?string $minChars1 = null;
     public ?string $category = 'fruits';
@@ -105,6 +106,19 @@ class AutocompleteDemo extends Component
     public function getTagSuggestions(): array
     {
         return ['php', 'js', 'python', 'rust', 'go'];
+    }
+
+    /** @return list<array{value: string, label: string}> */
+    #[Renderless]
+    public function getTagSuggestionsWithLabels(): array
+    {
+        return [
+            ['value' => 'php', 'label' => 'PHP'],
+            ['value' => 'js', 'label' => 'JavaScript'],
+            ['value' => 'python', 'label' => 'Python'],
+            ['value' => 'rust', 'label' => 'Rust'],
+            ['value' => 'go', 'label' => 'Go'],
+        ];
     }
 
     /** @return list<array{value: string, label: string}> */
