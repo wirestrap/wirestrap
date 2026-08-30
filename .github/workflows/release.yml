@@ -52,11 +52,16 @@ jobs:
             exit 1
           fi
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
       - name: Install Sass
-        run: npm install -g sass
+        run: npm ci
 
       - name: Compile SCSS
-        run: sass resources/sass/wirestrap.scss dist/wirestrap.css --style=compressed --no-source-map
+        run: npx sass resources/sass/wirestrap.scss dist/wirestrap.css --style=compressed --no-source-map
 
       - name: Commit and tag
         run: |
