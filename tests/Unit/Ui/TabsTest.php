@@ -161,12 +161,16 @@ test('renders label text in button', function () {
 });
 
 test('falls back to slot key when label is omitted', function () {
-    $this->blade('
+    $html = $this->blade('
         <x-wirestrap::tabs id="test">
             <x-slot:shipping>content</x-slot:shipping>
         </x-wirestrap::tabs>
-    ')
-    ->assertSee('shipping');
+    ')->__toString();
+
+    // Assert the button text: the key also appears in data-ws-tab, the panel/button
+    // ids and wire:key, so a page-wide assertSee() cannot tell whether the label
+    // fallback actually rendered.
+    expect(htmlText($html, 'ws-tabs-nav-button'))->toBe('shipping');
 });
 
 test('label slot overrides label attribute', function () {

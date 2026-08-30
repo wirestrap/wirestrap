@@ -45,12 +45,15 @@ test('renders id on root element', function () {
 });
 
 test('renders ws-slider class on root', function () {
-    $this->blade('
+    $html = $this->blade('
         <x-wirestrap::slider id="s">
             <x-slot:a>A</x-slot:a>
         </x-wirestrap::slider>
-    ')
-    ->assertSee('ws-slider', false);
+    ')->__toString();
+
+    // Token match: a substring assertion would also match ws-slider-track,
+    // ws-slider-inner, ws-slider-slide and ws-slider-arrow.
+    expect(htmlHasClass($html, 'ws-slider'))->toBeTrue();
 });
 
 test('forwards custom class to root element', function () {

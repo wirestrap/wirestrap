@@ -3,12 +3,15 @@
 // --- CSS classes ---
 
 test('renders ws-tooltip class on floatable', function () {
-    $this->blade('
+    $html = $this->blade('
         <x-wirestrap::tooltip id="test" content="Hello">
             <button type="button">Trigger</button>
         </x-wirestrap::tooltip>
-    ')
-    ->assertSee('ws-tooltip', false);
+    ')->__toString();
+
+    // Token match: a substring assertion would also match ws-tooltip-content
+    // and ws-tooltip-arrow.
+    expect(htmlHasClass($html, 'ws-tooltip'))->toBeTrue();
 });
 
 test('renders ws-tooltip-content class', function () {

@@ -32,9 +32,13 @@ test('switch renders type checkbox with role switch', function () {
 // --- Wrapper class ---
 
 test('renders ws-form-check wrapper', function (string $blade) {
-    $this->withViewErrors([])
+    $html = $this->withViewErrors([])
         ->blade($blade)
-        ->assertSee('ws-form-check', false);
+        ->__toString();
+
+    // Token match: a substring assertion would also match ws-form-check-input
+    // and ws-form-check-label carried by the input and the label.
+    expect(htmlHasClass($html, 'ws-form-check'))->toBeTrue();
 })->with('check components');
 
 test('switch has ws-form-switch class', function () {

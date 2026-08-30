@@ -3,9 +3,13 @@
 // --- Element ---
 
 test('renders ws-autocomplete class', function () {
-    $this->withViewErrors([])
+    $html = $this->withViewErrors([])
         ->blade('<x-wirestrap::autocomplete id="test" wire-options="getItems" />')
-        ->assertSee('ws-autocomplete', false);
+        ->__toString();
+
+    // Token match: a substring assertion would also match ws-autocomplete-input-wrapper,
+    // ws-autocomplete-field or ws-autocomplete-dropdown.
+    expect(htmlHasClass($html, 'ws-autocomplete'))->toBeTrue();
 });
 
 test('renders x-data wsAutocomplete', function () {

@@ -89,6 +89,44 @@ function htmlGetJsonAttribute(string $html, string $attribute): mixed
 }
 
 /**
+ * Check whether any element carries $class as a full class token.
+ *
+ * Unlike assertSee(), this never matches a partial class name: looking for
+ * 'ws-modal' will not match 'ws-modal-dialog'.
+ */
+function htmlHasClass(string $html, string $class): bool
+{
+    $doc = new DOMDocument();
+    @$doc->loadHTML('<meta charset="utf-8">' . $html);
+    $xpath = new DOMXPath($doc);
+
+    $elements = $xpath->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' {$class} ')]");
+
+    return $elements !== false && $elements->length > 0;
+}
+
+/**
+ * Get the trimmed text content of the first element carrying $class as a full token.
+ *
+ * Use it to assert on rendered text without matching the same string in an
+ * attribute value elsewhere in the markup.
+ */
+function htmlText(string $html, string $class): ?string
+{
+    $doc = new DOMDocument();
+    @$doc->loadHTML('<meta charset="utf-8">' . $html);
+    $xpath = new DOMXPath($doc);
+
+    $elements = $xpath->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' {$class} ')]");
+
+    if ($elements === false || $elements->length === 0) {
+        return null;
+    }
+
+    return trim($elements->item(0)->textContent);
+}
+
+/**
  * Count the number of elements that have the given attribute.
  */
 function htmlCountAttribute(string $html, string $attribute): int

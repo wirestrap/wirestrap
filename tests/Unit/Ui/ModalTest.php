@@ -158,12 +158,15 @@ test('renders aria-hidden true', function () {
 });
 
 test('renders ws-modal class', function () {
-    $this->blade('
+    $html = $this->blade('
         <x-wirestrap::modal id="m">
             <p>Content</p>
         </x-wirestrap::modal>
-    ')
-    ->assertSee('ws-modal', false);
+    ')->__toString();
+
+    // Token match: a substring assertion would also match ws-modal-dialog,
+    // ws-modal-content, ws-modal-header, etc.
+    expect(htmlHasClass($html, 'ws-modal'))->toBeTrue();
 });
 
 test('forwards custom class to modal element', function () {

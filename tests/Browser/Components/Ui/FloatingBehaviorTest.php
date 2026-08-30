@@ -103,6 +103,13 @@ test('interactive floatable stays open when hovering the panel', function (
         ->hover($trigger)
         ->assertVisible($floatable)
         ->hover($panel)
+        // Leaving the trigger schedules the hide 50 ms later. Wait past that deadline and
+        // assert on the .show class: it is dropped as soon as the hide runs, whereas
+        // display only follows after the CSS transition - so assertVisible alone would
+        // still see the (transparent) panel and could not catch the regression.
+        ->assertScript("new Promise(resolve => setTimeout(() => resolve(
+            document.querySelector('{$floatable}')?.classList.contains('show') === true
+        ), 150))")
         ->assertVisible($floatable);
 })->with('interactive-floatables');
 
@@ -121,7 +128,10 @@ test('non-interactive tooltip closes when hovering the floatable', function () {
 test('focusing input inside trigger keeps tooltip open', function () {
     $this->visit('/_ws/test/ui/tooltip')
         ->assertMissing('#tip-focus-tip')
-        ->click('#trigger-focus')
+        // Focus programmatically: a click would also fire mouseover and open the
+        // tooltip through the hover path, leaving the focusin path untested.
+        ->assertScript("(() => { document.querySelector('#trigger-focus').focus(); return true; })()")
+        ->assertScript(js_wait_for('#tip-focus-tip.show'))
         ->assertVisible('#tip-focus-tip')
         ->click('#elsewhere')
         ->assertScript(js_wait_hidden('#tip-focus-tip'));

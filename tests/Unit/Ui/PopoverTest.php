@@ -3,12 +3,15 @@
 // --- CSS classes ---
 
 test('renders ws-popover class on floatable', function () {
-    $this->blade('
+    $html = $this->blade('
         <x-wirestrap::popover id="test" content="Body">
             <button type="button">Trigger</button>
         </x-wirestrap::popover>
-    ')
-    ->assertSee('ws-popover', false);
+    ')->__toString();
+
+    // Token match: a substring assertion would also match ws-popover-header,
+    // ws-popover-body and ws-popover-arrow.
+    expect(htmlHasClass($html, 'ws-popover'))->toBeTrue();
 });
 
 test('renders ws-popover-header class', function () {

@@ -3,9 +3,12 @@
 // --- Element ---
 
 test('renders ws-select class', function () {
-    $this->withViewErrors([])
+    $html = $this->withViewErrors([])
         ->blade('<x-wirestrap::select id="test" :options="[\'a\' => \'A\']" />')
-        ->assertSee('ws-select', false);
+        ->__toString();
+
+    // Token match: a substring assertion would also match ws-select-dropdown.
+    expect(htmlHasClass($html, 'ws-select'))->toBeTrue();
 });
 
 test('renders x-data wsSelect', function () {
