@@ -4,18 +4,16 @@ on:
   pull_request:
 
 jobs:
-  php:
+  quality:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php: ['8.2', '8.3', '8.4']
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: '8.4'
+          extensions: sockets
           coverage: none
 
       - name: Install dependencies
@@ -30,21 +28,61 @@ jobs:
       - name: PHPStan
         run: composer analyse
 
-  js:
+  unit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.3', '8.4']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: sockets
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Unit tests
+        run: composer test:unit
+
+  browser:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: sockets
+          coverage: none
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: npm
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Prettier
-        run: npm run format-ci
+      - name: Install JS dependencies
+        run: npm ci
 
-      - name: ESLint
-        run: npm run lint-ci
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build test assets
+        run: npm run build:test
+
+      - name: Browser tests
+        run: composer test:browser
