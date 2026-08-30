@@ -10,7 +10,7 @@ const ANALYSIS_PATHS = [
 
 return RectorConfig::configure()
     ->withPaths(ANALYSIS_PATHS)
-    ->withPhpVersion(PhpVersion::PHP_81)
+    ->withPhpVersion(PhpVersion::PHP_83)
     ->withParallel()
     ->withSkip([
         SafeDeclareStrictTypesRector::class,
