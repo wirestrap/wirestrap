@@ -13,6 +13,6 @@ parameters:
 
     level: 8
 
-    phpVersion: 80100
+    phpVersion: 80300
 
     ignoreErrors:

@@ -1,0 +1,8 @@
+// Test-only stylesheet: WireStrap plus Bootstrap Icons, so browser tests never
+// depend on a CDN. Icons are a test fixture and are not shipped with the package.
+// The font directory points at the route served by BrowserTestCase.
+
+@use '../../resources/sass/wirestrap';
+@use 'bootstrap-icons/font/bootstrap-icons' with (
+    $bootstrap-icons-font-dir: '/_ws/fonts'
+);

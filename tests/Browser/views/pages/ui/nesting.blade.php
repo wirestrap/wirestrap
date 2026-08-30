@@ -1,0 +1,93 @@
+<x-layouts.app>
+    <div class="p-4">
+
+        {{-- Flyout > Tooltip --}}
+        <x-wirestrap::flyout id="parent-ft">
+            <x-slot:content>
+                <div style="padding: 20px;">
+                    <x-wirestrap::tooltip id="child-ft" content="Nested tooltip text">
+                        <button id="child-ft-trigger" type="button">Hover for tooltip</button>
+                    </x-wirestrap::tooltip>
+                </div>
+            </x-slot:content>
+            <button id="parent-ft-trigger" type="button">Flyout > Tooltip</button>
+        </x-wirestrap::flyout>
+
+        <br><br>
+
+        {{-- Flyout > Flyout --}}
+        <x-wirestrap::flyout id="parent-ff">
+            <x-slot:content>
+                <div style="padding: 20px;">
+                    <x-wirestrap::flyout id="child-ff">
+                        <x-slot:content>
+                            <div id="child-ff-panel" style="padding: 20px;">Nested flyout content</div>
+                        </x-slot:content>
+                        <button id="child-ff-trigger" type="button">Hover for nested flyout</button>
+                    </x-wirestrap::flyout>
+                </div>
+            </x-slot:content>
+            <button id="parent-ff-trigger" type="button">Flyout > Flyout</button>
+        </x-wirestrap::flyout>
+
+        <br><br>
+
+        {{-- Flyout > Popover --}}
+        <x-wirestrap::flyout id="parent-fp">
+            <x-slot:content>
+                <div style="padding: 20px;">
+                    <x-wirestrap::popover id="child-fp">
+                        <x-slot:content>
+                            <div id="child-fp-panel" style="padding: 20px;">Nested popover body</div>
+                        </x-slot:content>
+                        <button id="child-fp-trigger" type="button">Hover for popover</button>
+                    </x-wirestrap::popover>
+                </div>
+            </x-slot:content>
+            <button id="parent-fp-trigger" type="button">Flyout > Popover</button>
+        </x-wirestrap::flyout>
+
+        <br><br>
+
+        {{-- Popover > Tooltip --}}
+        <x-wirestrap::popover id="parent-pt">
+            <x-slot:content>
+                <x-wirestrap::tooltip id="child-pt" content="Nested tooltip in popover">
+                    <button id="child-pt-trigger" type="button">Hover for tooltip</button>
+                </x-wirestrap::tooltip>
+            </x-slot:content>
+            <button id="parent-pt-trigger" type="button">Popover > Tooltip</button>
+        </x-wirestrap::popover>
+
+        {{-- Teleported Flyout > Tooltip --}}
+        <x-wirestrap::flyout id="parent-tp" teleport="body">
+            <x-slot:content>
+                <div style="padding: 20px;">
+                    <x-wirestrap::tooltip id="child-tp" content="Tooltip inside teleported flyout">
+                        <button id="child-tp-trigger" type="button">Hover for tooltip</button>
+                    </x-wirestrap::tooltip>
+                </div>
+            </x-slot:content>
+            <button id="parent-tp-trigger" type="button">Teleported Flyout > Tooltip</button>
+        </x-wirestrap::flyout>
+
+        <br><br>
+
+        {{-- Teleported Flyout > Flyout --}}
+        <x-wirestrap::flyout id="parent-tpf" teleport="body">
+            <x-slot:content>
+                <div style="padding: 20px;">
+                    <x-wirestrap::flyout id="child-tpf">
+                        <x-slot:content>
+                            <div id="child-tpf-panel" style="padding: 20px;">Nested flyout in teleported parent</div>
+                        </x-slot:content>
+                        <button id="child-tpf-trigger" type="button">Hover for nested flyout</button>
+                    </x-wirestrap::flyout>
+                </div>
+            </x-slot:content>
+            <button id="parent-tpf-trigger" type="button">Teleported Flyout > Flyout</button>
+        </x-wirestrap::flyout>
+
+        <div id="elsewhere" style="margin-top: 100px; padding: 20px;">Click here to dismiss</div>
+    </div>
+</x-layouts.app>

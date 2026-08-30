@@ -1,0 +1,341 @@
+<?php
+
+// --- Element ---
+
+test('renders a textarea element', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea />')
+        ->assertSee('<textarea', false);
+});
+
+test('textarea has ws-form-textarea class', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea />')
+        ->assertSee('ws-form-textarea', false);
+});
+
+// --- Label ---
+
+test('renders label from prop', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea label="Description" />')
+        ->assertSee('ws-form-label', false)
+        ->assertSee('Description');
+});
+
+test('renders label from slot', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea><x-slot:label>Rich <strong>label</strong></x-slot:label></x-wirestrap::textarea>')
+        ->assertSee('<strong>label</strong>', false);
+});
+
+test('no label element when label is absent', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea />')
+        ->assertDontSee('ws-form-label', false);
+});
+
+test('label for attribute matches resolved id', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea id="desc" label="Description" />')
+        ->assertSee('for="desc"', false);
+});
+
+test('non-floating label renders before textarea', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea id="x" label="Name" />')
+        ->__toString();
+
+    $labelPos = strpos($html, 'ws-form-label');
+    $textareaPos = strpos($html, '<textarea');
+
+    expect($labelPos)->toBeLessThan($textareaPos);
+});
+
+// --- Floating ---
+
+test('floating adds ws-form-floating class', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea floating label="Bio" />')
+        ->assertSee('ws-form-floating', false);
+});
+
+test('no floating class by default', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea />')
+        ->assertDontSee('ws-form-floating', false);
+});
+
+test('floating label renders after textarea', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea floating id="x" label="Bio" />')
+        ->__toString();
+
+    $textareaPos = strpos($html, '<textarea');
+    $labelPos = strpos($html, 'ws-form-label');
+
+    expect($textareaPos)->toBeLessThan($labelPos);
+});
+
+test('floating sets placeholder to space when none given', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea floating label="Bio" />')
+        ->assertSee('placeholder=" "', false);
+});
+
+test('floating preserves explicit placeholder', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea floating label="Bio" placeholder="Enter bio" />')
+        ->assertSee('placeholder="Enter bio"', false);
+});
+
+// --- Placeholder ---
+
+test('placeholder is rendered', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea placeholder="Type here" />')
+        ->assertSee('placeholder="Type here"', false);
+});
+
+test('no placeholder attribute by default', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea />')
+        ->__toString();
+
+    expect($html)->not->toContain('placeholder=');
+});
+
+// --- Icon ---
+
+test('icon renders icon element', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea icon="bi-chat" />')
+        ->assertSee('ws-form-input-icon', false);
+});
+
+test('icon start placement adds class', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea icon="bi-chat" />')
+        ->assertSee('ws-form-has-icon-start', false)
+        ->assertSee('ws-form-input-icon-start', false);
+});
+
+test('icon end placement adds class', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea icon="bi-chat" icon-placement="end" />')
+        ->assertSee('ws-form-has-icon-end', false)
+        ->assertSee('ws-form-input-icon-end', false);
+});
+
+test('icon has aria-hidden', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea icon="bi-chat" />')
+        ->assertSee('aria-hidden="true"', false);
+});
+
+test('non-floating icon wraps in textarea-wrapper', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea icon="bi-chat" />')
+        ->assertSee('ws-form-textarea-wrapper', false);
+});
+
+test('floating icon does not use textarea-wrapper', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea floating icon="bi-chat" label="Bio" />')
+        ->assertDontSee('ws-form-textarea-wrapper', false);
+});
+
+test('floating with icon adds icon class to wrapper', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea floating icon="bi-chat" label="Bio" />')
+        ->assertSee('ws-form-floating ws-form-has-icon-start', false);
+});
+
+// --- Rows ---
+
+test('rows attribute is rendered', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea :rows="5" />')
+        ->assertSee('rows="5"', false);
+});
+
+test('rows defaults to config value', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea />')
+        ->assertSee('rows="3"', false);
+});
+
+// --- Autosize ---
+
+test('autosize adds x-data and x-bind', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea />')
+        ->assertSee('x-data="wsTextarea"', false)
+        ->assertSee('x-bind="textarea"', false);
+});
+
+test('autosize adds data-ws-wiremodel when wire:model present', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea wire:model="field" />')
+        ->assertSee('data-ws-wiremodel="field"', false);
+});
+
+test('autosize false removes x-data and x-bind', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea :autosize="false" />')
+        ->__toString();
+
+    expect($html)->not->toContain('x-data="wsTextarea"');
+    expect($html)->not->toContain('x-bind="textarea"');
+});
+
+test('autosize false does not add data-ws-wiremodel', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea :autosize="false" wire:model="field" />')
+        ->__toString();
+
+    expect($html)->not->toContain('data-ws-wiremodel');
+});
+
+// --- wire:ignore.self placement ---
+
+test('autosize places wire:ignore.self on outer wrapper without icon', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea />')
+        ->assertSee('wire:ignore.self', false);
+});
+
+test('autosize with non-floating icon places wire:ignore.self on inner wrapper', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea icon="bi-chat" />')
+        ->__toString();
+
+    expect($html)->toHaveAttributeOn('ws-form-textarea-wrapper', 'wire:ignore.self');
+});
+
+test('autosize with floating icon places wire:ignore.self on outer wrapper', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea floating icon="bi-chat" label="Bio" />')
+        ->__toString();
+
+    expect($html)->toHaveAttributeOn('ws-form-floating', 'wire:ignore.self');
+    expect($html)->not->toContain('ws-form-textarea-wrapper');
+});
+
+test('no wire:ignore.self when autosize is false', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea :autosize="false" />')
+        ->__toString();
+
+    expect($html)->not->toContain('wire:ignore.self');
+});
+
+// --- Disabled ---
+
+test('disabled attribute is rendered on textarea', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea disabled />')
+        ->__toString();
+
+    expect($html)->toHaveAttributeOn('ws-form-textarea', 'disabled');
+});
+
+// --- Validation ---
+
+test('invalid class applied when wire:model has error', function () {
+    $this->withViewErrors(['field' => 'Required'])
+        ->blade('<x-wirestrap::textarea wire:model="field" />')
+        ->assertSee('ws-form-invalid', false);
+});
+
+test('no invalid class when no error', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea wire:model="field" />')
+        ->assertDontSee('ws-form-invalid', false);
+});
+
+test('validation message rendered when has error', function () {
+    $this->withViewErrors(['field' => 'Required'])
+        ->blade('<x-wirestrap::textarea wire:model="field" />')
+        ->assertSee('ws-form-feedback-invalid', false)
+        ->assertSee('Required');
+});
+
+test('no validation message when has-validation-message is false', function () {
+    $this->withViewErrors(['field' => 'Required'])
+        ->blade('<x-wirestrap::textarea wire:model="field" :has-validation-message="false" />')
+        ->assertDontSee('ws-form-feedback-invalid', false);
+});
+
+test('no invalid class when has-validation is false', function () {
+    $this->withViewErrors(['field' => 'Required'])
+        ->blade('<x-wirestrap::textarea wire:model="field" :has-validation="false" />')
+        ->assertDontSee('ws-form-invalid', false);
+});
+
+test('floating error message renders outside wrapper', function () {
+    $html = $this->withViewErrors(['field' => 'Required'])
+        ->blade('<x-wirestrap::textarea wire:model="field" floating label="Bio" />')
+        ->__toString();
+
+    // Feedback must NOT be inside the floating wrapper
+    expect(htmlContainsInside($html, 'ws-form-floating', 'ws-form-feedback-invalid'))->toBeFalse();
+});
+
+test('non-floating error message renders inside wrapper', function () {
+    $html = $this->withViewErrors(['field' => 'Required'])
+        ->blade('<x-wirestrap::textarea wire:model="field" />')
+        ->__toString();
+
+    // Feedback must be inside the root wrapper
+    expect(htmlContainsInside($html, null, 'ws-form-feedback-invalid'))->toBeTrue();
+});
+
+test('non-floating icon with error adds invalid class to inner wrapper', function () {
+    $this->withViewErrors(['field' => 'Required'])
+        ->blade('<x-wirestrap::textarea wire:model="field" icon="bi-chat" />')
+        ->assertSee('ws-form-textarea-wrapper ws-form-invalid', false);
+});
+
+// --- Default attributes ---
+
+test('default-attributes are merged onto textarea', function () {
+    $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea :default-attributes="[\'data-custom\' => \'val\']" />')
+        ->assertSee('data-custom="val"', false);
+});
+
+test('custom class goes to the wrapper, not to the textarea', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea class="my-wrapper" />')
+        ->__toString();
+
+    expect(htmlGetAttribute($html, 'my-wrapper', 'class'))->toBe('my-wrapper');
+
+    preg_match('/<textarea\b[^>]*>/', $html, $matches);
+    expect(substr_count($matches[0], 'class='))->toBe(1)
+        ->and($matches[0])->not->toContain('my-wrapper');
+});
+
+test('autosize excludes user-supplied alpine attributes from the textarea', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea x-data="mine" x-bind="mine" data-ws-wiremodel="mine" wire:model="field" />')
+        ->__toString();
+
+    preg_match('/<textarea\b[^>]*>/', $html, $matches);
+
+    // Autosize owns these three attributes: user values must not be emitted alongside.
+    expect(substr_count($matches[0], 'x-data='))->toBe(1)
+        ->and(substr_count($matches[0], 'x-bind='))->toBe(1)
+        ->and(substr_count($matches[0], 'data-ws-wiremodel='))->toBe(1)
+        ->and($matches[0])->not->toContain('mine');
+});
+
+test('autosize disabled keeps user-supplied alpine attributes', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea :autosize="false" x-data="mine" />')
+        ->__toString();
+
+    preg_match('/<textarea\b[^>]*>/', $html, $matches);
+    expect($matches[0])->toContain('x-data="mine"');
+});

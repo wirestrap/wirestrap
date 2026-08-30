@@ -19,7 +19,7 @@
     }
   ],
   "require": {
-    "php": "^8.2",
+    "php": "^8.3",
     "livewire/livewire": "^4.0"
   },
   "autoload": {
@@ -34,27 +34,47 @@
       ]
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
   "require-dev": {
     "laravel/framework": "^12.0",
     "larastan/larastan": "^3.9",
     "rector/rector": "^2.4",
     "laravel/pint": "^1.29",
-    "orchestra/testbench": "^10.11"
+    "orchestra/testbench": "^10.11",
+    "pestphp/pest": "^4.0",
+    "pestphp/pest-plugin-laravel": "^4.0",
+    "pestphp/pest-plugin-browser": "^4.0"
   },
   "scripts": {
     "pint": "./vendor/bin/pint --parallel",
     "pint-ci": "./vendor/bin/pint --parallel --test",
     "rector": "./vendor/bin/rector --dry-run",
     "analyse": "./vendor/bin/phpstan analyse",
+    "test:browser": "./vendor/bin/pest --parallel --processes=4 --testsuite=Browser",
+    "test:unit": "./vendor/bin/pest --parallel --processes=4 --testsuite=Unit",
+    "test": [
+        "@test:unit",
+        "@test:browser"
+    ],
     "all": [
         "@pint",
         "@rector",
-        "@analyse"
+        "@analyse",
+        "@test"
     ],
     "ci": [
         "@pint-ci",
         "@rector",
         "@analyse"
     ]
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
   }
 }

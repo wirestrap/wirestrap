@@ -1,6 +1,5 @@
 <?php
 
-use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
 use Rector\Config\RectorConfig;
 use Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector;
 use Rector\ValueObject\PhpVersion;
@@ -11,11 +10,10 @@ const ANALYSIS_PATHS = [
 
 return RectorConfig::configure()
     ->withPaths(ANALYSIS_PATHS)
-    ->withPhpVersion(PhpVersion::PHP_81)
+    ->withPhpVersion(PhpVersion::PHP_83)
     ->withParallel()
     ->withSkip([
         SafeDeclareStrictTypesRector::class,
-        EncapsedStringsToSprintfRector::class,
     ])
     ->withPhpSets()
     ->withPreparedSets(

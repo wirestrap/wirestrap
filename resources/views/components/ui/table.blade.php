@@ -14,6 +14,7 @@
     $bulkActionsSlot = $bulkActions instanceof \Illuminate\View\ComponentSlot ? $bulkActions : null;
     $bulkActionItems = is_array($bulkActions) ? $bulkActions : null;
     $emptyColspan = ($count = count($columns) + ($wireModelBulk ? 1 : 0)) > 0 ? $count : 100;
+    $tableId = $attributes->get('id', 'ws-table');
     $configClass = config('wirestrap.table.class', '');
     $innerBaseClass = trim(($responsive ? 'ws-table-responsive' : '') . ($configClass ? ' ' . $configClass : ''));
     $innerAttrs = $attributes
@@ -54,6 +55,7 @@
                             @endphp
 
                             <th
+                                wire:key="th-{{ $tableId }}-{{ Str::slug($col['label'] ?? '') }}-{{ $loop->index }}"
                                 scope="col"
                                 @if ($colClass) class="{{ $colClass }}" @endif
                                 @foreach ($colAttrs as $attr => $val) {{ $attr }}="{{ $val }}" @endforeach
@@ -123,6 +125,7 @@
                             $btnAttrs = Arr::except($action, ['label', 'icon', 'icon-placement']);
                         @endphp
                         <button
+                            wire:key="action-{{ $tableId }}-{{ Str::slug($label) }}-{{ $loop->index }}"
                             @foreach ($btnAttrs as $attr => $val) {{ $attr }}="{{ $val }}" @endforeach
                         >
                             @if ($icon && $iconPlacement === 'start')
