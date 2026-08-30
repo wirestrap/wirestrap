@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\View\View;
 use Livewire\LivewireServiceProvider;
@@ -99,6 +100,20 @@ abstract class BrowserTestCase extends TestCase
                 'Content-Type' => 'application/javascript',
             ]);
         });
+
+        // Bootstrap Icons webfont, referenced by the test stylesheet. Served from
+        // node_modules so the icons are never copied into the package.
+        $router->get('_ws/fonts/{file}', function (string $file): Response {
+            $path = realpath(__DIR__ . '/../node_modules/bootstrap-icons/font/fonts/' . basename($file));
+
+            if (!$path || !file_exists($path)) {
+                abort(500, 'Bootstrap Icons font not found. Run: npm install');
+            }
+
+            return response((string) file_get_contents($path), 200, [
+                'Content-Type' => str_ends_with($path, '.woff2') ? 'font/woff2' : 'font/woff',
+            ]);
+        })->where('file', '[A-Za-z0-9._-]+');
 
         $router->get('_ws/test/{page}', fn(string $page): View => view('pages.' . str_replace('/', '.', $page)))
             ->where('page', '.*')
