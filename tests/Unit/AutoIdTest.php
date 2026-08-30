@@ -73,6 +73,29 @@ test('check explicit id takes precedence over wire:model', function (string $bla
         ->assertDontSee('id="terms"', false);
 })->with('check components');
 
+test('check auto id replaces dots with dashes', function (string $blade) {
+    $blade = str_replace('wire:model="terms"', 'wire:model="user.terms"', $blade);
+
+    $this->withViewErrors([])
+        ->blade($blade)
+        ->assertSee('id="user-terms"', false);
+})->with('check components');
+
+$checkComponentsNoModel = [
+    'checkbox' => '<x-wirestrap::checkbox />',
+    'radio' => '<x-wirestrap::radio />',
+    'switch' => '<x-wirestrap::switch />',
+];
+
+dataset('check components without model', $checkComponentsNoModel);
+
+test('no check id rendered when no id and no wire:model', function (string $blade) {
+    $rendered = (string) $this->withViewErrors([])
+        ->blade($blade);
+
+    expect($rendered)->not->toContain(' id="');
+})->with('check components without model');
+
 // --- wire:model modifiers ---
 
 test('wire:model.live resolves id correctly', function (string $blade) {

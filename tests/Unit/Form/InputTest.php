@@ -303,3 +303,16 @@ test('default-attributes are merged onto input', function () {
         ->blade('<x-wirestrap::input :default-attributes="[\'data-custom\' => \'val\']" />')
         ->assertSee('data-custom="val"', false);
 });
+
+test('custom class goes to the wrapper, not to the input', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::input class="my-wrapper" />')
+        ->__toString();
+
+    expect(htmlGetAttribute($html, 'my-wrapper', 'class'))->toBe('my-wrapper');
+
+    // The input must carry a single class attribute: its own.
+    preg_match('/<input\b[^>]*>/', $html, $matches);
+    expect(substr_count($matches[0], 'class='))->toBe(1)
+        ->and($matches[0])->not->toContain('my-wrapper');
+});

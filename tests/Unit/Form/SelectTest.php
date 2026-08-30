@@ -145,6 +145,16 @@ test('placeholder defaults to config value', function () {
         ->assertSee('Select an option');
 });
 
+test('placeholder span carries the placeholder text', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::select id="test" :options="[\'a\' => \'A\']" placeholder="Choose..." />')
+        ->__toString();
+
+    // Assert the span content: the text also appears in data-ws-placeholder, so a
+    // page-wide assertSee() cannot tell whether the span itself renders it.
+    expect(htmlText($html, 'ws-selection-placeholder'))->toBe('Choose...');
+});
+
 // --- Icon ---
 
 test('icon renders icon element', function () {
@@ -491,6 +501,27 @@ test('no aria-owns without teleport', function () {
         ->__toString();
 
     expect($html)->not->toContain('aria-owns');
+});
+
+test('teleport wraps the dropdown in an x-teleport template', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::select id="test" :options="[\'a\' => \'A\']" teleport="body" />')
+        ->__toString();
+
+    expect($html)->toContain('<template x-teleport="body">');
+
+    // The dropdown must sit inside the template, not next to it.
+    $template = substr($html, strpos($html, '<template x-teleport="body">'));
+    expect(strpos($template, 'ws-select-dropdown'))->not->toBeFalse()
+        ->and(strpos($template, 'ws-select-dropdown'))->toBeLessThan(strpos($template, '</template>'));
+});
+
+test('no teleport template when teleport is not set', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::select id="test" :options="[\'a\' => \'A\']" />')
+        ->__toString();
+
+    expect($html)->not->toContain('x-teleport');
 });
 
 test('no aria-labelledby without label', function () {

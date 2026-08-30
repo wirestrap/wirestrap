@@ -255,6 +255,19 @@ test('no footer when not provided', function () {
     ->assertDontSee('ws-modal-footer', false);
 });
 
+// --- Body ---
+
+test('slot content renders inside the modal body', function () {
+    $html = $this->blade('
+        <x-wirestrap::modal id="m">
+            <p>Content</p>
+        </x-wirestrap::modal>
+    ')->__toString();
+
+    expect(htmlHasClass($html, 'ws-modal-body'))->toBeTrue()
+        ->and(htmlText($html, 'ws-modal-body'))->toBe('Content');
+});
+
 // --- Dialog sizing ---
 
 test('size class applied to dialog', function () {

@@ -215,3 +215,32 @@ test('php toast() with duration 0 has no progress bar', function () {
         ->assertScript(js_wait_for('.ws-toast.ws-toast-danger'))
         ->assertNotPresent('.ws-toast .ws-toast-progress');
 });
+
+// --- Default duration ---
+
+test('a toast without explicit duration is timed by default', function () {
+    $this->visit('/_ws/test/ui/toast')
+        ->assertScript(js_toast("{ message: 'default duration' }"))
+        ->assertVisible('.ws-toast')
+        // The default duration is > 0, so the progress bar must be rendered.
+        ->assertPresent('.ws-toast .ws-toast-progress-bar');
+});
+
+test('configure duration 0 makes new toasts persistent', function () {
+    $this->visit('/_ws/test/ui/toast')
+        ->assertScript('(() => { Wirestrap.toast.configure({ duration: 0 }); return true; })()')
+        ->assertScript(js_toast("{ message: 'persistent' }"))
+        ->assertVisible('.ws-toast')
+        ->assertNotPresent('.ws-toast .ws-toast-progress');
+});
+
+// --- Destroy ---
+
+test('destroy removes the container from the DOM', function () {
+    $this->visit('/_ws/test/ui/toast')
+        ->assertScript(js_toast("{ message: 'ok', duration: 0 }"))
+        ->assertPresent('.ws-toast-container')
+        ->assertScript('(() => { Wirestrap.toast.destroy(); return true; })()')
+        ->assertNotPresent('.ws-toast-container')
+        ->assertNotPresent('.ws-toast');
+});

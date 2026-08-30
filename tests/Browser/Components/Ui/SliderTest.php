@@ -323,3 +323,36 @@ test('scrollPrev with scroll-page goes back by columns', function () {
             return Math.abs(actual - expected) < 1;
         })()"));
 });
+
+// --- Boundary guards emit no change event ---
+
+test('scrollPrev at start emits no change event', function () {
+    $this->visit('/_ws/test/ui/slider')
+        ->assertScript(js_after_tick(
+            "document.getElementById('event-offset').textContent === '0'"
+        ))
+        ->assertScript("(() => {
+            window.__wsSliderChanges = 0;
+            document.getElementById('slider-events')
+                .addEventListener('ws-slider-change', () => { window.__wsSliderChanges++; });
+            return true;
+        })()")
+        ->assertScript(js_wirestrap("slider.prev('slider-events')"))
+        ->assertScript(js_after_tick('window.__wsSliderChanges === 0'));
+});
+
+test('scrollNext at end emits no change event', function () {
+    $this->visit('/_ws/test/ui/slider')
+        ->click('#btn-ev-last')
+        ->assertScript(js_after_tick(
+            "document.getElementById('event-offset').textContent === '2'"
+        ))
+        ->assertScript("(() => {
+            window.__wsSliderChanges = 0;
+            document.getElementById('slider-events')
+                .addEventListener('ws-slider-change', () => { window.__wsSliderChanges++; });
+            return true;
+        })()")
+        ->assertScript(js_wirestrap("slider.next('slider-events')"))
+        ->assertScript(js_after_tick('window.__wsSliderChanges === 0'));
+});

@@ -98,3 +98,18 @@ test('invalid-feedback highlights button when panel contains validation error', 
         ->assertPresent('#acc-valid [data-ws-accordion-item="profile"].ws-accordion-button-invalid')
         ->assertNotPresent('#acc-valid [data-ws-accordion-item="settings"].ws-accordion-button-invalid');
 });
+
+// --- ws-show event ---
+
+test('ws-show event is dispatched when a panel opens', function () {
+    $this->visit('/_ws/test/ui/accordion')
+        ->assertScript("(() => {
+            window.__wsAccShow = 0;
+            document.querySelector('#acc-multi [data-ws-accordion-panel=\"first\"]')
+                .addEventListener('ws-show', () => { window.__wsAccShow++; });
+            return true;
+        })()")
+        ->click('#acc-multi [data-ws-accordion-item="first"]')
+        ->assertVisible('#acc-multi [data-ws-accordion-panel="first"]')
+        ->assertScript('window.__wsAccShow === 1');
+});

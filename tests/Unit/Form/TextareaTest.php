@@ -304,3 +304,38 @@ test('default-attributes are merged onto textarea', function () {
         ->blade('<x-wirestrap::textarea :default-attributes="[\'data-custom\' => \'val\']" />')
         ->assertSee('data-custom="val"', false);
 });
+
+test('custom class goes to the wrapper, not to the textarea', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea class="my-wrapper" />')
+        ->__toString();
+
+    expect(htmlGetAttribute($html, 'my-wrapper', 'class'))->toBe('my-wrapper');
+
+    preg_match('/<textarea\b[^>]*>/', $html, $matches);
+    expect(substr_count($matches[0], 'class='))->toBe(1)
+        ->and($matches[0])->not->toContain('my-wrapper');
+});
+
+test('autosize excludes user-supplied alpine attributes from the textarea', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea x-data="mine" x-bind="mine" data-ws-wiremodel="mine" wire:model="field" />')
+        ->__toString();
+
+    preg_match('/<textarea\b[^>]*>/', $html, $matches);
+
+    // Autosize owns these three attributes: user values must not be emitted alongside.
+    expect(substr_count($matches[0], 'x-data='))->toBe(1)
+        ->and(substr_count($matches[0], 'x-bind='))->toBe(1)
+        ->and(substr_count($matches[0], 'data-ws-wiremodel='))->toBe(1)
+        ->and($matches[0])->not->toContain('mine');
+});
+
+test('autosize disabled keeps user-supplied alpine attributes', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::textarea :autosize="false" x-data="mine" />')
+        ->__toString();
+
+    preg_match('/<textarea\b[^>]*>/', $html, $matches);
+    expect($matches[0])->toContain('x-data="mine"');
+});

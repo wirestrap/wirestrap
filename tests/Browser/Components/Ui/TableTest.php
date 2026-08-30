@@ -355,3 +355,59 @@ test('truncation tooltip shows on hover when text overflows', function () {
         ->assertScript(js_wait_for('body > .ws-tooltip.show'))
         ->assertScript("document.querySelector('.ws-tooltip.show .ws-tooltip-content').textContent.includes('Lorem ipsum')");
 });
+
+// --- Bulk selection guards ---
+
+test('a change event on a disabled checkbox does not select it', function () {
+    $this->visit('/_ws/test/ui/table')
+        ->assertScript(js_wait_for('[data-ws-model="selectedIds"]'))
+        // click() is a no-op on a disabled input, so dispatch the event directly to
+        // exercise the guard inside the change handler itself.
+        ->assertScript("(() => {
+            const cb = document.querySelector('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk][disabled]');
+            cb.checked = true;
+            cb.dispatchEvent(new Event('change', { bubbles: true }));
+            return true;
+        })()")
+        // The checkbox was ticked by hand above, so its own state proves nothing:
+        // assert the selection itself did not grow (the bulk bar stays hidden).
+        ->assertScript("new Promise(resolve => setTimeout(() => resolve(
+            document.querySelector('[data-ws-bulk-container]').style.display === 'none'
+                && document.querySelector('[data-ws-model=\"selectedIds\"] thead input[type=checkbox]').checked === false
+        ), 250))");
+});
+
+test('header checkbox is not indeterminate when every row is selected', function () {
+    $this->visit('/_ws/test/ui/table')
+        ->assertScript(js_wait_for('[data-ws-model="selectedIds"]'))
+        // Tick each selectable row individually so the header state comes from the
+        // binding, not from a native click on the header itself. Each click has to
+        // settle before the next one: the handler reads the current selection, which
+        // only updates once Livewire has propagated the previous $set.
+        ->assertScript("new Promise(async (resolve) => {
+            const boxes = [...document.querySelectorAll(
+                '[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk]:not([disabled])'
+            )];
+            for (const cb of boxes) {
+                cb.click();
+                await new Promise((r) => setTimeout(r, 150));
+            }
+            const head = document.querySelector('[data-ws-model=\"selectedIds\"] thead input[type=checkbox]');
+            resolve(head.checked === true && head.indeterminate === false);
+        })");
+});
+
+test('select-all covers rows added after a Livewire morph', function () {
+    $this->visit('/_ws/test/ui/table')
+        ->assertScript(js_wait_for('[data-ws-model="selectedIds"]'))
+        ->click('#btn-add-row')
+        ->assertScript(js_wait_rows('[data-ws-model="selectedIds"]', 4))
+        ->assertScript("(() => {
+            document.querySelector('[data-ws-model=\"selectedIds\"] thead input[type=checkbox]').click();
+            return true;
+        })()")
+        // 4 rows, one of them disabled: the new row must be part of the selection.
+        ->assertScript(js_after_tick(
+            "document.querySelectorAll('[data-ws-model=\"selectedIds\"] tbody [data-ws-bulk]:checked').length === 3"
+        ));
+});

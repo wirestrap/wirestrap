@@ -60,6 +60,15 @@ test('ghost text has aria-hidden', function () {
     expect($html)->toHaveAttributeOn('ws-autocomplete-ghost', 'aria-hidden');
 });
 
+test('input sits inside the autocomplete-field wrapper', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::autocomplete id="test" wire-options="getItems" />')
+        ->__toString();
+
+    expect(htmlHasClass($html, 'ws-autocomplete-field'))->toBeTrue()
+        ->and(htmlContainsInside($html, 'ws-autocomplete-field', '<input'))->toBeTrue();
+});
+
 // --- wire:ignore ---
 
 test('tag list has wire:ignore', function () {

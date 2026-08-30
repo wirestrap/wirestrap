@@ -98,3 +98,19 @@ test('invalid-feedback highlights non-active tab containing validation error', f
         ->assertPresent('#tabs-valid [data-ws-tab="profile"].ws-tabs-nav-link-invalid')
         ->assertNotPresent('#tabs-valid [data-ws-tab="other"].ws-tabs-nav-link-invalid');
 });
+
+// --- Re-entry guard ---
+
+test('clicking the active tab does not replay the panel transition', function () {
+    $this->visit('/_ws/test/ui/tabs')
+        ->assertScript("(() => {
+            window.__wsTabReshow = 0;
+            document.querySelector('#tabs-basic [data-ws-tab=\"first\"].ws-tabs-panel')
+                .addEventListener('ws-show', () => { window.__wsTabReshow++; });
+            return true;
+        })()")
+        ->click('#tabs-basic [data-ws-tab="first"].ws-tabs-nav-button')
+        // Without the key === activeTab guard, setTab() would re-run the whole
+        // fade-out/fade-in sequence on the panel that is already active.
+        ->assertScript('new Promise(resolve => setTimeout(() => resolve(window.__wsTabReshow === 0), 250))');
+});

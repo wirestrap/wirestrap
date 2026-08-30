@@ -298,3 +298,17 @@ test('php alert() with title renders header', function () {
         ->assertScript("document.querySelector('.ws-alert .ws-alert-title').textContent.trim() === 'Info'")
         ->assertScript("document.querySelector('.ws-alert .ws-alert-body').textContent.trim() === 'PHP titled alert'");
 });
+
+// --- Confirm layout ---
+
+test('confirm footer is inserted before the progress bar', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->assertScript("(() => { Wirestrap.alert.confirm.show({ message: 'ok', duration: 10000 }); return true; })()")
+        ->assertVisible('.ws-alert')
+        ->assertPresent('.ws-alert .ws-alert-progress')
+        ->assertScript("(() => {
+            const kids = [...document.querySelector('.ws-alert').children].map(e => e.className);
+            return kids.indexOf('ws-alert-footer') > -1
+                && kids.indexOf('ws-alert-footer') < kids.indexOf('ws-alert-progress');
+        })()");
+});
