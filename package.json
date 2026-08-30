@@ -2,21 +2,13 @@
   "name": "wirestrap",
   "private": true,
   "scripts": {
-    "lint": "eslint resources/js",
-    "lint-ci": "eslint resources/js --max-warnings 0",
-    "format": "prettier resources/js --write",
-    "format-ci": "prettier resources/js --check",
-    "build:css": "sass resources/sass/wirestrap.scss tests/Browser/dist/wirestrap.css --style=compressed --no-source-map",
-    "build:test": "npm run build:css && vite build --config tests/vite.config.test.js",
-    "all": "npm run format && npm run lint"
+    "build:test:css": "sass tests/sass/wirestrap-test.scss tests/Browser/dist/wirestrap.css --load-path=node_modules --style=compressed --no-source-map",
+    "build:test": "npm run build:test:css && vite build --config tests/vite.config.test.js"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
     "@floating-ui/dom": "^1.7",
-    "eslint": "^10.2.0",
-    "globals": "^17.4.0",
+    "bootstrap-icons": "^1.13.1",
     "playwright": "^1.62.1",
-    "prettier": "^3.8.1",
     "sass": "^1.102.0",
     "vite": "^6.0"
   }
