@@ -16,6 +16,11 @@
     <button id="btn-confirm-params" type="button"
         x-on:click="$wirestrap.alert.confirm('Move item?', 'move', 42, 99)">Confirm Params</button>
 
+    @teleport('body')
+        <button id="btn-confirm-teleported" type="button"
+            x-on:click="$wirestrap.alert.confirm('Delete this record?', 'delete')">Confirm Teleported</button>
+    @endteleport
+
     @if($deleted)
         <span id="deleted-flag">DELETED</span>
     @endif

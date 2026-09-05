@@ -39,16 +39,14 @@ Alpine.magic('wirestrap', (el) => ({
 
         /**
          * Shorthand confirm: accepts either a plain message string or a full options object.
-         * Automatically resolves the nearest Livewire component so callers don't have to
-         * pass a $wire reference manually.
+         * Automatically resolves Livewire component so callers don't have to pass a $wire reference manually.
          *
          * @param {string|object} optionsOrMessage
          * @param {string} [method]   Livewire method to call on confirm (string shorthand only).
          * @param {...*}   [params]   Arguments forwarded to the Livewire method.
          */
         confirm: (optionsOrMessage, method, ...params) => {
-            const wireEl = el.closest('[wire\\:id]');
-            const wire = wireEl ? Livewire.find(wireEl.getAttribute('wire:id')) : null;
+            const wire = Alpine.evaluate(el, '$wire');
             const options =
                 typeof optionsOrMessage === 'string'
                     ? { message: optionsOrMessage, wire, method, params }

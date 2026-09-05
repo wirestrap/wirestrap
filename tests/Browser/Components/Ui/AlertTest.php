@@ -248,6 +248,16 @@ test('confirm with params forwards arguments to method', function () {
         ->assertSeeIn('#moved-flag', '42->99');
 });
 
+test('confirm from a teleported trigger calls Livewire method', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->assertScript(js_wait_for('#btn-confirm-teleported'))
+        ->click('#btn-confirm-teleported')
+        ->assertVisible('.ws-alert')
+        ->click('.ws-alert-dismiss')
+        ->assertScript(js_wait_for('#deleted-flag'))
+        ->assertVisible('#deleted-flag');
+});
+
 // --- Configure ---
 
 test('configure sets global defaults', function () {
