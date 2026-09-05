@@ -31,15 +31,34 @@ Generic floating panel built on `@floating-ui/dom`. No semantic meaning — use 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | `string\|null` | `null` | Element id. Required when using teleport or `$wirestrap.flyout`. |
+| `id` | `string\|null` | `null` | Element id. Required for `$wirestrap.flyout` control. |
 | `content` | `slot\|string` | `''` | Panel content. Slot attributes are forwarded to the panel element. |
 | `placement` | `string` | `config` | Preferred placement: top, bottom, left, right, and -start/-end variants. Flips if out of bounds. |
 | `trigger` | `string` | `config` | Show trigger: hover or click. |
 | `interactive` | `bool` | `true` | When true, hovering the panel keeps it visible. |
-| `teleport` | `string\|null` | `config` | CSS selector of the element to teleport the panel into (e.g. `"body"`, `"#app"`). Avoids overflow/z-index issues. Requires id. |
+| `teleport` | `string\|null` | `config` | CSS selector of the element to teleport the panel into (e.g. `"body"`, `"#app"`). Avoids overflow/z-index issues. |
 | `offset-distance` | `int` | `config` | Distance between trigger and panel in px. |
 | `offset-skidding` | `int` | `config` | Lateral offset in px. |
 | `position` | `string` | `config` | CSS positioning strategy: absolute or fixed. |
+
+## Dismiss
+
+Any element carrying `data-ws-dismiss="floating"` inside the panel closes it when clicked. No id required — the owning element is resolved from the DOM, teleported panels included.
+
+```blade
+<x-wirestrap::flyout trigger="click">
+    <button type="button">Actions</button>
+
+    <x-slot:content>
+        <button type="button" data-ws-dismiss="floating" wire:click="archive">Archive</button>
+        <button type="button" data-ws-dismiss="floating" x-on:click="$wirestrap.modal.show('confirm-delete')">Delete…</button>
+    </x-slot:content>
+</x-wirestrap::flyout>
+```
+
+This is mostly useful on interactive panels, whose own content never closes them on click. On a hover-triggered element, a later hover shows it again.
+
+Use `data-ws-dismiss="floating-stack"` instead to also close every floating element enclosing it.
 
 ## $wirestrap.flyout
 

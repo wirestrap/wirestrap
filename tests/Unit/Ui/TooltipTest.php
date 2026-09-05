@@ -275,19 +275,20 @@ test('renders data-ws-position from prop', function () {
 
 // --- Teleport ---
 
-test('teleport without id throws MissingComponentIdException', function () {
+test('teleport renders and marks the panel as teleported', function () {
     $this->blade('
         <x-wirestrap::tooltip content="Hello" teleport="body">
             <button type="button">Trigger</button>
         </x-wirestrap::tooltip>
-    ');
-})->throws(\Illuminate\View\ViewException::class, 'Missing ID');
+    ')
+    ->assertSee('data-ws-teleported', false);
+});
 
-test('renders data-ws-float-for when teleported', function () {
+test('no data-ws-teleported without teleport', function () {
     $this->blade('
-        <x-wirestrap::tooltip id="test" content="Hello" teleport="body">
+        <x-wirestrap::tooltip content="Hello">
             <button type="button">Trigger</button>
         </x-wirestrap::tooltip>
     ')
-    ->assertSee('data-ws-float-for="test"', false);
+    ->assertDontSee('data-ws-teleported', false);
 });

@@ -14,13 +14,18 @@
  *   trigger    - the element carrying data-ws-float-trigger, where click/hover starts.
  *
  * Teleport support:
- *   When `append` is used (Blade component option), the floatable lives outside the
- *   container in the DOM. It carries data-ws-float-for="{containerId}" to link back.
- *   _containerFor() resolves the owning container for any element, handling both cases.
+ *   When `teleport` is used (Blade component option), the floatable lives outside the
+ *   container in the DOM and carries data-ws-teleported. Both directions are resolved through
+ *   Alpine.findClosest(), which crosses teleport boundaries.
  *
  * Triggers:
  *   "hover" - show on mouseover/focusin, hide on mouseout/focusout with a 50 ms delay.
  *   "click" - toggle on click, hide on outside click.
+ *
+ * Dismiss:
+ *   A click on any element carrying data-ws-dismiss="floating" hides the floating element
+ *   it belongs to. Useful inside interactive panels, whose own content never closes them.
+ *   data-ws-dismiss="floating-stack" hides that element and every floating element enclosing it.
  *
  * Livewire integration:
  *   After each morph, _schedulePrune() removes entries whose DOM elements are gone.
@@ -55,7 +60,7 @@ import { onNavigate } from '../../utils/navigate';
 const _active = []; // Currently visible entries: { container, floatable, cleanup }
 const _hoverTimeouts = new WeakMap(); // Pending hide timeouts for hover-triggered elements (keyed by container)
 const _transitionTimeouts = new WeakMap(); // Pending afterTransition cancellers for hide animations (keyed by floatable)
-const _floatableToContainer = new WeakMap(); // Reverse lookup: floatable → container, needed for teleported floatables
+const _containerToFloatable = new WeakMap(); // Resolved teleported panel for a container, cached after the first lookup
 let _pruneScheduled = false;
 
 /*
@@ -146,7 +151,6 @@ function show(triggerEl) {
 
     const cleanup = autoUpdate(anchor, floatable, () => _update(anchor, floatable, floatingConfig, arrowEl));
     _active.push({ container, floatable, cleanup });
-    _floatableToContainer.set(floatable, container);
 }
 
 function hide(container) {
@@ -210,36 +214,50 @@ function _findEntry(container) {
 }
 
 /**
- * When `append` is used, the floatable is teleported outside the container.
- * Look inside the container first, then fall back to a document query via data-ws-float-for.
- * Exclude floatables that are inside [data-ws-float-trigger]: those belong to nested Alpine
- * components (select, autocomplete) and are not managed by this floating-manager instance.
+ * When `teleport` is used, the floatable lives outside the container.
+ * Look inside the container first, then scan teleported panels and keep the one whose original
+ * markup position resolves back to this container. Exclude floatables that are inside
+ * [data-ws-float-trigger]: those belong to nested Alpine components (select, autocomplete)
+ * and are not managed by this floating-manager instance.
  */
 function _findFloatable(container) {
     const trigger = container.querySelector('[data-ws-float-trigger]');
     const candidates = Array.from(container.querySelectorAll('[data-ws-floatable]'));
     const direct = candidates.find((f) => f.closest('[data-ws-float-id]') === container && !(trigger && trigger.contains(f)));
-    return direct ?? document.querySelector(`[data-ws-floatable][data-ws-float-for="${container.dataset.wsFloatId}"]`);
-}
 
-/**
- * Returns the delegated container for any element, handling both direct ancestry
- * and elements inside a teleported floatable (linked via data-ws-float-for).
- */
-function _containerFor(el) {
-    const direct = el.closest('[data-ws-float-id]');
     if (direct) {
         return direct;
     }
 
-    const floatable = el.closest('[data-ws-floatable][data-ws-float-for]');
-    if (floatable) {
-        return (
-            _floatableToContainer.get(floatable) ?? document.querySelector(`[data-ws-float-id="${floatable.dataset.wsFloatFor}"]`)
-        );
+    const cached = _containerToFloatable.get(container);
+    if (cached?.isConnected) {
+        return cached;
     }
 
-    return null;
+    const teleported = Array.from(document.querySelectorAll('[data-ws-floatable][data-ws-teleported]'));
+    const match = teleported.find((f) => _containerFor(f) === container) ?? null;
+    match && _containerToFloatable.set(container, match);
+
+    return match;
+}
+
+/**
+ * Returns the delegated container for any element. Alpine.findClosest() walks the DOM like
+ * closest(), but also crosses teleport boundaries, so this resolves an element sitting inside
+ * a teleported panel back to the container it was written in.
+ */
+function _containerFor(el) {
+    return Alpine.findClosest(el, (node) => node.hasAttribute?.('data-ws-float-id')) ?? null;
+}
+
+/**
+ * Like node.contains(el), but follows the markup nesting rather than the physical DOM:
+ * an element sitting in a teleported panel is still considered part of the elements its
+ * markup was written in. Without this, a teleported child panel looks like it lives outside
+ * its parent floating element, which would close the parent as soon as it is interacted with.
+ */
+function _logicallyContains(node, el) {
+    return Alpine.findClosest(el, (candidate) => candidate === node) !== undefined;
 }
 
 /**
@@ -255,13 +273,13 @@ function _inScope(container, el) {
     const entry = _findEntry(container);
 
     // Elements inside the floatable are in-scope only when the component is interactive.
-    // This check must come before container.contains() to handle the non-teleported case,
+    // This check must come before the container one to handle the non-teleported case,
     // where the floatable lives inside the container.
-    if (entry && entry.floatable.contains(el)) {
+    if (entry && _logicallyContains(entry.floatable, el)) {
         return container.hasAttribute('data-ws-interactive');
     }
 
-    if (container.contains(el)) {
+    if (_logicallyContains(container, el)) {
         return true;
     }
 
@@ -420,6 +438,20 @@ globalThis.Wirestrap.floating = {
 
 document.addEventListener('click', (e) => {
     [..._active].filter((a) => !_inScope(a.container, e.target)).forEach((a) => hide(a.container));
+
+    // Support data-ws-dismiss inside panel content for convenience. _containerFor() resolves the
+    // owner without an id, and works from inside a teleported panel too. The "floating-stack"
+    // variant keeps walking outwards, for cascading menus whose leaf action closes the whole chain.
+    const dismiss = e.target.closest('[data-ws-dismiss="floating"], [data-ws-dismiss="floating-stack"]');
+    if (dismiss) {
+        const walkUp = dismiss.dataset.wsDismiss === 'floating-stack';
+        let owner = _containerFor(dismiss);
+
+        while (owner) {
+            hide(owner);
+            owner = walkUp ? _containerFor(owner.parentElement) : null;
+        }
+    }
 
     const trigger = e.target.closest('[data-ws-float-trigger]');
     if (!trigger) {

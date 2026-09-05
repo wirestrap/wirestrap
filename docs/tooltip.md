@@ -25,16 +25,22 @@ Floating tooltip built on `@floating-ui/dom`. Wraps any trigger element. Focusin
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | `string\|null` | `null` | Element id. Required when using teleport or `$wirestrap.tooltip`. |
+| `id` | `string\|null` | `null` | Element id. Required for `$wirestrap.tooltip` control. |
 | `content` | `slot\|string` | `''` | Tooltip text. Use the content slot for HTML. |
 | `placement` | `string` | `config` | Preferred placement: top, bottom, left, right, and -start/-end variants. Flips if out of bounds. |
 | `trigger` | `string` | `config` | Show trigger: hover or click. |
 | `arrow` | `bool` | `true` | Show directional arrow. |
 | `interactive` | `bool` | `false` | When true, hovering the tooltip panel keeps it visible. |
-| `teleport` | `string\|null` | `config` | CSS selector of the element to teleport the tooltip into (e.g. `"body"`, `"#app"`). Avoids overflow/z-index issues. Requires id. |
+| `teleport` | `string\|null` | `config` | CSS selector of the element to teleport the tooltip into (e.g. `"body"`, `"#app"`). Avoids overflow/z-index issues. |
 | `offset-distance` | `int` | `config` | Distance between trigger and tooltip in px. |
 | `offset-skidding` | `int` | `config` | Lateral offset in px. |
 | `position` | `string` | `config` | CSS positioning strategy: absolute or fixed. |
+
+## Dismiss
+
+Any element carrying `data-ws-dismiss="floating"` inside the tooltip closes it when clicked. No id required — the owning element is resolved from the DOM, teleported tooltips included.
+
+Use `data-ws-dismiss="floating-stack"` instead to also close every floating element enclosing it.
 
 ## $wirestrap.tooltip
 
