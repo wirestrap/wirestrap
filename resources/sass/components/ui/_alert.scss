@@ -95,14 +95,25 @@
         gap: var(--ws-spacing-4);
         padding: var(--ws-spacing-2) var(--ws-alert-padding-x) var(--ws-alert-padding-y);
 
-        .ws-alert-dismiss {
+        // Actions are a <button>, or an <a> when a url is set. Both are normalized
+        // here so the two elements are visually indistinguishable.
+        .ws-alert-dismiss,
+        .ws-alert-cancel {
+            display: inline-block;
             padding: var(--ws-alert-btn-padding-y) var(--ws-alert-btn-padding-x);
+            font-family: inherit;
             font-size: var(--ws-alert-btn-font-size);
+            line-height: 1.5;
+            text-align: center;
+            text-decoration: none;
+            border-radius: var(--ws-border-radius);
+            cursor: pointer;
+        }
+
+        .ws-alert-dismiss {
             background-color: var(--ws-alert-primary);
             color: #fff;
             border: none;
-            border-radius: var(--ws-border-radius);
-            cursor: pointer;
 
             &:hover {
                 opacity: .85;
@@ -110,13 +121,9 @@
         }
 
         .ws-alert-cancel {
-            padding: var(--ws-alert-btn-padding-y) var(--ws-alert-btn-padding-x);
-            font-size: var(--ws-alert-btn-font-size);
             background-color: transparent;
             color: var(--ws-body-color);
             border: 1px solid var(--ws-alert-border-color);
-            border-radius: var(--ws-border-radius);
-            cursor: pointer;
 
             &:hover {
                 background-color: var(--ws-tertiary-bg);

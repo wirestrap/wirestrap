@@ -258,6 +258,112 @@ test('confirm from a teleported trigger calls Livewire method', function () {
         ->assertVisible('#deleted-flag');
 });
 
+// --- Redirect ---
+
+test('redirect navigates when the countdown ends', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->click('#btn-redirect')
+        ->assertVisible('.ws-alert')
+        ->wait(1.5)
+        ->assertPathIs('/_ws/test/ui/alert-target')
+        ->assertVisible('#alert-target');
+});
+
+test('redirect shows a countdown progress bar', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->click('#btn-redirect-blocking')
+        ->assertPresent('.ws-alert .ws-alert-progress .ws-alert-progress-bar');
+});
+
+test('redirect shows a continue link by default', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->click('#btn-redirect-blocking')
+        ->assertVisible('.ws-alert')
+        ->assertSeeIn('.ws-alert-footer .ws-alert-dismiss', 'Continue')
+        ->assertScript("document.querySelector('.ws-alert-dismiss').tagName === 'A'")
+        ->assertScript("document.querySelector('.ws-alert-dismiss').getAttribute('href') === '/_ws/test/ui/alert-target'");
+});
+
+test('redirect showDismiss false hides the continue link', function () {
+    // The alert is built in a microtask, so wait for it before asserting an absence:
+    // a bare assertNotPresent would pass on a page where nothing has been created yet.
+    $this->visit('/_ws/test/ui/alert')
+        ->click('#btn-redirect-silent')
+        ->assertScript(js_wait_for('.ws-alert'))
+        ->assertScript("document.querySelectorAll('.ws-alert .ws-alert-footer').length === 0");
+});
+
+test('redirect blocks escape and backdrop dismissal', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->click('#btn-redirect-blocking')
+        ->assertVisible('.ws-alert')
+        ->assertScript("(() => {
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+            return !!document.querySelector('.ws-alert.ws-alert-shaking');
+        })()")
+        ->assertScript("(() => {
+            document.querySelector('.ws-alert-backdrop').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            return !!document.querySelector('.ws-alert.ws-alert-shaking');
+        })()")
+        ->assertPresent('.ws-alert.ws-alert-visible');
+});
+
+test('redirect continue link navigates immediately', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->click('#btn-redirect-continue')
+        ->assertVisible('.ws-alert')
+        ->assertSeeIn('.ws-alert-dismiss', 'Go now')
+        ->assertScript("document.querySelector('.ws-alert-dismiss').tagName === 'A'")
+        ->click('.ws-alert-dismiss')
+        ->wait(0.5)
+        ->assertPathIs('/_ws/test/ui/alert-target');
+});
+
+test('php alertRedirect() navigates when the countdown ends', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->click('#btn-php-redirect')
+        ->assertScript(js_wait_for('.ws-alert'))
+        ->wait(1.5)
+        ->assertPathIs('/_ws/test/ui/alert-target');
+});
+
+test('redirect configure sets defaults', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->assertScript("(() => {
+            Wirestrap.alert.redirect.configure({ type: 'warning', dismissText: 'Leave' });
+            Wirestrap.alert.redirect.show({ message: 'ok', url: '/_ws/test/ui/alert-target', duration: 5000 });
+            return true;
+        })()")
+        ->assertPresent('.ws-alert.ws-alert-warning')
+        ->assertSeeIn('.ws-alert-dismiss', 'Leave');
+});
+
+// --- Action link ---
+
+test('alert url turns the dismiss button into a link', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->click('#btn-alert-link')
+        ->assertVisible('.ws-alert')
+        ->assertSeeIn('.ws-alert-dismiss', 'View it')
+        ->assertScript("document.querySelector('.ws-alert-dismiss').tagName === 'A'")
+        ->assertScript("document.querySelector('.ws-alert-dismiss').getAttribute('href') === '/_ws/test/ui/alert-target'");
+});
+
+test('alert without url keeps a button', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->assertScript(js_alert("{ message: 'ok' }"))
+        ->assertScript("document.querySelector('.ws-alert-dismiss').tagName === 'BUTTON'");
+});
+
+test('alert link navigates on click', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->click('#btn-alert-link')
+        ->assertVisible('.ws-alert')
+        ->click('.ws-alert-dismiss')
+        ->wait(0.5)
+        ->assertPathIs('/_ws/test/ui/alert-target');
+});
+
 // --- Configure ---
 
 test('configure sets global defaults', function () {

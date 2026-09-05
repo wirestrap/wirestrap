@@ -41,6 +41,7 @@ trait WithWirestrap
         ?bool $backdropDismiss = null,
         ?bool $escapeDismiss = null,
         ?int $duration = null,
+        ?string $url = null,
     ): void {
         $options = ['type' => $type, 'message' => $message];
 
@@ -68,7 +69,44 @@ trait WithWirestrap
             $options['duration'] = $duration;
         }
 
+        if ($url !== null) {
+            $options['url'] = $url;
+        }
+
         $this->js('$wirestrap.alert.show(' . json_encode($options) . ')');
+    }
+
+    /**
+     * Display an alert that sends the browser to $url once its countdown ends.
+     */
+    protected function alertRedirect(
+        string $url,
+        string $message = '',
+        string $type = '',
+        ?string $title = null,
+        ?int $duration = null,
+        ?bool $showDismiss = null,
+        ?string $dismissText = null,
+    ): void {
+        $options = ['type' => $type, 'message' => $message, 'url' => $url];
+
+        if ($title !== null) {
+            $options['title'] = $title;
+        }
+
+        if ($duration !== null) {
+            $options['duration'] = $duration;
+        }
+
+        if ($showDismiss !== null) {
+            $options['showDismiss'] = $showDismiss;
+        }
+
+        if ($dismissText !== null) {
+            $options['dismissText'] = $dismissText;
+        }
+
+        $this->js('$wirestrap.alert.redirect(' . json_encode($options) . ')');
     }
 
     /**

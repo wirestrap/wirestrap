@@ -33,6 +33,11 @@ class AlertTrigger extends Component
         $this->moved = "{$itemId}->{$targetId}";
     }
 
+    public function goToTarget(): void
+    {
+        $this->alertRedirect('/_ws/test/ui/alert-target', 'Redirecting…', duration: 300);
+    }
+
     public function render(): View
     {
         return view('livewire.ui.alert-trigger');

@@ -8,6 +8,7 @@
  *   $wirestrap.modal.show('myModalId')
  *   $wirestrap.toast({ message: 'Saved!' })
  *   $wirestrap.alert.confirm('Are you sure?', 'deleteRecord', id)
+ *   $wirestrap.alert.redirect('Deleted, redirecting…', '/records', 2000)
  *
  * Floating elements (flyout, popover, tooltip) share the same show/hide/toggle
  * interface and are dispatched through the ws-floating custom event.
@@ -52,6 +53,21 @@ Alpine.magic('wirestrap', (el) => ({
                     ? { message: optionsOrMessage, wire, method, params }
                     : { ...optionsOrMessage, wire };
             Wirestrap.alert.confirm.show(options);
+        },
+
+        /**
+         * Shorthand redirect: accepts either a plain message string or a full options object.
+         *
+         * @param {string|object} optionsOrMessage
+         * @param {string} [url]       Destination url (string shorthand only).
+         * @param {number} [duration]  Countdown before navigating, in ms (string shorthand only).
+         */
+        redirect: (optionsOrMessage, url, duration) => {
+            const options =
+                typeof optionsOrMessage === 'string'
+                    ? { message: optionsOrMessage, url, duration }
+                    : optionsOrMessage;
+            Wirestrap.alert.redirect.show(options);
         },
     },
 

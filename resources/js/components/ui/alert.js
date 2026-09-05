@@ -11,6 +11,10 @@
  * Confirm:
  *   Extends alert with Cancel/Confirm actions and calls Livewire on confirm.
  *
+ * Redirect:
+ *   Blocking alert that sends the browser to a url once its countdown ends,
+ *   leaving time to read the message before the page changes.
+ *
  * On Livewire navigate, alerts are cleared and queue reset.
  *
  * Global configuration (Wirestrap.alert.configure):
@@ -22,10 +26,13 @@
  *
  * Alert options (passed to alertShow / $wirestrap.alert.show):
  *   message, title, type, duration, showDismiss, dismissText,
- *   backdropDismiss, escapeDismiss.
+ *   backdropDismiss, escapeDismiss, url.
  *
  * Confirm options (passed to alertShowConfirm / $wirestrap.alert.confirm):
  *   All alert options plus: wire, method, params, confirmText, cancelText.
+ *
+ * Redirect options (passed to $wirestrap.alert.redirect):
+ *   All alert options plus: url. Navigation is a native full page load.
  */
 import { afterTransition } from '../../utils/transition';
 import { onNavigate } from '../../utils/navigate';
@@ -55,6 +62,54 @@ const _confirmDefaults = {
     cancelText: 'Cancel',
 };
 
+const _redirectDefaults = {
+    type: 'success',
+    title: null,
+    duration: 2000,
+    showDismiss: true,
+    dismissText: 'Continue',
+    backdropDismiss: false,
+    escapeDismiss: false,
+};
+
+/*
+|--------------------------------------------------------------------------
+|   Helpers
+|--------------------------------------------------------------------------
+*/
+
+/**
+ * Builds an alert action element. With a url it is a real link, so modified
+ * clicks (new tab) and the status bar preview keep working; without one it is
+ * a plain button. Both carry the same class and are styled identically.
+ */
+const _createActionEl = (className, label, url) => {
+    const el = document.createElement(url ? 'a' : 'button');
+    el.className = className;
+    el.textContent = label;
+
+    if (url) {
+        el.href = url;
+    } else {
+        el.type = 'button';
+    }
+
+    return el;
+};
+
+/**
+ * Inserts a footer above the progress bar so the countdown stays at the bottom.
+ */
+const _insertFooter = (item, footer) => {
+    const progressEl = item.alertEl.querySelector('.ws-alert-progress');
+
+    if (progressEl) {
+        item.alertEl.insertBefore(footer, progressEl);
+    } else {
+        item.alertEl.appendChild(footer);
+    }
+};
+
 /*
 |--------------------------------------------------------------------------
 |   Core
@@ -75,39 +130,49 @@ const _alert = {
      * Public
      */
     show(options) {
-        if (_current) {
-            _queue.push(options);
-            return;
-        }
-        _current = this._build(options);
+        this._showOrQueue('alert', options);
     },
 
     showConfirm(options) {
-        if (_current) {
-            _queue.push({ ...options, _isConfirm: true });
-            return;
-        }
-        _current = this._buildConfirm(options);
+        this._showOrQueue('confirm', options);
+    },
+
+    showRedirect(options) {
+        this._showOrQueue('redirect', options);
     },
 
     /**
      * Private
      */
+    _showOrQueue(kind, options) {
+        if (_current) {
+            _queue.push({ ...options, _kind: kind });
+            return;
+        }
+        _current = this._buildFor(kind, options);
+    },
+
+    _buildFor(kind, options) {
+        if (kind === 'confirm') {
+            return this._buildConfirm(options);
+        }
+        if (kind === 'redirect') {
+            return this._buildRedirect(options);
+        }
+        return this._build(options);
+    },
+
     _next() {
         _current = null;
         if (_queue.length > 0) {
             const next = _queue.shift();
-            const isConfirm = next._isConfirm;
-            delete next._isConfirm;
-            if (isConfirm) {
-                this.showConfirm(next);
-            } else {
-                this.show(next);
-            }
+            const kind = next._kind;
+            delete next._kind;
+            _current = this._buildFor(kind, next);
         }
     },
 
-    _build(options) {
+    _build(options, onExpire = null) {
         const type = options.type || 'primary';
         const duration = options.duration !== undefined ? options.duration : this._defaultDuration;
 
@@ -120,6 +185,7 @@ const _alert = {
             keyHandler: null,
             backdropHandler: null,
             buttonHandlers: [],
+            onExpire,
             _dismissed: false,
         };
 
@@ -158,10 +224,9 @@ const _alert = {
             const footer = document.createElement('div');
             footer.className = 'ws-alert-footer';
 
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'ws-alert-dismiss';
-            btn.textContent = options.dismissText || this._dismissText;
+            // With a url the button becomes a link: the click dismisses the alert and the
+            // browser performs the navigation itself.
+            const btn = _createActionEl('ws-alert-dismiss', options.dismissText || this._dismissText, options.url);
             const dismissHandler = () => this._dismiss(item);
             btn.addEventListener('click', dismissHandler, { once: true });
             item.buttonHandlers.push({ el: btn, handler: dismissHandler });
@@ -238,19 +303,13 @@ const _alert = {
         const footer = document.createElement('div');
         footer.className = 'ws-alert-footer';
 
-        const cancelBtn = document.createElement('button');
-        cancelBtn.type = 'button';
-        cancelBtn.className = 'ws-alert-cancel';
-        cancelBtn.textContent = options.cancelText || _confirmDefaults.cancelText;
+        const cancelBtn = _createActionEl('ws-alert-cancel', options.cancelText || _confirmDefaults.cancelText);
         const cancelHandler = () => this._dismiss(item);
         cancelBtn.addEventListener('click', cancelHandler, { once: true });
         item.buttonHandlers.push({ el: cancelBtn, handler: cancelHandler });
         footer.appendChild(cancelBtn);
 
-        const confirmBtn = document.createElement('button');
-        confirmBtn.type = 'button';
-        confirmBtn.className = 'ws-alert-dismiss';
-        confirmBtn.textContent = options.confirmText || _confirmDefaults.confirmText;
+        const confirmBtn = _createActionEl('ws-alert-dismiss', options.confirmText || _confirmDefaults.confirmText);
         const confirmHandler = () => {
             confirmBtn.disabled = true;
             this._dismiss(item);
@@ -261,11 +320,36 @@ const _alert = {
         item.buttonHandlers.push({ el: confirmBtn, handler: confirmHandler });
         footer.appendChild(confirmBtn);
 
-        const progressEl = item.alertEl.querySelector('.ws-alert-progress');
-        if (progressEl) {
-            item.alertEl.insertBefore(footer, progressEl);
-        } else {
-            item.alertEl.appendChild(footer);
+        _insertFooter(item, footer);
+
+        return item;
+    },
+
+    _buildRedirect(options) {
+        const resolved = {
+            type: options.type !== undefined ? options.type : _redirectDefaults.type,
+            title: options.title !== undefined ? options.title : _redirectDefaults.title,
+            duration: options.duration !== undefined ? options.duration : _redirectDefaults.duration,
+            backdropDismiss: options.backdropDismiss !== undefined ? options.backdropDismiss : _redirectDefaults.backdropDismiss,
+            escapeDismiss: options.escapeDismiss !== undefined ? options.escapeDismiss : _redirectDefaults.escapeDismiss,
+        };
+
+        // Native full page load, so any target works whether or not Livewire is on the page.
+        // The alert is left on screen: dismissing it first would flash the underlying view
+        // while the browser loads the destination.
+        const item = this._build({ ...options, ...resolved, showDismiss: false }, () => window.location.assign(options.url));
+
+        const showDismiss = options.showDismiss !== undefined ? options.showDismiss : _redirectDefaults.showDismiss;
+        if (showDismiss) {
+            const footer = document.createElement('div');
+            footer.className = 'ws-alert-footer';
+
+            // Plain link with no handler: clicking it just performs the navigation the countdown
+            // would have performed, ahead of time.
+            const btn = _createActionEl('ws-alert-dismiss', options.dismissText || _redirectDefaults.dismissText, options.url);
+            footer.appendChild(btn);
+
+            _insertFooter(item, footer);
         }
 
         return item;
@@ -344,6 +428,8 @@ const _alert = {
             item.progressBarEl.style.width = progress * 100 + '%';
             if (progress > 0) {
                 item.timer.raf = requestAnimationFrame(tick);
+            } else if (item.onExpire) {
+                item.onExpire();
             } else {
                 this._dismiss(item);
             }
@@ -370,6 +456,22 @@ globalThis.Wirestrap.alert = {
         if (options.showDismiss !== undefined) _alert._showDismiss = options.showDismiss;
         if (options.backdropDismiss !== undefined) _alert._backdropDismiss = options.backdropDismiss;
         if (options.escapeDismiss !== undefined) _alert._escapeDismiss = options.escapeDismiss;
+    },
+
+    redirect: {
+        show: (options) => {
+            _alert.showRedirect(options);
+        },
+
+        configure(options) {
+            if (options.type !== undefined) _redirectDefaults.type = options.type;
+            if (options.title !== undefined) _redirectDefaults.title = options.title;
+            if (options.duration !== undefined) _redirectDefaults.duration = options.duration;
+            if (options.showDismiss !== undefined) _redirectDefaults.showDismiss = options.showDismiss;
+            if (options.dismissText !== undefined) _redirectDefaults.dismissText = options.dismissText;
+            if (options.backdropDismiss !== undefined) _redirectDefaults.backdropDismiss = options.backdropDismiss;
+            if (options.escapeDismiss !== undefined) _redirectDefaults.escapeDismiss = options.escapeDismiss;
+        },
     },
 
     confirm: {
