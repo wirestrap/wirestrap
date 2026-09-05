@@ -150,9 +150,9 @@ test('data-ws-dismiss closes the panel it belongs to', function () {
 test('data-ws-dismiss closes a teleported panel', function () {
     $this->visit('/_ws/test/ui/flyout')
         ->click('#trigger-dismiss-teleport')
-        ->assertVisible('[data-ws-float-for="flyout-dismiss-teleport"]')
+        ->assertVisible('.panel-teleport')
         ->click('#btn-dismiss-teleported')
-        ->assertScript(js_wait_hidden('[data-ws-float-for="flyout-dismiss-teleport"]'));
+        ->assertScript(js_wait_hidden('.panel-teleport'));
 });
 
 test('floating-stack closes a standalone floating element', function () {
@@ -177,6 +177,37 @@ test('data-ws-dismiss works on a popover too', function () {
         ->assertVisible('#pop-dismiss [data-ws-floatable]')
         ->click('#btn-dismiss')
         ->assertScript(js_wait_hidden('#pop-dismiss [data-ws-floatable]'));
+});
+
+// --- Teleport ---
+
+test('a teleported panel is appended to the teleport target', function () {
+    $this->visit('/_ws/test/ui/flyout')
+        ->click('#teleport-trigger')
+        ->assertVisible('.panel-noattr')
+        ->assertScript("document.querySelector('.panel-noattr').parentElement === document.body");
+});
+
+test('dismiss works from a teleported panel', function () {
+    $this->visit('/_ws/test/ui/flyout')
+        ->click('#teleport-trigger')
+        ->assertVisible('.panel-noattr')
+        ->click('#teleport-dismiss')
+        ->assertScript(js_wait_hidden('.panel-noattr'));
+});
+
+test('a teleported panel still opens after a Livewire re-render', function () {
+    $this->visit('/_ws/test/ui/flyout')
+        ->assertScript(js_wait_for('#btn-bump'))
+        ->click('#morph-trigger')
+        ->assertVisible('.morph-panel')
+        ->click('#morph-dismiss')
+        ->assertScript(js_wait_hidden('.morph-panel'))
+        ->click('#btn-bump')
+        ->assertScript(js_wait_for('#bump-count'))
+        ->assertSeeIn('#bump-count', '1')
+        ->click('#morph-trigger')
+        ->assertVisible('.morph-panel');
 });
 
 // --- Programmatic control ($wirestrap magic) ---

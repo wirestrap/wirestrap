@@ -27,14 +27,14 @@ Floating panel with header and body, built on `@floating-ui/dom`. Flips and shif
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | `string\|null` | `null` | Element id. Required when using teleport or `$wirestrap.popover`. |
+| `id` | `string\|null` | `null` | Element id. Required for `$wirestrap.popover` control. |
 | `header` | `slot\|string` | `''` | Header text. Use the header slot for HTML. |
 | `content` | `slot\|string` | `''` | Body text. Use the content slot for HTML. |
 | `placement` | `string` | `config` | Preferred placement: top, bottom, left, right, and -start/-end variants. Flips if out of bounds. |
 | `trigger` | `string` | `config` | Show trigger: hover or click. |
 | `arrow` | `bool` | `true` | Show directional arrow. |
 | `interactive` | `bool` | `true` | When true, hovering the popover panel keeps it visible. |
-| `teleport` | `string\|null` | `config` | CSS selector of the element to teleport the popover into (e.g. `"body"`, `"#app"`). Avoids overflow/z-index issues. Requires id. |
+| `teleport` | `string\|null` | `config` | CSS selector of the element to teleport the popover into (e.g. `"body"`, `"#app"`). Avoids overflow/z-index issues. |
 | `offset-distance` | `int` | `config` | Distance between trigger and popover in px. |
 | `offset-skidding` | `int` | `config` | Lateral offset in px. |
 | `position` | `string` | `config` | CSS positioning strategy: absolute or fixed. |

@@ -39,7 +39,7 @@
 
         {{-- Dismiss from a teleported panel --}}
         <x-wirestrap::flyout id="flyout-dismiss-teleport" trigger="click" teleport="body">
-            <x-slot:content>
+            <x-slot:content class="panel-teleport">
                 <div style="padding: 20px;">
                     <button id="btn-dismiss-teleported" type="button" data-ws-dismiss="floating">Close</button>
                 </div>
@@ -48,6 +48,20 @@
         </x-wirestrap::flyout>
 
         <br><br>
+
+        {{-- Teleported --}}
+        <x-wirestrap::flyout teleport="body" trigger="click">
+            <x-slot:content class="panel-noattr">
+                <div style="padding: 20px;">
+                    <button id="teleport-dismiss" type="button" data-ws-dismiss="floating">Close</button>
+                </div>
+            </x-slot:content>
+            <button id="teleport-trigger" type="button">Teleported flyout</button>
+        </x-wirestrap::flyout>
+
+        <br><br>
+
+        <livewire:ui.floating-morph lazy />
 
         {{-- Spacer to allow clicking away --}}
         <div id="elsewhere" style="margin-top: 100px; padding: 20px;">Click here to dismiss</div>

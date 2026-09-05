@@ -13,9 +13,6 @@
 ])
 
 @php
-    if ($teleport && !$id) {
-        throw new \Wirestrap\Exceptions\MissingComponentIdException('popover');
-    }
     $isHeaderSlot = $header instanceof \Illuminate\View\ComponentSlot;
     $isContentSlot = $content instanceof \Illuminate\View\ComponentSlot;
 @endphp
@@ -50,7 +47,7 @@
 
     @if ($teleport) @teleport($teleport) @endif
         <div
-            @if($teleport) data-ws-float-for="{{ $id }}" @endif
+            @if($teleport) data-ws-teleported @endif
             data-ws-floatable
             class="ws-popover {{ config('wirestrap.popover.class', '') }}"
             style="display: none"

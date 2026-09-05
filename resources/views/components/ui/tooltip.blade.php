@@ -12,10 +12,6 @@
 ])
 
 @php
-    if ($teleport && !$id) {
-        throw new \Wirestrap\Exceptions\MissingComponentIdException('tooltip');
-    }
-
     $isContentSlot = $content instanceof \Illuminate\View\ComponentSlot;
 @endphp
 
@@ -52,7 +48,7 @@
 
     @if ($teleport) @teleport($teleport) @endif
         <div
-            @if($teleport) data-ws-float-for="{{ $id }}" @endif
+            @if($teleport) data-ws-teleported @endif
             @if($id) id="{{ $id }}-tip" @endif
             data-ws-floatable
             role="tooltip"

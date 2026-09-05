@@ -13,8 +13,8 @@ dataset('nested-interactive-children', [
 ]);
 
 dataset('nested-teleported-parent', [
-    'teleported flyout > tooltip' => ['#parent-tp-trigger', '[data-ws-float-for="parent-tp"]', '#child-tp-trigger', '#child-tp-tip'],
-    'teleported flyout > flyout' => ['#parent-tpf-trigger', '[data-ws-float-for="parent-tpf"]', '#child-tpf-trigger', '#child-tpf > [data-ws-floatable]'],
+    'teleported flyout > tooltip' => ['#parent-tp-trigger', '.panel-tp', '#child-tp-trigger', '#child-tp-tip'],
+    'teleported flyout > flyout' => ['#parent-tpf-trigger', '.panel-tpf', '#child-tpf-trigger', '#child-tpf > [data-ws-floatable]'],
 ]);
 
 test('parent stays visible when showing child', function (
@@ -65,12 +65,39 @@ test('teleported parent stays visible when showing child', function (
 test('teleported parent stays visible when hovering child interactive panel', function () {
     $this->visit('/_ws/test/ui/nesting')
         ->hover('#parent-tpf-trigger')
-        ->assertVisible('[data-ws-float-for="parent-tpf"]')
+        ->assertVisible('.panel-tpf')
         ->hover('#child-tpf-trigger')
         ->assertVisible('#child-tpf > [data-ws-floatable]')
         ->hover('#child-tpf-panel')
         ->assertVisible('#child-tpf > [data-ws-floatable]')
-        ->assertVisible('[data-ws-float-for="parent-tpf"]');
+        ->assertVisible('.panel-tpf');
+});
+
+// --- Teleported child inside a parent ---
+
+test('hovering a teleported child panel keeps the parent open', function () {
+    $this->visit('/_ws/test/ui/nesting')
+        ->hover('#nest-hover-parent-trigger')
+        ->assertVisible('.panel-hover-parent')
+        ->hover('#nest-hover-child-trigger')
+        ->assertVisible('.panel-hover-child')
+        ->hover('#nest-hover-inner')
+        // The hover-out delay is 50ms and the leave transition lasts longer: assert on the show
+        // class, which hide() drops synchronously, rather than on visibility.
+        ->wait(0.5)
+        ->assertScript("document.querySelector('.panel-hover-parent').classList.contains('show')");
+});
+
+test('clicking inside a teleported child panel keeps the parent open', function () {
+    $this->visit('/_ws/test/ui/nesting')
+        ->click('#nest-click-parent-trigger')
+        ->assertVisible('.panel-click-parent')
+        ->click('#nest-click-child-trigger')
+        ->assertVisible('.panel-click-child')
+        ->click('#nest-click-inner')
+        ->wait(0.5)
+        ->assertScript("document.querySelector('.panel-click-parent').classList.contains('show')")
+        ->assertScript("document.querySelector('.panel-click-child').classList.contains('show')");
 });
 
 // --- Dismiss in nested contexts ---
@@ -110,12 +137,12 @@ test('floating-stack in a nested child closes the whole chain', function () {
 test('floating-stack walks past a teleported parent', function () {
     $this->visit('/_ws/test/ui/nesting')
         ->click('#parent-tstack-trigger')
-        ->assertVisible('[data-ws-float-for="parent-tstack"]')
+        ->assertVisible('.panel-tstack')
         ->click('#child-tstack-trigger')
         ->assertVisible('#child-tstack > [data-ws-floatable]')
         ->click('#child-tstack-btn')
         ->assertScript(js_wait_hidden('#child-tstack > [data-ws-floatable]'))
-        ->assertScript(js_wait_hidden('[data-ws-float-for="parent-tstack"]'));
+        ->assertScript(js_wait_hidden('.panel-tstack'));
 });
 
 test('dismiss in a teleported child closes that child', function () {
@@ -123,9 +150,9 @@ test('dismiss in a teleported child closes that child', function () {
         ->click('#parent-tdismiss-trigger')
         ->assertVisible('#parent-tdismiss > [data-ws-floatable]')
         ->click('#child-tdismiss-trigger')
-        ->assertVisible('[data-ws-float-for="child-tdismiss"]')
+        ->assertVisible('.panel-tdismiss')
         ->click('#child-tdismiss-btn')
-        ->assertScript(js_wait_hidden('[data-ws-float-for="child-tdismiss"]'));
+        ->assertScript(js_wait_hidden('.panel-tdismiss'));
 });
 
 test('dismiss on a flyout inside a modal leaves the modal open', function () {

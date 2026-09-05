@@ -61,7 +61,7 @@
 
         {{-- Teleported Flyout > Tooltip --}}
         <x-wirestrap::flyout id="parent-tp" teleport="body">
-            <x-slot:content>
+            <x-slot:content class="panel-tp">
                 <div style="padding: 20px;">
                     <x-wirestrap::tooltip id="child-tp" content="Tooltip inside teleported flyout">
                         <button id="child-tp-trigger" type="button">Hover for tooltip</button>
@@ -75,7 +75,7 @@
 
         {{-- Teleported Flyout > Flyout --}}
         <x-wirestrap::flyout id="parent-tpf" teleport="body">
-            <x-slot:content>
+            <x-slot:content class="panel-tpf">
                 <div style="padding: 20px;">
                     <x-wirestrap::flyout id="child-tpf">
                         <x-slot:content>
@@ -115,7 +115,7 @@
             <x-slot:content>
                 <div style="padding: 20px;">
                     <x-wirestrap::flyout id="child-tdismiss" trigger="click" teleport="body">
-                        <x-slot:content>
+                        <x-slot:content class="panel-tdismiss">
                             <div style="padding: 20px;">
                                 <button id="child-tdismiss-btn" type="button" data-ws-dismiss="floating">Close teleported child</button>
                             </div>
@@ -129,7 +129,7 @@
 
         {{-- Teleported parent > inline child: the parent contains the click, so only floating-stack closes it --}}
         <x-wirestrap::flyout id="parent-tstack" trigger="click" teleport="body">
-            <x-slot:content>
+            <x-slot:content class="panel-tstack">
                 <div style="padding: 20px;">
                     <x-wirestrap::flyout id="child-tstack" trigger="click">
                         <x-slot:content>
@@ -142,6 +142,43 @@
                 </div>
             </x-slot:content>
             <button id="parent-tstack-trigger" type="button">Open teleported parent</button>
+        </x-wirestrap::flyout>
+
+        <br><br>
+
+        {{-- Teleported child inside a parent: interacting with the child must not close the parent --}}
+        <x-wirestrap::flyout id="nest-hover-parent">
+            <x-slot:content class="panel-hover-parent">
+                <div style="padding: 20px;">
+                    <x-wirestrap::flyout id="nest-hover-child" teleport="body">
+                        <x-slot:content class="panel-hover-child">
+                            <div style="padding: 20px;">
+                                <span id="nest-hover-inner">Child content</span>
+                            </div>
+                        </x-slot:content>
+                        <button id="nest-hover-child-trigger" type="button">Hover child</button>
+                    </x-wirestrap::flyout>
+                </div>
+            </x-slot:content>
+            <button id="nest-hover-parent-trigger" type="button">Hover parent</button>
+        </x-wirestrap::flyout>
+
+        <br><br>
+
+        <x-wirestrap::flyout id="nest-click-parent" trigger="click">
+            <x-slot:content class="panel-click-parent">
+                <div style="padding: 20px;">
+                    <x-wirestrap::flyout id="nest-click-child" trigger="click" teleport="body">
+                        <x-slot:content class="panel-click-child">
+                            <div style="padding: 20px;">
+                                <button id="nest-click-inner" type="button">Child button</button>
+                            </div>
+                        </x-slot:content>
+                        <button id="nest-click-child-trigger" type="button">Open child</button>
+                    </x-wirestrap::flyout>
+                </div>
+            </x-slot:content>
+            <button id="nest-click-parent-trigger" type="button">Open parent</button>
         </x-wirestrap::flyout>
 
         <br><br>
