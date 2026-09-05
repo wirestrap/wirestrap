@@ -58,6 +58,8 @@ Any element carrying `data-ws-dismiss="floating"` inside the panel closes it whe
 
 This is mostly useful on interactive panels, whose own content never closes them on click. On a hover-triggered element, a later hover shows it again.
 
+Use `data-ws-dismiss="floating-stack"` instead to also close every floating element enclosing it.
+
 ## $wirestrap.flyout
 
 | Method | Description |

@@ -43,6 +43,8 @@ Floating panel with header and body, built on `@floating-ui/dom`. Flips and shif
 
 Any element carrying `data-ws-dismiss="floating"` inside the panel closes it when clicked. No id required — the owning element is resolved from the DOM, teleported panels included. See [flyout](flyout.md#dismiss) for an example.
 
+Use `data-ws-dismiss="floating-stack"` instead to also close every floating element enclosing it.
+
 ## $wirestrap.popover
 
 | Method | Description |

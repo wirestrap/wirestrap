@@ -40,6 +40,8 @@ Floating tooltip built on `@floating-ui/dom`. Wraps any trigger element. Focusin
 
 Any element carrying `data-ws-dismiss="floating"` inside the tooltip closes it when clicked. No id required — the owning element is resolved from the DOM, teleported tooltips included.
 
+Use `data-ws-dismiss="floating-stack"` instead to also close every floating element enclosing it.
+
 ## $wirestrap.tooltip
 
 | Method | Description |

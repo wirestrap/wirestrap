@@ -29,6 +29,7 @@
                 <div style="padding: 20px;">
                     <button id="btn-dismiss" type="button" data-ws-dismiss="floating">Close</button>
                     <button id="btn-keep" type="button">Keep open</button>
+                    <button id="btn-dismiss-stack" type="button" data-ws-dismiss="floating-stack">Close the stack</button>
                 </div>
             </x-slot:content>
             <button id="trigger-dismiss" type="button">Dismiss flyout</button>

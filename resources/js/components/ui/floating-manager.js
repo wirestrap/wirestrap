@@ -25,6 +25,7 @@
  * Dismiss:
  *   A click on any element carrying data-ws-dismiss="floating" hides the floating element
  *   it belongs to. Useful inside interactive panels, whose own content never closes them.
+ *   data-ws-dismiss="floating-stack" hides that element and every floating element enclosing it.
  *
  * Livewire integration:
  *   After each morph, _schedulePrune() removes entries whose DOM elements are gone.
@@ -425,11 +426,19 @@ globalThis.Wirestrap.floating = {
 document.addEventListener('click', (e) => {
     [..._active].filter((a) => !_inScope(a.container, e.target)).forEach((a) => hide(a.container));
 
-    // Support data-ws-dismiss="floating" inside panel content for convenience. _containerFor()
-    // resolves the owner without an id, and works from inside a teleported panel too.
-    const dismiss = e.target.closest('[data-ws-dismiss="floating"]');
-    const owner = dismiss && _containerFor(dismiss);
-    owner && hide(owner);
+    // Support data-ws-dismiss inside panel content for convenience. _containerFor() resolves the
+    // owner without an id, and works from inside a teleported panel too. The "floating-stack"
+    // variant keeps walking outwards, for cascading menus whose leaf action closes the whole chain.
+    const dismiss = e.target.closest('[data-ws-dismiss="floating"], [data-ws-dismiss="floating-stack"]');
+    if (dismiss) {
+        const walkUp = dismiss.dataset.wsDismiss === 'floating-stack';
+        let owner = _containerFor(dismiss);
+
+        while (owner) {
+            hide(owner);
+            owner = walkUp ? _containerFor(owner.parentElement) : null;
+        }
+    }
 
     const trigger = e.target.closest('[data-ws-float-trigger]');
     if (!trigger) {

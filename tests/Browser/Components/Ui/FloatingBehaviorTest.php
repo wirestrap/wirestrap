@@ -155,6 +155,14 @@ test('data-ws-dismiss closes a teleported panel', function () {
         ->assertScript(js_wait_hidden('[data-ws-float-for="flyout-dismiss-teleport"]'));
 });
 
+test('floating-stack closes a standalone floating element', function () {
+    $this->visit('/_ws/test/ui/flyout')
+        ->click('#trigger-dismiss')
+        ->assertVisible('#flyout-dismiss [data-ws-floatable]')
+        ->click('#btn-dismiss-stack')
+        ->assertScript(js_wait_hidden('#flyout-dismiss [data-ws-floatable]'));
+});
+
 test('a panel button without the attribute keeps the panel open', function () {
     $this->visit('/_ws/test/ui/flyout')
         ->click('#trigger-dismiss')

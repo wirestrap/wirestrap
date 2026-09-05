@@ -98,6 +98,7 @@
                         <x-slot:content>
                             <div style="padding: 20px;">
                                 <button id="child-dismiss-btn" type="button" data-ws-dismiss="floating">Close child</button>
+                                <button id="child-stack-btn" type="button" data-ws-dismiss="floating-stack">Close the whole stack</button>
                             </div>
                         </x-slot:content>
                         <button id="child-dismiss-trigger" type="button">Open child</button>
@@ -125,6 +126,25 @@
             </x-slot:content>
             <button id="parent-tdismiss-trigger" type="button">Open parent (teleported child)</button>
         </x-wirestrap::flyout>
+
+        {{-- Teleported parent > inline child: the parent contains the click, so only floating-stack closes it --}}
+        <x-wirestrap::flyout id="parent-tstack" trigger="click" teleport="body">
+            <x-slot:content>
+                <div style="padding: 20px;">
+                    <x-wirestrap::flyout id="child-tstack" trigger="click">
+                        <x-slot:content>
+                            <div style="padding: 20px;">
+                                <button id="child-tstack-btn" type="button" data-ws-dismiss="floating-stack">Close the whole stack</button>
+                            </div>
+                        </x-slot:content>
+                        <button id="child-tstack-trigger" type="button">Open child</button>
+                    </x-wirestrap::flyout>
+                </div>
+            </x-slot:content>
+            <button id="parent-tstack-trigger" type="button">Open teleported parent</button>
+        </x-wirestrap::flyout>
+
+        <br><br>
 
         {{-- Flyout inside a modal: data-ws-dismiss must not cross subsystems --}}
         <button id="modal-nest-trigger" type="button" x-on:click="$wirestrap.modal.show('modal-nest')">Open modal with flyout</button>

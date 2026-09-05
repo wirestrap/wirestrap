@@ -96,6 +96,28 @@ test('dismiss in the parent content closes the parent', function () {
         ->assertScript(js_wait_hidden('#parent-dismiss > [data-ws-floatable]'));
 });
 
+test('floating-stack in a nested child closes the whole chain', function () {
+    $this->visit('/_ws/test/ui/nesting')
+        ->click('#parent-dismiss-trigger')
+        ->assertVisible('#parent-dismiss > [data-ws-floatable]')
+        ->click('#child-dismiss-trigger')
+        ->assertVisible('#child-dismiss > [data-ws-floatable]')
+        ->click('#child-stack-btn')
+        ->assertScript(js_wait_hidden('#child-dismiss > [data-ws-floatable]'))
+        ->assertScript(js_wait_hidden('#parent-dismiss > [data-ws-floatable]'));
+});
+
+test('floating-stack walks past a teleported parent', function () {
+    $this->visit('/_ws/test/ui/nesting')
+        ->click('#parent-tstack-trigger')
+        ->assertVisible('[data-ws-float-for="parent-tstack"]')
+        ->click('#child-tstack-trigger')
+        ->assertVisible('#child-tstack > [data-ws-floatable]')
+        ->click('#child-tstack-btn')
+        ->assertScript(js_wait_hidden('#child-tstack > [data-ws-floatable]'))
+        ->assertScript(js_wait_hidden('[data-ws-float-for="parent-tstack"]'));
+});
+
 test('dismiss in a teleported child closes that child', function () {
     $this->visit('/_ws/test/ui/nesting')
         ->click('#parent-tdismiss-trigger')
