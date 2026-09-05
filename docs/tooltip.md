@@ -36,6 +36,10 @@ Floating tooltip built on `@floating-ui/dom`. Wraps any trigger element. Focusin
 | `offset-skidding` | `int` | `config` | Lateral offset in px. |
 | `position` | `string` | `config` | CSS positioning strategy: absolute or fixed. |
 
+## Dismiss
+
+Any element carrying `data-ws-dismiss="floating"` inside the tooltip closes it when clicked. No id required — the owning element is resolved from the DOM, teleported tooltips included.
+
 ## $wirestrap.tooltip
 
 | Method | Description |

@@ -41,6 +41,23 @@ Generic floating panel built on `@floating-ui/dom`. No semantic meaning — use 
 | `offset-skidding` | `int` | `config` | Lateral offset in px. |
 | `position` | `string` | `config` | CSS positioning strategy: absolute or fixed. |
 
+## Dismiss
+
+Any element carrying `data-ws-dismiss="floating"` inside the panel closes it when clicked. No id required — the owning element is resolved from the DOM, teleported panels included.
+
+```blade
+<x-wirestrap::flyout trigger="click">
+    <button type="button">Actions</button>
+
+    <x-slot:content>
+        <button type="button" data-ws-dismiss="floating" wire:click="archive">Archive</button>
+        <button type="button" data-ws-dismiss="floating" x-on:click="$wirestrap.modal.show('confirm-delete')">Delete…</button>
+    </x-slot:content>
+</x-wirestrap::flyout>
+```
+
+This is mostly useful on interactive panels, whose own content never closes them on click. On a hover-triggered element, a later hover shows it again.
+
 ## $wirestrap.flyout
 
 | Method | Description |

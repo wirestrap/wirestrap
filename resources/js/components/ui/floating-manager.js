@@ -22,6 +22,10 @@
  *   "hover" - show on mouseover/focusin, hide on mouseout/focusout with a 50 ms delay.
  *   "click" - toggle on click, hide on outside click.
  *
+ * Dismiss:
+ *   A click on any element carrying data-ws-dismiss="floating" hides the floating element
+ *   it belongs to. Useful inside interactive panels, whose own content never closes them.
+ *
  * Livewire integration:
  *   After each morph, _schedulePrune() removes entries whose DOM elements are gone.
  *   On Livewire navigate, all active entries are torn down synchronously.
@@ -420,6 +424,12 @@ globalThis.Wirestrap.floating = {
 
 document.addEventListener('click', (e) => {
     [..._active].filter((a) => !_inScope(a.container, e.target)).forEach((a) => hide(a.container));
+
+    // Support data-ws-dismiss="floating" inside panel content for convenience. _containerFor()
+    // resolves the owner without an id, and works from inside a teleported panel too.
+    const dismiss = e.target.closest('[data-ws-dismiss="floating"]');
+    const owner = dismiss && _containerFor(dismiss);
+    owner && hide(owner);
 
     const trigger = e.target.closest('[data-ws-float-trigger]');
     if (!trigger) {

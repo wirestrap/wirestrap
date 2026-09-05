@@ -39,6 +39,10 @@ Floating panel with header and body, built on `@floating-ui/dom`. Flips and shif
 | `offset-skidding` | `int` | `config` | Lateral offset in px. |
 | `position` | `string` | `config` | CSS positioning strategy: absolute or fixed. |
 
+## Dismiss
+
+Any element carrying `data-ws-dismiss="floating"` inside the panel closes it when clicked. No id required — the owning element is resolved from the DOM, teleported panels included. See [flyout](flyout.md#dismiss) for an example.
+
 ## $wirestrap.popover
 
 | Method | Description |

@@ -37,6 +37,18 @@
             <button id="trigger-interactive" type="button">Interactive popover</button>
         </x-wirestrap::popover>
 
+        <br><br>
+
+        {{-- Dismiss via data attribute --}}
+        <x-wirestrap::popover id="pop-dismiss" trigger="click">
+            <x-slot:content>
+                <div style="padding: 10px;">
+                    <button id="btn-dismiss" type="button" data-ws-dismiss="floating">Close</button>
+                </div>
+            </x-slot:content>
+            <button id="trigger-dismiss" type="button">Dismiss popover</button>
+        </x-wirestrap::popover>
+
         {{-- Spacer to allow clicking away --}}
         <div id="elsewhere" style="margin-top: 100px; padding: 20px;">Click here to dismiss</div>
     </div>

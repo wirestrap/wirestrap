@@ -88,6 +88,58 @@
             <button id="parent-tpf-trigger" type="button">Teleported Flyout > Flyout</button>
         </x-wirestrap::flyout>
 
+        {{-- Dismiss in nested flyouts, click-triggered to keep the panels stable --}}
+        <x-wirestrap::flyout id="parent-dismiss" trigger="click">
+            <x-slot:content>
+                <div style="padding: 20px;">
+                    <button id="parent-dismiss-btn" type="button" data-ws-dismiss="floating">Close parent</button>
+
+                    <x-wirestrap::flyout id="child-dismiss" trigger="click">
+                        <x-slot:content>
+                            <div style="padding: 20px;">
+                                <button id="child-dismiss-btn" type="button" data-ws-dismiss="floating">Close child</button>
+                            </div>
+                        </x-slot:content>
+                        <button id="child-dismiss-trigger" type="button">Open child</button>
+                    </x-wirestrap::flyout>
+                </div>
+            </x-slot:content>
+            <button id="parent-dismiss-trigger" type="button">Open parent</button>
+        </x-wirestrap::flyout>
+
+        <br><br>
+
+        {{-- Dismiss from a teleported child inside a parent --}}
+        <x-wirestrap::flyout id="parent-tdismiss" trigger="click">
+            <x-slot:content>
+                <div style="padding: 20px;">
+                    <x-wirestrap::flyout id="child-tdismiss" trigger="click" teleport="body">
+                        <x-slot:content>
+                            <div style="padding: 20px;">
+                                <button id="child-tdismiss-btn" type="button" data-ws-dismiss="floating">Close teleported child</button>
+                            </div>
+                        </x-slot:content>
+                        <button id="child-tdismiss-trigger" type="button">Open teleported child</button>
+                    </x-wirestrap::flyout>
+                </div>
+            </x-slot:content>
+            <button id="parent-tdismiss-trigger" type="button">Open parent (teleported child)</button>
+        </x-wirestrap::flyout>
+
+        {{-- Flyout inside a modal: data-ws-dismiss must not cross subsystems --}}
+        <button id="modal-nest-trigger" type="button" x-on:click="$wirestrap.modal.show('modal-nest')">Open modal with flyout</button>
+
+        <x-wirestrap::modal id="modal-nest" title="Modal with flyout">
+            <x-wirestrap::flyout id="flyout-in-modal" trigger="click">
+                <x-slot:content>
+                    <div style="padding: 20px;">
+                        <button id="flyout-in-modal-dismiss" type="button" data-ws-dismiss="floating">Close the flyout</button>
+                    </div>
+                </x-slot:content>
+                <button id="flyout-in-modal-trigger" type="button">Open flyout</button>
+            </x-wirestrap::flyout>
+        </x-wirestrap::modal>
+
         <div id="elsewhere" style="margin-top: 100px; padding: 20px;">Click here to dismiss</div>
     </div>
 </x-layouts.app>

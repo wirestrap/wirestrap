@@ -137,6 +137,40 @@ test('focusing input inside trigger keeps tooltip open', function () {
         ->assertScript(js_wait_hidden('#tip-focus-tip'));
 });
 
+// --- Dismiss via data attribute ---
+
+test('data-ws-dismiss closes the panel it belongs to', function () {
+    $this->visit('/_ws/test/ui/flyout')
+        ->click('#trigger-dismiss')
+        ->assertVisible('#flyout-dismiss [data-ws-floatable]')
+        ->click('#btn-dismiss')
+        ->assertScript(js_wait_hidden('#flyout-dismiss [data-ws-floatable]'));
+});
+
+test('data-ws-dismiss closes a teleported panel', function () {
+    $this->visit('/_ws/test/ui/flyout')
+        ->click('#trigger-dismiss-teleport')
+        ->assertVisible('[data-ws-float-for="flyout-dismiss-teleport"]')
+        ->click('#btn-dismiss-teleported')
+        ->assertScript(js_wait_hidden('[data-ws-float-for="flyout-dismiss-teleport"]'));
+});
+
+test('a panel button without the attribute keeps the panel open', function () {
+    $this->visit('/_ws/test/ui/flyout')
+        ->click('#trigger-dismiss')
+        ->assertVisible('#flyout-dismiss [data-ws-floatable]')
+        ->click('#btn-keep')
+        ->assertVisible('#flyout-dismiss [data-ws-floatable]');
+});
+
+test('data-ws-dismiss works on a popover too', function () {
+    $this->visit('/_ws/test/ui/popover')
+        ->click('#trigger-dismiss')
+        ->assertVisible('#pop-dismiss [data-ws-floatable]')
+        ->click('#btn-dismiss')
+        ->assertScript(js_wait_hidden('#pop-dismiss [data-ws-floatable]'));
+});
+
 // --- Programmatic control ($wirestrap magic) ---
 
 dataset('programmatic-floatables', [

@@ -72,3 +72,48 @@ test('teleported parent stays visible when hovering child interactive panel', fu
         ->assertVisible('#child-tpf > [data-ws-floatable]')
         ->assertVisible('[data-ws-float-for="parent-tpf"]');
 });
+
+// --- Dismiss in nested contexts ---
+
+test('dismiss in a nested child closes the child, not the parent', function () {
+    $this->visit('/_ws/test/ui/nesting')
+        ->click('#parent-dismiss-trigger')
+        ->assertVisible('#parent-dismiss > [data-ws-floatable]')
+        ->click('#child-dismiss-trigger')
+        ->assertVisible('#child-dismiss > [data-ws-floatable]')
+        ->click('#child-dismiss-btn')
+        ->assertScript(js_wait_hidden('#child-dismiss > [data-ws-floatable]'))
+        // hide() drops the show class synchronously, while display:none only lands after the
+        // transition: asserting on the class catches a parent that was closed along with the child.
+        ->assertScript("document.querySelector('#parent-dismiss > [data-ws-floatable]').classList.contains('show')");
+});
+
+test('dismiss in the parent content closes the parent', function () {
+    $this->visit('/_ws/test/ui/nesting')
+        ->click('#parent-dismiss-trigger')
+        ->assertVisible('#parent-dismiss > [data-ws-floatable]')
+        ->click('#parent-dismiss-btn')
+        ->assertScript(js_wait_hidden('#parent-dismiss > [data-ws-floatable]'));
+});
+
+test('dismiss in a teleported child closes that child', function () {
+    $this->visit('/_ws/test/ui/nesting')
+        ->click('#parent-tdismiss-trigger')
+        ->assertVisible('#parent-tdismiss > [data-ws-floatable]')
+        ->click('#child-tdismiss-trigger')
+        ->assertVisible('[data-ws-float-for="child-tdismiss"]')
+        ->click('#child-tdismiss-btn')
+        ->assertScript(js_wait_hidden('[data-ws-float-for="child-tdismiss"]'));
+});
+
+test('dismiss on a flyout inside a modal leaves the modal open', function () {
+    $this->visit('/_ws/test/ui/nesting')
+        ->click('#modal-nest-trigger')
+        ->assertVisible('#modal-nest')
+        ->click('#flyout-in-modal-trigger')
+        ->assertVisible('#flyout-in-modal > [data-ws-floatable]')
+        ->click('#flyout-in-modal-dismiss')
+        ->assertScript(js_wait_hidden('#flyout-in-modal > [data-ws-floatable]'))
+        ->assertScript("document.getElementById('modal-nest').style.display !== 'none'")
+        ->assertVisible('#modal-nest');
+});
