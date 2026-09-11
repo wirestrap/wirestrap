@@ -356,6 +356,32 @@ test('truncation tooltip shows on hover when text overflows', function () {
         ->assertScript("document.querySelector('.ws-tooltip.show .ws-tooltip-content').textContent.includes('Lorem ipsum')");
 });
 
+test('tooltip does not vanish after quickly sweeping across the table before landing on the truncated header', function () {
+    $this->visit('/_ws/test/ui/table')
+        ->assertScript(js_wait_for('body > .ws-tooltip'))
+        ->hover('#table-truncate thead th:nth-child(1) span[data-ws-label]')
+        ->hover('#table-truncate thead th:nth-child(2) span[data-ws-label]')
+        ->hover('#table-truncate thead th:nth-child(1) span[data-ws-label]')
+        ->assertScript(js_wait_for('body > .ws-tooltip.show'))
+        ->assertScript("new Promise(resolve => setTimeout(() => {
+            const tooltip = document.querySelector('.ws-tooltip.show');
+            resolve(tooltip !== null && tooltip.style.display !== 'none');
+        }, 400))");
+});
+
+test('tooltip does not vanish after hovering a cell then back to the truncated header inside a modal', function () {
+    $this->visit('/_ws/test/ui/table')
+        ->click('#btn-table-modal')
+        ->assertVisible('#modal-table-truncate')
+        ->hover('#table-truncate-modal tbody tr:not([data-ws-empty]) td:nth-child(1)')
+        ->hover('#table-truncate-modal thead th:nth-child(1) span[data-ws-label]')
+        ->assertScript(js_wait_for('body > .ws-tooltip.show'))
+        ->assertScript("new Promise(resolve => setTimeout(() => {
+            const tooltip = document.querySelector('.ws-tooltip.show');
+            resolve(tooltip !== null && tooltip.style.display !== 'none');
+        }, 400))");
+});
+
 // --- Bulk selection guards ---
 
 test('a change event on a disabled checkbox does not select it', function () {

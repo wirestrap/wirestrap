@@ -184,7 +184,7 @@ Alpine.data('wsTable', () => ({
         document.body.appendChild(this._tooltipEl);
 
         this._onMouseOver = (e) => {
-            const el = e.target.closest('[data-ws-label]');
+            const el = this._getLabelEl(e.target);
 
             if (el === this._currentEl) {
                 return;
@@ -208,7 +208,7 @@ Alpine.data('wsTable', () => ({
         };
 
         this._onMouseOut = (e) => {
-            const el = e.target.closest('[data-ws-label]');
+            const el = this._getLabelEl(e.target);
 
             // Suppress hide when moving within the same <th>: the label element may not
             // fill the entire cell and moving to padding space would flicker the tooltip.
@@ -466,6 +466,7 @@ Alpine.data('wsTable', () => ({
         this._tooltipEl.classList.remove('show');
         this._currentEl = null;
 
+        this._cancelTooltipHide?.();
         this._cancelTooltipHide = afterTransition(
             this._tooltipEl,
             () => {
@@ -493,5 +494,10 @@ Alpine.data('wsTable', () => ({
 
     _getSelected() {
         return this.selectedItems;
+    },
+
+    _getLabelEl(target) {
+        const el = target.closest('th [data-ws-label]');
+        return el && this._tableEl.contains(el) ? el : null;
     },
 }));
