@@ -114,3 +114,65 @@ test('clicking the active tab does not replay the panel transition', function ()
         // fade-out/fade-in sequence on the panel that is already active.
         ->assertScript('new Promise(resolve => setTimeout(() => resolve(window.__wsTabReshow === 0), 250))');
 });
+
+// --- Removed active tab ---
+
+// Resolves once the tabs component has finished its panel transition,
+// since setTab() ignores calls while a transition is running.
+function js_tabs_settled(string $id): string
+{
+    return "new Promise((resolve, reject) => {
+        const deadline = Date.now() + 5000;
+        const check = () => {
+            if (Alpine.\$data(document.getElementById('{$id}'))._transitioning === false) {
+                resolve(true);
+            } else if (Date.now() > deadline) {
+                reject(new Error('Timed out waiting for tabs transition: {$id}'));
+            } else {
+                requestAnimationFrame(check);
+            }
+        };
+        check();
+    })";
+}
+
+test('showing a tab after the active tab was removed reveals the new panel', function () {
+    $this->visit('/_ws/test/ui/tabs')
+        ->assertScript(js_wait_for('#tabs-entities'))
+        ->click('#tabs-entities [data-ws-tab="beta"].ws-tabs-nav-button')
+        ->assertScript(js_wait_for('#tabs-entities [data-ws-tab="alpha"].ws-tabs-panel--hidden'))
+        ->assertScript(js_tabs_settled('tabs-entities'))
+        ->click('#btn-delete-beta')
+        ->assertScript(js_wait_removed('ws-tabs-tabs-entities-panel-beta'))
+        ->assertScript(js_wait_for('#tabs-entities [data-ws-tab="alpha"].ws-tabs-panel:not(.ws-tabs-panel--hidden)'))
+        ->assertVisible('#tabs-entities [data-ws-tab="alpha"].ws-tabs-panel')
+        ->assertPresent('#tabs-entities [data-ws-tab="alpha"].ws-tabs-nav-button.active');
+});
+
+test('ws-show event is dispatched when the previous active tab was removed', function () {
+    $this->visit('/_ws/test/ui/tabs')
+        ->assertScript(js_wait_for('#tabs-entities'))
+        ->click('#tabs-entities [data-ws-tab="beta"].ws-tabs-nav-button')
+        ->assertScript(js_tabs_settled('tabs-entities'))
+        ->assertScript("(() => {
+            window.__wsShowAfterRemove = false;
+            document.querySelector('#tabs-entities [data-ws-tab=\"alpha\"].ws-tabs-panel')
+                .addEventListener('ws-show', () => { window.__wsShowAfterRemove = true; });
+            return true;
+        })()")
+        ->click('#btn-delete-beta')
+        ->assertScript(js_wait_removed('ws-tabs-tabs-entities-panel-beta'))
+        ->assertScript('new Promise((resolve, reject) => {
+            const deadline = Date.now() + 5000;
+            const check = () => {
+                if (window.__wsShowAfterRemove) {
+                    resolve(true);
+                } else if (Date.now() > deadline) {
+                    reject(new Error("ws-show not dispatched"));
+                } else {
+                    requestAnimationFrame(check);
+                }
+            };
+            check();
+        })');
+});

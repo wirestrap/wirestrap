@@ -112,8 +112,17 @@ Alpine.data('wsTabs', () => ({
         const oldPanel = content.querySelector(`[data-ws-tab="${this.activeTab}"]`);
         const newPanel = content.querySelector(`[data-ws-tab="${key}"]`);
 
-        if (!oldPanel || !newPanel) {
+        if (!newPanel) {
             this.activeTab = key;
+            return;
+        }
+
+        // The previous active panel may have been removed (e.g. by a Livewire morph):
+        // there is nothing to fade out, so the new panel is shown immediately.
+        if (!oldPanel) {
+            this.activeTab = key;
+            newPanel.classList.remove('ws-tabs-panel--hidden');
+            newPanel.dispatchEvent(new CustomEvent('ws-show'));
             return;
         }
 
