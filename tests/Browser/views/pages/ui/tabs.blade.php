@@ -57,5 +57,10 @@
 
         {{-- Invalid feedback (Livewire) --}}
         <livewire:ui.tabs-validation lazy />
+
+        <br>
+
+        {{-- Deletable tabs (Livewire) --}}
+        <livewire:ui.tabs-entities lazy />
     </div>
 </x-layouts.app>
