@@ -50,6 +50,18 @@
             <x-slot:content>Focus tooltip content</x-slot:content>
         </x-wirestrap::tooltip>
 
+        <br><br>
+
+        {{-- Anchor clipped by a horizontally scrollable container (e.g. last column of a wide table) --}}
+        <div id="scroll-clipped" style="width: 300px; overflow-x: scroll;">
+            <x-wirestrap::tooltip id="tip-clipped" content="Clipped anchor tooltip" style="width: 900px;">
+                <div style="display: flex; justify-content: space-between; width: 900px;">
+                    <span id="trigger-clipped">Row content</span>
+                    <button id="anchor-clipped" type="button" data-ws-anchor>Action</button>
+                </div>
+            </x-wirestrap::tooltip>
+        </div>
+
         {{-- Spacer to allow clicking away --}}
         <div id="elsewhere" style="margin-top: 100px; padding: 20px;">Click here to dismiss</div>
     </div>
