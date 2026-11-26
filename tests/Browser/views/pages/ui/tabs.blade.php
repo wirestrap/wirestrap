@@ -55,6 +55,27 @@
 
         <br>
 
+        {{-- Flex-grow chain down to the active panel (fill-height layouts) --}}
+        <style>
+            .tabs-fill,
+            .tabs-fill .ws-tabs-content,
+            .tabs-fill [x-ref="tabsInner"],
+            .tabs-fill .ws-tabs-panel:not(.ws-tabs-panel--hidden) {
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+            }
+        </style>
+
+        <div style="display: flex; flex-direction: column;">
+            <x-wirestrap::tabs id="tabs-fill" class="tabs-fill">
+                <x-slot:tall label="Tall"><div style="height: 300px;">Tall content</div></x-slot:tall>
+                <x-slot:short label="Short"><div style="height: 50px;">Short content</div></x-slot:short>
+            </x-wirestrap::tabs>
+        </div>
+
+        <br>
+
         {{-- Invalid feedback (Livewire) --}}
         <livewire:ui.tabs-validation lazy />
 

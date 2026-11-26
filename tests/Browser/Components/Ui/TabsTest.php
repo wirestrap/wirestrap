@@ -176,3 +176,32 @@ test('ws-show event is dispatched when the previous active tab was removed', fun
             check();
         })');
 });
+
+// --- Height transition ---
+
+test('height transition ends at the panel height in a flex-grow chain', function () {
+    $this->visit('/_ws/test/ui/tabs')
+        // Record the height the inner container is animated to, and the height it settles at
+        // once the inline styles are cleared: a mismatch is a visible jump at the end.
+        ->assertScript("(() => {
+            const inner = document.querySelector('#tabs-fill [x-ref=\"tabsInner\"]');
+            window.__wsTabsHeights = { target: null, final: null };
+
+            const observer = new MutationObserver(() => {
+                const heights = window.__wsTabsHeights;
+
+                if (heights.target === null && inner.style.transition.includes('height')) {
+                    heights.target = parseFloat(inner.style.height);
+                } else if (heights.target !== null && inner.style.height === '') {
+                    heights.final = inner.offsetHeight;
+                    observer.disconnect();
+                }
+            });
+            observer.observe(inner, { attributes: true, attributeFilter: ['style'] });
+
+            return true;
+        })()")
+        ->click('#tabs-fill [data-ws-tab="short"].ws-tabs-nav-button')
+        ->assertScript(js_tabs_settled('tabs-fill'))
+        ->assertScript('(({ target, final }) => target !== null && final !== null && Math.abs(final - target) <= 1)(window.__wsTabsHeights)');
+});
