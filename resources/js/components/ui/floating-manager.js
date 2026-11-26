@@ -47,7 +47,7 @@
  *   data-ws-interactive     - boolean attribute. When present, hovering the floatable
  *                             panel keeps it visible.
  */
-import { computePosition, autoUpdate, offset, flip, shift, arrow as arrowMiddleware } from '@floating-ui/dom';
+import { computePosition, autoUpdate, offset, flip, shift, arrow as arrowMiddleware, hide as hideMiddleware } from '@floating-ui/dom';
 import { afterTransition } from '../../utils/transition';
 import { onNavigate } from '../../utils/navigate';
 
@@ -135,6 +135,8 @@ function show(triggerEl) {
         middleware.push(arrowMiddleware({ element: arrowEl }));
     }
 
+    middleware.push(hideMiddleware());
+
     const floatingConfig = {
         placement: config.placement,
         strategy: config.strategy,
@@ -190,6 +192,15 @@ function _update(anchor, floatable, floatingConfig, arrowEl) {
     computePosition(anchor, floatable, floatingConfig).then(({ x, y, placement, middlewareData }) => {
         Object.assign(floatable.style, { left: `${x}px`, top: `${y}px` });
         floatable.dataset.floatingPlacement = placement;
+
+        // When the anchor is clipped (e.g. scrolled out of an overflow container), only mask the
+        // panel instead of calling hide(): the entry stays active, so further hover events do not
+        // re-show it in a loop, and autoUpdate reveals it again once the anchor is back in view.
+        if (middlewareData.hide?.referenceHidden) {
+            floatable.style.visibility = 'hidden';
+        } else {
+            floatable.style.removeProperty('visibility');
+        }
 
         if (middlewareData.arrow && arrowEl) {
             const { x: ax, y: ay } = middlewareData.arrow;

@@ -123,6 +123,44 @@ test('non-interactive tooltip closes when hovering the floatable', function () {
         ->assertScript(js_wait_hidden('#tip-noninteractive-tip'));
 });
 
+// --- Hidden anchor ---
+
+test('tooltip stays hidden while its anchor is clipped by a scroll container', function () {
+    $this->visit('/_ws/test/ui/tooltip')
+        ->hover('#trigger-clipped')
+        // Positioning is async: give it a few frames to settle before asserting.
+        ->assertScript('new Promise(resolve => setTimeout(() => resolve(true), 150))')
+        ->assertMissing('#tip-clipped-tip');
+});
+
+test('tooltip appears once its clipped anchor is scrolled into view', function () {
+    $this->visit('/_ws/test/ui/tooltip')
+        ->hover('#trigger-clipped')
+        ->assertScript('new Promise(resolve => setTimeout(() => resolve(true), 150))')
+        ->assertMissing('#tip-clipped-tip')
+        ->assertScript("(() => {
+            const box = document.querySelector('#scroll-clipped');
+            box.scrollLeft = box.scrollWidth;
+            return true;
+        })()")
+        ->assertScript("new Promise((resolve, reject) => {
+            const deadline = Date.now() + 5000;
+            const check = () => {
+                const el = document.querySelector('#tip-clipped-tip');
+                const style = getComputedStyle(el);
+                if (el.classList.contains('show') && style.display !== 'none' && style.visibility !== 'hidden') {
+                    resolve(true);
+                } else if (Date.now() > deadline) {
+                    reject(new Error('Timed out waiting for the tooltip to appear'));
+                } else {
+                    requestAnimationFrame(check);
+                }
+            };
+            check();
+        })")
+        ->assertVisible('#tip-clipped-tip');
+});
+
 // --- Focus behavior ---
 
 test('focusing input inside trigger keeps tooltip open', function () {
