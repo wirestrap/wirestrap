@@ -10,6 +10,7 @@ class AutocompleteDemo extends Component
 {
     public ?string $single = null;
     public array $tags = [];
+    public array $limitedTags = [];
     public ?string $search = null;
     public ?string $disabled = null;
     public ?string $grouped = null;

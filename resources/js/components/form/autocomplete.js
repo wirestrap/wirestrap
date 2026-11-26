@@ -20,6 +20,9 @@
  *   In multiple mode the selected values are stored as an array of strings in
  *   selectedTags and synced to Livewire via wire.set(). Comma, Tab, and Enter
  *   all confirm the current query as a new tag.
+ *   When data-ws-max-items is set, no tag can be added once the limit is reached:
+ *   the dropdown stays closed and typed text is discarded. The input is deliberately not
+ *   readonly, so it keeps a visible caret and Backspace still clearly removes tags.
  *
  * Data attributes read from the root element:
  *   data-ws-wire-options             - Livewire method name that returns the suggestion array.
@@ -31,6 +34,7 @@
  *   data-ws-wire-options-reset-live  - "true" to trigger a server round-trip when applying the reset.
  *   data-ws-multiple           - "true" for tag mode.
  *   data-ws-live               - "true" to use live: true when syncing tags to Livewire.
+ *   data-ws-max-items          - maximum number of tags in multiple mode.
  *   data-ws-wiremodel          - dot-path to the Livewire property for tag mode sync.
  */
 import { floatingElement, defaultDropdownConfig } from '../../mixins/floating-element.js';
@@ -50,7 +54,10 @@ Alpine.data('wsAutocomplete', () => ({
      */
     autocompleteRoot: {
         ['x-bind:class']() {
-            return { 'ws-autocomplete-has-value': this.hasValue };
+            return {
+                'ws-autocomplete-has-value': this.hasValue,
+                'ws-autocomplete-is-full': this.isFull,
+            };
         },
     },
 
@@ -72,6 +79,12 @@ Alpine.data('wsAutocomplete', () => ({
 
     autocompleteInput: {
         ['x-on:input'](event) {
+            // Discard any inserted text before it is painted
+            if (this.isFull) {
+                event.target.value = '';
+                return;
+            }
+
             this._dropdownActive = true;
             this.query = event.target.value;
         },
@@ -83,6 +96,9 @@ Alpine.data('wsAutocomplete', () => ({
         },
         ['x-on:focusout'](event) {
             this.onFocusout(event);
+        },
+        [':aria-readonly']() {
+            return this.isFull ? 'true' : null;
         },
         [':aria-autocomplete']() {
             return 'list';
@@ -116,6 +132,7 @@ Alpine.data('wsAutocomplete', () => ({
     autocompletePosition: 'absolute',
     multiple: false,
     live: false,
+    autocompleteMaxItems: null,
     autocompleteMinChars: 0,
     autocompleteNoDropdown: false,
     wireOptionsMethod: null,
@@ -142,8 +159,12 @@ Alpine.data('wsAutocomplete', () => ({
         return this.query.length > 0 || (this.multiple && this.selectedTags.length > 0);
     },
 
+    get isFull() {
+        return this.multiple && this.autocompleteMaxItems !== null && this.selectedTags.length >= this.autocompleteMaxItems;
+    },
+
     get filteredSuggestions() {
-        if (this.autocompleteNoDropdown || !this._dropdownActive) {
+        if (this.autocompleteNoDropdown || !this._dropdownActive || this.isFull) {
             return [];
         }
 
@@ -208,6 +229,8 @@ Alpine.data('wsAutocomplete', () => ({
             });
         }
         this.live = this.$el.getAttribute('data-ws-live') === 'true';
+        const maxItems = parseInt(this.$el.getAttribute('data-ws-max-items'), 10);
+        this.autocompleteMaxItems = maxItems >= 1 ? maxItems : null;
         this.autocompleteWiremodel = this.$el.getAttribute('data-ws-wiremodel');
 
         // Keep suggestions in the DOM during the close transition
@@ -385,7 +408,7 @@ Alpine.data('wsAutocomplete', () => ({
     },
 
     addTag(value, refocus = true) {
-        if (!value || this.selectedTags.some((t) => this._normalize(t) === this._normalize(value))) {
+        if (!value || this.isFull || this.selectedTags.some((t) => this._normalize(t) === this._normalize(value))) {
             return;
         }
 
@@ -406,8 +429,14 @@ Alpine.data('wsAutocomplete', () => ({
     },
 
     removeTag(tag) {
+        const wasFull = this.isFull;
         const removedIndex = this.selectedTags.indexOf(tag);
         this.selectedTags = this.selectedTags.filter((t) => t !== tag);
+
+        // Reaching the limit closed the dropdown: freeing a slot brings the suggestions back
+        if (wasFull) {
+            this._dropdownActive = true;
+        }
 
         if (removedIndex !== -1) {
             this.invalidIndices = this.invalidIndices

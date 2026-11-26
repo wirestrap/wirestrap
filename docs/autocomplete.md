@@ -61,6 +61,9 @@ public function getContacts(): array
     multiple
     live
 />
+
+{{-- max-items: once reached, typing is ignored and the dropdown stays closed --}}
+<x-wirestrap::autocomplete wire:model="tags" wire-options="getTechnologies" multiple :max-items="3" />
 ```
 
 ```blade
@@ -90,6 +93,7 @@ public function getContacts(): array
 | `no-dropdown` | `bool` | `config` | Disable the suggestion dropdown entirely. Useful in multiple mode as a pure tag input with no suggestions. |
 | `multiple` | `bool` | `false` | Tag mode. wire:model must bind to an array property. |
 | `live` | `bool` | `false` | In multiple mode, sync to Livewire on each tag change. |
+| `max-items` | `int\|null` | `null` | In multiple mode, maximum number of tags. Once reached, typing is ignored and the dropdown stays closed; Backspace and remove buttons still work. Root gets `ws-autocomplete-is-full`. Ignored in single mode. |
 | `dropdown-offset` | `int` | `config` | Y-axis offset in pixels between the trigger and the dropdown. |
 | `position` | `string` | `config` | Floating positioning strategy: `absolute` or `fixed`. |
 | `teleport` | `string\|null` | `config` | CSS selector of the teleport target (e.g. `body`). Moves the dropdown outside the component's DOM tree, escaping all stacking contexts. Requires `id`. Prefer over `position="fixed"` when the dropdown is clipped by a parent. |
