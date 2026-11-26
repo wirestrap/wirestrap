@@ -287,7 +287,12 @@ Alpine.data('wsSelect', () => ({
         if (this.wireOptionsMethod) {
             this._refreshHandler = () => {
                 this.lazyReset();
-                this.loadOptions();
+
+                // Same rule as the initial load: reload now only when the options are needed
+                // right away (a selection to label, or an open dropdown), otherwise on next open.
+                if (this.floatingShown || this._hasRealSelection()) {
+                    this.loadOptions();
+                }
             };
             this.$el.addEventListener('ws:refresh', this._refreshHandler);
         } else {

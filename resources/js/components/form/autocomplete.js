@@ -8,7 +8,8 @@
  *   Suggestions are loaded lazily on first focus by calling a Livewire method
  *   (data-ws-wire-options). An optional data-ws-wire-options-watch property path triggers
  *   a reload whenever its value changes in the Livewire component.
- *   The ws:refresh custom event forces a reload programmatically.
+ *   The ws:refresh custom event discards the cache programmatically: suggestions reload
+ *   immediately when the input is focused or tags are selected, otherwise on next focus.
  *   The method may return list<string> or list<{value: string, label: string}>; strings
  *   are normalised to {value, label} internally.
  *
@@ -216,7 +217,14 @@ Alpine.data('wsAutocomplete', () => ({
         if (this.wireOptionsMethod) {
             this._refreshHandler = () => {
                 this.lazyReset();
-                this.loadSuggestions();
+
+                // Same rule as the initial load: reload now only when the suggestions are needed
+                // right away (tags to label, or a focused input), otherwise on next focus.
+                const inputFocused = document.activeElement === this.$refs.input;
+
+                if (inputFocused || (this.multiple && this.selectedTags.length > 0)) {
+                    this.loadSuggestions();
+                }
             };
             this.$el.addEventListener('ws:refresh', this._refreshHandler);
         }

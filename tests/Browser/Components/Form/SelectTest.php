@@ -775,6 +775,33 @@ test('refresh reloads wire-options and preserves selection', function () {
         "));
 });
 
+test('refresh with an empty value defers loading until the next open', function () {
+    $calls = js_wire_get('#sel-refresh', 'refreshCalls');
+    $page = waitForSelectPage($this);
+    openSelect($page, 'sel-refresh')
+        ->keys('#sel-refresh', 'Escape')
+        ->assertScript(js_wait_hidden('#sel-refresh-listbox'))
+        ->assertScript("{$calls} === 1")
+        ->assertScript(js_wirestrap("select.refresh('sel-refresh')"))
+        // Leave time for an immediate reload to happen, which must not.
+        ->assertScript("new Promise(resolve => setTimeout(() => resolve({$calls} === 1), 300))");
+
+    openSelect($page, 'sel-refresh')
+        ->assertScript(js_wait_until("{$calls} === 2"));
+});
+
+test('refresh with a selected value reloads options immediately', function () {
+    $calls = js_wire_get('#sel-refresh', 'refreshCalls');
+    $page = waitForSelectPage($this);
+    openSelect($page, 'sel-refresh')
+        ->click('#sel-refresh-listbox [data-ws-value="red"]')
+        ->assertScript(js_wait_hidden('#sel-refresh-listbox'))
+        ->assertScript("{$calls} === 1")
+        ->assertScript(js_wirestrap("select.refresh('sel-refresh')"))
+        ->assertScript(js_wait_until("{$calls} === 2"))
+        ->assertMissing('#sel-refresh-listbox');
+});
+
 // --- Focus management ---
 
 test('escape returns focus to selection', function () {

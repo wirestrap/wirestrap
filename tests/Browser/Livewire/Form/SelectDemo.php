@@ -25,6 +25,8 @@ class SelectDemo extends Component
     public ?string $classed = null;
     public ?string $xss = null;
     public bool $extendOptions = false;
+    public ?string $refreshed = null;
+    public int $refreshCalls = 0;
 
     /** @return list<array{value: string, label: string}> */
     #[Renderless]
@@ -35,6 +37,15 @@ class SelectDemo extends Component
             ['value' => 'green', 'label' => 'Green'],
             ['value' => 'blue', 'label' => 'Blue'],
         ];
+    }
+
+    /** @return list<array{value: string, label: string}> */
+    #[Renderless]
+    public function getRefreshOptions(): array
+    {
+        $this->refreshCalls++;
+
+        return $this->getOptions();
     }
 
     /** @return list<array{value: string, label: string, disabled?: bool}> */

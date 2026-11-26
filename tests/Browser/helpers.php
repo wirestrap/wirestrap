@@ -117,3 +117,37 @@ function js_wirestrap(string $expression): string
 {
     return '(() => { Alpine.evaluate(document.body, "$wirestrap.' . $expression . '"); return true; })()';
 }
+
+/**
+ * Returns a JS expression (Promise) that resolves to true once the given
+ * JS condition becomes truthy. Use for state that is not a DOM selector.
+ *
+ * Use with assertScript(): ->assertScript(js_wait_until('window.done === true'))
+ */
+function js_wait_until(string $condition, int $timeout = 5000): string
+{
+    return "new Promise((resolve, reject) => {
+        const deadline = Date.now() + {$timeout};
+        const check = () => {
+            if ({$condition}) {
+                resolve(true);
+            } else if (Date.now() > deadline) {
+                reject(new Error('Timed out waiting until: ' + " . json_encode($condition) . '));
+            } else {
+                requestAnimationFrame(check);
+            }
+        };
+        check();
+    })';
+}
+
+/**
+ * Returns a JS expression reading a property of the Livewire component that
+ * encloses the element matching the selector.
+ *
+ * Use inside assertScript() expressions: js_wire_get('#my-select', 'count') . ' === 1'
+ */
+function js_wire_get(string $selector, string $property): string
+{
+    return "Livewire.find(document.querySelector('{$selector}').closest('[wire\\\\:id]').getAttribute('wire:id')).get('{$property}')";
+}
