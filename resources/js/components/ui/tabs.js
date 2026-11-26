@@ -147,11 +147,17 @@ Alpine.data('wsTabs', () => ({
             newPanel.dispatchEvent(new CustomEvent('ws-show'));
 
             // First rAF: let the browser paint the newly shown panel (display: block, opacity: 0).
-            // Second rAF: measure the panel's natural height, then start the animation.
+            // Second rAF: measure the target height, then start the animation.
             // Two frames are needed because offsetHeight forces a reflow that must happen
             // after the panel is both visible and in its final layout state.
             requestAnimationFrame(() => {
-                const targetHeight = newPanel.offsetHeight;
+                // Measure inner with its height lock released, not the panel: when the panel
+                // stretches to fill inner (flex-grow), it would report the locked height and the
+                // animation would jump at the end. The lock is restored before the next paint.
+                const lockedHeight = inner.style.height;
+                inner.style.height = '';
+                const targetHeight = inner.offsetHeight;
+                inner.style.height = lockedHeight;
 
                 requestAnimationFrame(() => {
                     // Animate inner to new panel height
