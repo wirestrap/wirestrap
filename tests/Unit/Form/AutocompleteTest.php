@@ -283,6 +283,36 @@ test('data-ws-live false by default', function () {
         ->assertSee('data-ws-live="false"', false);
 });
 
+test('data-ws-max-items rendered in multiple mode', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::autocomplete id="test" wire-options="getItems" multiple :max-items="3" />')
+        ->__toString();
+
+    expect(htmlGetAttribute($html, 'ws-autocomplete', 'data-ws-max-items'))->toBe('3');
+});
+
+test('no data-ws-max-items when not applicable', function (string $blade) {
+    $html = $this->withViewErrors([])
+        ->blade($blade)
+        ->__toString();
+
+    expect($html)->not->toContain('data-ws-max-items');
+})->with([
+    'single mode' => '<x-wirestrap::autocomplete id="test" wire-options="getItems" :max-items="3" />',
+    'multiple without max-items' => '<x-wirestrap::autocomplete id="test" wire-options="getItems" multiple />',
+    'max-items below 1' => '<x-wirestrap::autocomplete id="test" wire-options="getItems" multiple :max-items="0" />',
+]);
+
+test('max-items is not forwarded to the input', function () {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::autocomplete id="test" wire-options="getItems" multiple :max-items="3" />')
+        ->__toString();
+
+    expect(htmlGetAttribute($html, 'ws-autocomplete-input', 'type'))->toBe('text')
+        ->and(htmlGetAttribute($html, 'ws-autocomplete-input', 'max-items'))->toBeNull()
+        ->and(htmlGetAttribute($html, 'ws-autocomplete-input', 'max'))->toBeNull();
+});
+
 test('data-ws-min-chars rendered', function () {
     $this->withViewErrors([])
         ->blade('<x-wirestrap::autocomplete id="test" wire-options="getItems" :min-chars="3" />')

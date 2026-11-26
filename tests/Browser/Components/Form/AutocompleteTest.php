@@ -809,3 +809,88 @@ test('duplicate tag is prevented with different casing', function () {
         ->keys('#ac-tags', 'Enter')
         ->assertScript(js_after_tick("{$root}.querySelectorAll('.ws-autocomplete-tag').length === 1"));
 });
+
+// --- Max items ---
+
+test('max-items ignores typing once the limit is reached', function () {
+    $page = waitForAutocompletePage($this);
+    $root = acRoot('ac-max');
+    $page->click('#ac-max')
+        ->fill('#ac-max', 'alpha')
+        ->keys('#ac-max', 'Enter')
+        ->assertScript(js_after_tick("!{$root}.classList.contains('ws-autocomplete-is-full')"))
+        ->fill('#ac-max', 'beta')
+        ->keys('#ac-max', 'Enter')
+        ->assertScript(js_after_tick("{$root}.classList.contains('ws-autocomplete-is-full')"))
+        ->keys('#ac-max', 'x')
+        ->fill('#ac-max', 'gamma')
+        ->keys('#ac-max', 'Enter')
+        ->assertScript(js_after_tick("
+            {$root}.querySelectorAll('.ws-autocomplete-tag').length === 2
+                && document.querySelector('#ac-max').value === ''
+        "));
+});
+
+test('max-items keeps the input focused and editable-looking once the limit is reached', function () {
+    $page = waitForAutocompletePage($this);
+    $page->click('#ac-max')
+        ->fill('#ac-max', 'alpha')
+        ->keys('#ac-max', 'Enter')
+        ->fill('#ac-max', 'beta')
+        ->keys('#ac-max', 'Enter')
+        ->assertScript(js_after_tick("
+            (() => {
+                const input = document.querySelector('#ac-max');
+                return document.activeElement === input
+                    && input.getAttribute('aria-readonly') === 'true';
+            })()
+        "));
+});
+
+test('max-items keeps the dropdown closed once the limit is reached', function () {
+    $page = waitForAutocompletePage($this);
+    $root = acRoot('ac-max');
+    focusAndWait($page, 'ac-max')
+        ->click('#ac-max-listbox [data-ws-value="rust"]')
+        ->assertScript(js_wait_for('#ac-max-listbox .ws-autocomplete-option'))
+        ->click('#ac-max-listbox [data-ws-value="go"]')
+        ->assertScript(js_after_tick("{$root}.querySelectorAll('.ws-autocomplete-tag').length === 2"))
+        // ArrowDown opens the dropdown when closed; once full, it must stay closed.
+        ->keys('#ac-max', 'ArrowDown')
+        ->assertScript('new Promise(resolve => setTimeout(() => resolve(true), 200))')
+        ->assertMissing('#ac-max-listbox');
+});
+
+test('removing a tag re-enables input once the limit was reached', function () {
+    $page = waitForAutocompletePage($this);
+    $root = acRoot('ac-max');
+    $page->click('#ac-max')
+        ->fill('#ac-max', 'alpha')
+        ->keys('#ac-max', 'Enter')
+        ->fill('#ac-max', 'beta')
+        ->keys('#ac-max', 'Enter')
+        ->assertScript(js_after_tick("document.querySelector('#ac-max').getAttribute('aria-readonly') === 'true'"))
+        ->keys('#ac-max', 'Backspace')
+        ->assertScript(js_after_tick("
+            {$root}.querySelectorAll('.ws-autocomplete-tag').length === 1
+                && !document.querySelector('#ac-max').hasAttribute('aria-readonly')
+                && !{$root}.classList.contains('ws-autocomplete-is-full')
+        "))
+        ->fill('#ac-max', 'gamma')
+        ->keys('#ac-max', 'Enter')
+        ->assertScript(js_after_tick("{$root}.querySelectorAll('.ws-autocomplete-tag').length === 2"));
+});
+
+test('removing a tag once the limit was reached reopens the dropdown', function () {
+    $page = waitForAutocompletePage($this);
+    focusAndWait($page, 'ac-max')
+        ->fill('#ac-max', 'alpha')
+        ->keys('#ac-max', 'Enter')
+        ->fill('#ac-max', 'beta')
+        ->keys('#ac-max', 'Enter')
+        ->assertScript(js_after_tick("document.querySelector('#ac-max').getAttribute('aria-readonly') === 'true'"))
+        ->assertMissing('#ac-max-listbox')
+        ->keys('#ac-max', 'Backspace')
+        ->assertScript(js_wait_for('#ac-max-listbox .ws-autocomplete-option', 2000))
+        ->assertVisible('#ac-max-listbox');
+});

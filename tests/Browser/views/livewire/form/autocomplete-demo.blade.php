@@ -16,6 +16,16 @@
         multiple
     />
 
+    {{-- Multiple with max-items --}}
+    <x-wirestrap::autocomplete
+        id="ac-max"
+        wire:model="limitedTags"
+        wire-options="getTagSuggestions"
+        label="Max"
+        multiple
+        :max-items="2"
+    />
+
     {{-- Search / filtering --}}
     <x-wirestrap::autocomplete
         id="ac-search"

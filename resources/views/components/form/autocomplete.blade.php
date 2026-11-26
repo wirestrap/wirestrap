@@ -8,6 +8,7 @@
     'disabled' => false,
     'multiple' => false,
     'live' => false,
+    'maxItems' => null,
     'wireOptions' => null,      /** @var string|list<mixed>|null */
     'wireOptionsWatch' => null, /** @var string|list<mixed>|null */
     'hasValidation' => config('wirestrap.input.has_validation', true),
@@ -119,6 +120,7 @@
         @if ($multiple && !empty($invalidIndices)) data-ws-invalid-indices="{{ json_encode($invalidIndices) }}" @endif
         data-ws-multiple="{{ $multiple ? 'true' : 'false' }}"
         data-ws-live="{{ $live ? 'true' : 'false' }}"
+        @if ($multiple && $maxItems) data-ws-max-items="{{ $maxItems }}" @endif
         data-ws-min-chars="{{ $minChars }}"
         @if ($noDropdown) data-ws-no-dropdown="true" @endif
         data-ws-dropdown-offset="{{ $dropdownOffset }}"
