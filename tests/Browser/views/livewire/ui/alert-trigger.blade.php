@@ -46,6 +46,12 @@
             x-on:click="$wirestrap.alert.confirm('Delete this record?', 'delete')">Confirm Teleported</button>
     @endteleport
 
+    <button id="btn-modal-confirm" type="button" x-on:click="$wirestrap.modal.show('modal-confirm')">Open modal</button>
+
+    <x-wirestrap::modal id="modal-confirm" title="Modal">
+        <button id="btn-confirm-in-modal" type="button" x-on:click="$wirestrap.alert.confirm('Delete this record?', 'delete')">Confirm in modal</button>
+    </x-wirestrap::modal>
+
     @if($deleted)
         <span id="deleted-flag">DELETED</span>
     @endif

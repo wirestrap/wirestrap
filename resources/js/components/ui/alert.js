@@ -261,17 +261,20 @@ const _alert = {
         document.body.appendChild(item.backdropEl);
 
         const escapeDismiss = options.escapeDismiss !== undefined ? options.escapeDismiss : this._escapeDismiss;
+        // Registered on window in the capture phase: the alert sits above everything else, so it must
+        // handle Escape first and stop it, otherwise an open modal behind it would close instead.
         item.keyHandler = (e) => {
             if (e.key !== 'Escape') {
                 return;
             }
+            e.stopImmediatePropagation();
             if (escapeDismiss) {
                 this._dismiss(item);
             } else {
                 this._shake(item);
             }
         };
-        document.addEventListener('keydown', item.keyHandler);
+        window.addEventListener('keydown', item.keyHandler, true);
 
         // Double rAF: ensures the initial state is painted before adding the visible classes
         requestAnimationFrame(() => {
@@ -375,7 +378,7 @@ const _alert = {
         Alpine.destroyTree(item.backdropEl);
 
         if (item.keyHandler) {
-            document.removeEventListener('keydown', item.keyHandler);
+            window.removeEventListener('keydown', item.keyHandler, true);
         }
 
         if (item.backdropHandler) {
@@ -500,7 +503,7 @@ globalThis.Wirestrap.alert = {
 onNavigate(() => {
     if (_current) {
         if (_current.keyHandler) {
-            document.removeEventListener('keydown', _current.keyHandler);
+            window.removeEventListener('keydown', _current.keyHandler, true);
         }
         if (_current.backdropHandler) {
             _current.backdropEl.removeEventListener('click', _current.backdropHandler);
