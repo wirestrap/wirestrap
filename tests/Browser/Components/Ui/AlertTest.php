@@ -138,6 +138,21 @@ test('escape key dismisses alert', function () {
         ->assertScript(js_wait_no_alerts());
 });
 
+test('escape dismisses a confirm opened from a modal without closing the modal', function () {
+    $this->visit('/_ws/test/ui/alert')
+        ->click('#btn-modal-confirm')
+        ->assertScript(js_wait_for('#modal-confirm.ws-modal-visible'))
+        ->click('#btn-confirm-in-modal')
+        ->assertScript(js_wait_for('.ws-alert.ws-alert-visible'))
+        ->assertScript("(() => {
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+            return true;
+        })()")
+        ->assertScript(js_wait_no_alerts())
+        ->assertPresent('#modal-confirm.ws-modal-visible')
+        ->assertVisible('#modal-confirm');
+});
+
 test('backdrop shake when backdropDismiss is false', function () {
     $this->visit('/_ws/test/ui/alert')
         ->assertScript(js_alert("{ message: 'ok', backdropDismiss: false }"))
