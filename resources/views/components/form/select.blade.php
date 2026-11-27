@@ -15,6 +15,7 @@
     'options' => null,
     'wireOptions' => null,      /** @var string|list<mixed>|null */
     'wireOptionsWatch' => null, /** @var string|list<mixed>|null */
+    'refreshKeys' => null,      /** @var string|list<string>|null */
     'live' => config('wirestrap.select.live', false),
     'dropdownOffset' => config('wirestrap.select.dropdown_offset', 0),
     'position' => config('wirestrap.select.position', 'absolute'),
@@ -115,6 +116,7 @@
         @if ($wireOptionsWatchProp) data-ws-wire-options-watch="{{ $wireOptionsWatchProp }}" @endif
         @if ($wireOptionsResetJson !== null) data-ws-wire-options-reset="{{ $wireOptionsResetJson }}" @endif
         @if ($wireOptionsResetLive) data-ws-wire-options-reset-live="true" @endif
+        @if ($wireOptionsMethod && $refreshKeys) data-ws-refresh-keys="{{ json_encode(array_values((array) $refreshKeys)) }}" @endif
         @if ($normalizedOptions !== null) data-ws-options="{{ $normalizedOptions }}" @endif
         @if ($emptyValue !== null) data-ws-empty-value="{{ $emptyValue }}" @endif
         data-ws-dropdown-offset="{{ $dropdownOffset }}"
@@ -123,7 +125,7 @@
             $attributes->whereDoesntStartWith('wire:model')->except([
                 'class', 'x-data', 'data-ws-wiremodel', 'data-ws-multiple', 'data-ws-placeholder',
                 'data-ws-live', 'data-ws-wire-options', 'data-ws-wire-options-params', 'data-ws-wire-options-watch',
-                'data-ws-wire-options-reset', 'data-ws-wire-options-reset-live', 'data-ws-options',
+                'data-ws-wire-options-reset', 'data-ws-wire-options-reset-live', 'data-ws-refresh-keys', 'data-ws-options',
                 'data-ws-dropdown-offset', 'data-ws-position', 'data-ws-empty-options-label',
             ])->merge($defaultAttributes)
         }}

@@ -142,6 +142,18 @@ function js_wait_until(string $condition, int $timeout = 5000): string
 }
 
 /**
+ * Returns a JS expression (Promise) that resolves to the given JS condition
+ * evaluated after a delay. Use it to assert that something did NOT happen
+ * (e.g. a reload), by leaving it time to happen first.
+ *
+ * Use with assertScript(): ->assertScript(js_still_true('window.count === 1'))
+ */
+function js_still_true(string $condition, int $delay = 300): string
+{
+    return "new Promise(resolve => setTimeout(() => resolve({$condition}), {$delay}))";
+}
+
+/**
  * Returns a JS expression reading a property of the Livewire component that
  * encloses the element matching the selector.
  *

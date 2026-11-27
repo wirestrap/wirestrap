@@ -11,6 +11,7 @@
     'maxItems' => null,
     'wireOptions' => null,      /** @var string|list<mixed>|null */
     'wireOptionsWatch' => null, /** @var string|list<mixed>|null */
+    'refreshKeys' => null,      /** @var string|list<string>|null */
     'hasValidation' => config('wirestrap.input.has_validation', true),
     'hasValidationMessage' => config('wirestrap.input.has_validation_message', true),
     'defaultAttributes' => config('wirestrap.input.default_attributes', []),
@@ -116,6 +117,7 @@
         @if ($wireOptionsWatchProp) data-ws-wire-options-watch="{{ $wireOptionsWatchProp }}" @endif
         @if ($wireOptionsResetJson !== null) data-ws-wire-options-reset="{{ $wireOptionsResetJson }}" @endif
         @if ($wireOptionsResetLive) data-ws-wire-options-reset-live="true" @endif
+        @if ($wireOptionsMethod && $refreshKeys) data-ws-refresh-keys="{{ json_encode(array_values((array) $refreshKeys)) }}" @endif
         @if ($wiremodel) data-ws-wiremodel="{{ $wiremodel }}" @endif
         @if ($multiple && !empty($invalidIndices)) data-ws-invalid-indices="{{ json_encode($invalidIndices) }}" @endif
         data-ws-multiple="{{ $multiple ? 'true' : 'false' }}"

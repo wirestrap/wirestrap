@@ -21,9 +21,16 @@ const _floatingDispatch = (id, action) => {
     document.getElementById(id)?.dispatchEvent(new CustomEvent('ws-floating', { bubbles: true, detail: { action } }));
 };
 
+// Refreshes the select/autocomplete whose id is target, plus every component of that type
+// subscribed to target through refresh-keys (they listen on window).
+const _optionsRefresh = (type, target) => {
+    document.getElementById(target)?.dispatchEvent(new CustomEvent('ws:refresh', { bubbles: true }));
+    window.dispatchEvent(new CustomEvent(`ws-${type}-refresh`, { detail: { key: target } }));
+};
+
 Alpine.magic('wirestrap', (el) => ({
     autocomplete: {
-        refresh: (id) => document.getElementById(id)?.dispatchEvent(new CustomEvent('ws:refresh', { bubbles: true })),
+        refresh: (target) => _optionsRefresh('autocomplete', target),
     },
 
     accordion: {
@@ -98,7 +105,7 @@ Alpine.magic('wirestrap', (el) => ({
     },
 
     select: {
-        refresh: (id) => document.getElementById(id)?.dispatchEvent(new CustomEvent('ws:refresh', { bubbles: true })),
+        refresh: (target) => _optionsRefresh('select', target),
     },
 
     slider: {
