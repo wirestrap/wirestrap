@@ -423,6 +423,28 @@ test('no wire-options attributes when null', function () {
 
 // --- wire-options-watch ---
 
+test('data-ws-refresh-keys rendered from refresh-keys', function (mixed $keys, array $expected) {
+    $html = $this->withViewErrors([])
+        ->blade('<x-wirestrap::autocomplete id="test" wire-options="getItems" :refresh-keys="$keys" />', ['keys' => $keys])
+        ->__toString();
+
+    expect(htmlGetJsonAttribute($html, 'data-ws-refresh-keys'))->toBe($expected);
+})->with([
+    'string' => ['clients', ['clients']],
+    'list' => [['clients', 'contacts'], ['clients', 'contacts']],
+]);
+
+test('no data-ws-refresh-keys when not applicable', function (string $blade) {
+    $html = $this->withViewErrors([])
+        ->blade($blade)
+        ->__toString();
+
+    expect($html)->not->toContain('data-ws-refresh-keys');
+})->with([
+    'without refresh-keys' => '<x-wirestrap::autocomplete id="test" wire-options="getItems" />',
+    'without wire-options' => '<x-wirestrap::autocomplete id="test" refresh-keys="clients" />',
+]);
+
 test('data-ws-wire-options-watch rendered with string', function () {
     $this->withViewErrors([])
         ->blade('<x-wirestrap::autocomplete id="test" wire-options="getItems" wire-options-watch="country" />')
