@@ -115,6 +115,7 @@ public function getStatuses(): array
 | `options` | `array\|null` | `null` | Options passed as an array. Short form: `['value' => 'Label']`. Full form: `[['value' => ..., 'label' => ..., 'disabled' => ..., 'optgroup' => ..., 'class' => ..., 'html_prefix' => ..., 'html_suffix' => ...]]`. Reacts to Livewire re-renders automatically. Mutually exclusive with `wire-options`. |
 | `wire-options` | `string\|list<mixed>\|null` | `null` | Livewire method returning the options array. String: method name. Array: `[method, ...params]` — remaining elements are passed as positional arguments. To pass a Livewire property resolved at call time, use `['ws-wire' => 'dotPath']` as a param. Called once on first open; cached. Called immediately on load if a value is already selected. |
 | `wire-options-watch` | `string\|list<mixed>\|null` | `null` | Livewire property to watch. Invalidates options cache on change; reloads immediately if dropdown is open. Array form: `[property, resetValue]` or `[property, resetValue, liveReset]` — sets the model to `resetValue` when the watched property changes; `liveReset` (default `false`) triggers a server round-trip on reset. Requires `wire-options`. |
+| `refresh-keys` | `string\|list<string>\|null` | `null` | Extra keys this select answers to: `$wirestrap.select.refresh(key)` refreshes every select subscribed to `key`, across Livewire components. Requires `wire-options`. |
 | `floating` | `bool` | `false` | Floating label layout. |
 | `placeholder` | `string` | `config` | Text shown when no option is selected. |
 | `search-placeholder` | `string` | `config` | Placeholder for the search input. |
@@ -134,6 +135,12 @@ public function getStatuses(): array
 
 ```js
 $wirestrap.select.refresh('my-select-id')
+$wirestrap.select.refresh('clients') // every select with refresh-keys containing 'clients'
 ```
 
-Dispatches `ws:refresh` on the root element: discards the cache. Options reload immediately when a value is selected or the dropdown is open, otherwise on next open. Only applies when `wire-options` is set.
+```php
+// From a Livewire action, e.g. after creating an entry shown in several selects
+$this->js("\$wirestrap.select.refresh('clients')");
+```
+
+Dispatches `ws:refresh` on the root element: discards the cache. Options reload immediately when a value is selected or the dropdown is open, otherwise on next open. The argument is an id or a `refresh-keys` key: every subscribed select is refreshed the same way. Selects only: autocompletes are never reached. Only applies when `wire-options` is set.

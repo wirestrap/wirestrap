@@ -33,6 +33,8 @@
  *   data-ws-wire-options-watch       - dot-path to a Livewire property; invalidates cache on change.
  *   data-ws-wire-options-reset       - JSON-encoded value to set the model to when the watched property changes.
  *   data-ws-wire-options-reset-live  - "true" to trigger a server round-trip when applying the reset.
+ *   data-ws-refresh-keys             - JSON-encoded list of keys: a ws-autocomplete-refresh window event
+ *                                      carrying one of them refreshes this autocomplete, like a refresh by id.
  *   data-ws-multiple           - "true" for tag mode.
  *   data-ws-live               - "true" to use live: true when syncing tags to Livewire.
  *   data-ws-max-items          - maximum number of tags in multiple mode.
@@ -145,6 +147,7 @@ Alpine.data('wsAutocomplete', () => ({
      * Cleanup
      */
     _refreshHandler: null,
+    _refreshKeysHandler: null,
     _watchUnsub: null,
     _valueWatchUnsub: null,
     _morphedUnsub: null,
@@ -227,6 +230,14 @@ Alpine.data('wsAutocomplete', () => ({
                 }
             };
             this.$el.addEventListener('ws:refresh', this._refreshHandler);
+
+            const refreshKeys = JSON.parse(this.$el.getAttribute('data-ws-refresh-keys') || '[]');
+            if (refreshKeys.length > 0) {
+                this._refreshKeysHandler = (e) => {
+                    refreshKeys.includes(e.detail?.key) && this._refreshHandler();
+                };
+                window.addEventListener('ws-autocomplete-refresh', this._refreshKeysHandler);
+            }
         }
         this.multiple = this.$el.getAttribute('data-ws-multiple') === 'true';
         this.invalidIndices = this._readInvalidIndices();
@@ -315,6 +326,7 @@ Alpine.data('wsAutocomplete', () => ({
         this._watchUnsub?.();
         this._valueWatchUnsub?.();
         this._refreshHandler && this.$el.removeEventListener('ws:refresh', this._refreshHandler);
+        this._refreshKeysHandler && window.removeEventListener('ws-autocomplete-refresh', this._refreshKeysHandler);
         this._morphedUnsub?.();
         this.floatingDestroy();
     },

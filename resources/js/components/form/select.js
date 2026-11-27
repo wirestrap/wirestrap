@@ -22,6 +22,8 @@
  *   data-ws-wire-options-watch   - dot-path to a Livewire property; invalidates cache on change.
  *   data-ws-wire-options-reset   - JSON-encoded value to set the model to when the watched property changes.
  *   data-ws-wire-options-reset-live - "true" to trigger a server round-trip when applying the reset.
+ *   data-ws-refresh-keys         - JSON-encoded list of keys: a ws-select-refresh window event carrying
+ *                                  one of them refreshes this select, like a refresh by id.
  */
 import { floatingElement, defaultDropdownConfig } from '../../mixins/floating-element.js';
 import { listNavigation } from '../../mixins/list-navigation.js';
@@ -217,6 +219,7 @@ Alpine.data('wsSelect', () => ({
      * Cleanup
      */
     _refreshHandler: null,
+    _refreshKeysHandler: null,
     _morphedUnsub: null,
     _watchUnsub: null,
     _wireModelUnsub: null,
@@ -295,6 +298,14 @@ Alpine.data('wsSelect', () => ({
                 }
             };
             this.$el.addEventListener('ws:refresh', this._refreshHandler);
+
+            const refreshKeys = JSON.parse(this.$el.getAttribute('data-ws-refresh-keys') || '[]');
+            if (refreshKeys.length > 0) {
+                this._refreshKeysHandler = (e) => {
+                    refreshKeys.includes(e.detail?.key) && this._refreshHandler();
+                };
+                window.addEventListener('ws-select-refresh', this._refreshKeysHandler);
+            }
         } else {
             this._morphedUnsub = this.$wire.$hook('morphed', () => {
                 const json = this.$el.getAttribute('data-ws-options');
@@ -389,6 +400,7 @@ Alpine.data('wsSelect', () => ({
         this._watchUnsub?.();
         this._wireModelUnsub?.();
         this._refreshHandler && this.$el.removeEventListener('ws:refresh', this._refreshHandler);
+        this._refreshKeysHandler && window.removeEventListener('ws-select-refresh', this._refreshKeysHandler);
         this._morphedUnsub?.();
         document.removeEventListener('click', this._onClickOutside);
         this.floatingDestroy();

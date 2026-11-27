@@ -85,6 +85,7 @@ public function getContacts(): array
 | `label` | `slot\|string\|null` | `null` | Label text or slot content. |
 | `wire-options` | `string\|list<mixed>\|null` | `null` | Livewire method returning `list<string>` or `list<option>` (see option fields above). String: method name. Array: `[method, ...params]` — remaining elements are passed as positional arguments; use `['ws-wire' => 'dotPath']` to resolve a Livewire property at call time. Called once on first focus; cached. |
 | `wire-options-watch` | `string\|list<mixed>\|null` | `null` | Livewire property to watch. Invalidates cache on change; reloads immediately if dropdown is open. Array form `[property, resetValue]` also resets the model on change; third element `true` triggers a server round-trip on reset. Requires `wire-options`. |
+| `refresh-keys` | `string\|list<string>\|null` | `null` | Extra keys this autocomplete answers to: `$wirestrap.autocomplete.refresh(key)` refreshes every autocomplete subscribed to `key`, across Livewire components. Requires `wire-options`. |
 | `floating` | `bool` | `false` | Floating label layout. |
 | `placeholder` | `string\|null` | `null` | Placeholder text. Forced to a space in floating mode. |
 | `icon` | `string\|array` | `null` | Icon forwarded to the configured icon component. |
@@ -106,6 +107,7 @@ public function getContacts(): array
 
 ```js
 $wirestrap.autocomplete.refresh('my-autocomplete-id')
+$wirestrap.autocomplete.refresh('clients') // every autocomplete with refresh-keys containing 'clients'
 ```
 
-Dispatches `ws:refresh` on the root element: discards the cache. Suggestions reload immediately when the input is focused or tags are selected, otherwise on next focus.
+Dispatches `ws:refresh` on the root element: discards the cache. Suggestions reload immediately when the input is focused or tags are selected, otherwise on next focus. The argument is an id or a `refresh-keys` key: every subscribed autocomplete is refreshed the same way. Autocompletes only: selects are never reached.
