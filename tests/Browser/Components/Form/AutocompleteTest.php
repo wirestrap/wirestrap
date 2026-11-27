@@ -562,6 +562,33 @@ test('refresh reloads suggestions', function () {
         "));
 });
 
+test('refresh without tags defers loading until the next focus', function () {
+    $calls = js_wire_get('#ac-refresh', 'refreshCalls');
+    $page = waitForAutocompletePage($this);
+    focusAndWait($page, 'ac-refresh')
+        ->assertScript("(() => { document.querySelector('#ac-refresh').blur(); return true; })()")
+        ->assertScript(js_wait_hidden('#ac-refresh-listbox'))
+        ->assertScript("{$calls} === 1")
+        ->assertScript(js_wirestrap("autocomplete.refresh('ac-refresh')"))
+        // Leave time for an immediate reload to happen, which must not.
+        ->assertScript("new Promise(resolve => setTimeout(() => resolve({$calls} === 1), 300))");
+
+    focusAndWait($page, 'ac-refresh')
+        ->assertScript(js_wait_until("{$calls} === 2"));
+});
+
+test('refresh with tags reloads suggestions immediately', function () {
+    $calls = js_wire_get('#ac-refresh', 'refreshCalls');
+    $page = waitForAutocompletePage($this);
+    focusAndWait($page, 'ac-refresh')
+        ->click('#ac-refresh-listbox [data-ws-value="rust"]')
+        ->assertScript(waitForTags('ac-refresh'))
+        ->assertScript("(() => { document.querySelector('#ac-refresh').blur(); return true; })()")
+        ->assertScript("{$calls} === 1")
+        ->assertScript(js_wirestrap("autocomplete.refresh('ac-refresh')"))
+        ->assertScript(js_wait_until("{$calls} === 2"));
+});
+
 // --- Focus management ---
 
 test('escape returns focus to input', function () {

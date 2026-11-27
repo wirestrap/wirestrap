@@ -108,4 +108,4 @@ public function getContacts(): array
 $wirestrap.autocomplete.refresh('my-autocomplete-id')
 ```
 
-Dispatches `ws:refresh` on the root element: discards cache and re-calls `wire-options` immediately.
+Dispatches `ws:refresh` on the root element: discards the cache. Suggestions reload immediately when the input is focused or tags are selected, otherwise on next focus.

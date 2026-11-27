@@ -125,6 +125,14 @@
         label="XSS"
     />
 
+    {{-- Refresh: getRefreshOptions counts its calls --}}
+    <x-wirestrap::select
+        id="sel-refresh"
+        wire:model="refreshed"
+        wire-options="getRefreshOptions"
+        label="Refresh"
+    />
+
     {{-- Reactive static options: morph updates data-ws-options --}}
     <x-wirestrap::select
         id="sel-reactive"

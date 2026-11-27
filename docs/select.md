@@ -136,4 +136,4 @@ public function getStatuses(): array
 $wirestrap.select.refresh('my-select-id')
 ```
 
-Dispatches `ws:refresh` on the root element: discards cache and re-calls `wire-options` immediately. Only applies when `wire-options` is set.
+Dispatches `ws:refresh` on the root element: discards the cache. Options reload immediately when a value is selected or the dropdown is open, otherwise on next open. Only applies when `wire-options` is set.

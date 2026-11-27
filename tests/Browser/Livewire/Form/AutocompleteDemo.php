@@ -11,6 +11,8 @@ class AutocompleteDemo extends Component
     public ?string $single = null;
     public array $tags = [];
     public array $limitedTags = [];
+    public array $refreshTags = [];
+    public int $refreshCalls = 0;
     public ?string $search = null;
     public ?string $disabled = null;
     public ?string $grouped = null;
@@ -107,6 +109,15 @@ class AutocompleteDemo extends Component
     public function getTagSuggestions(): array
     {
         return ['php', 'js', 'python', 'rust', 'go'];
+    }
+
+    /** @return list<string> */
+    #[Renderless]
+    public function getRefreshSuggestions(): array
+    {
+        $this->refreshCalls++;
+
+        return $this->getTagSuggestions();
     }
 
     /** @return list<array{value: string, label: string}> */

@@ -26,6 +26,15 @@
         :max-items="2"
     />
 
+    {{-- Refresh: getRefreshSuggestions counts its calls --}}
+    <x-wirestrap::autocomplete
+        id="ac-refresh"
+        wire:model="refreshTags"
+        wire-options="getRefreshSuggestions"
+        label="Refresh"
+        multiple
+    />
+
     {{-- Search / filtering --}}
     <x-wirestrap::autocomplete
         id="ac-search"
